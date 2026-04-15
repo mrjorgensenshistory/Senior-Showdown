@@ -423,12 +423,12 @@ function show(id) {
   document.getElementById(id).classList.add('active');
   document.getElementById('bank').style.display = (id==='sFund' || id==='sLab' || id==='sEnd') ? 'block' : 'none';
   document.getElementById('month-tag').style.display = (id==='sFund') ? 'block' : 'none';
-  // Leaving the Bobby cutscene? kill the rickroll and restore bg music.
-  if (id !== 'sBobby') {
-    var rick = document.getElementById('rick-music');
-    if (rick) { try { rick.pause(); rick.currentTime = 0; } catch(e) {} }
-    var bg = document.getElementById('bg-music');
-    if (bg && audioUnlocked) { try { bg.volume = 0.25; bg.play().catch(function(){}); } catch(e) {} }
+  // Audio control: rickroll plays on Bobby gameovers AND the final results.
+  // Everywhere else: Happy Happy Game Show.
+  if (id === 'sBobby' || id === 'sEnd') {
+    playRickroll();
+  } else if (audioUnlocked) {
+    stopRickroll();
   }
   window.scrollTo(0,0);
   document.getElementById(id).scrollTop = 0;
@@ -587,7 +587,7 @@ var FUND_STEPS = {
         { label:'&#x1F697; Spring Car Wash (~3 hrs)', product:'car_wash' },
         { label:'&#x1F369; Spring Donut Sale (4 weeks)', product:'donut_spring' },
         { label:'&#x2615; Hot Chocolate at sports finals', product:'hot_cocoa' },
-        { label:'&#x1F4A4; Save energy for senior year', yield:0, cutscene:{gif:'terry-tate', title:'&quot;SAVE ENERGY,&quot; THEY SAID', msg:'Senior year starts in 5 months with nothing added to the bank. That sound you hear is Terry Tate warming up.'} }
+        { label:'&#x1F4A4; Save energy for senior year', yield:0, cutscene:{gif:'rickroll', title:'&#x1F4F1; YOU\u2019VE BEEN RICKROLLED', msg:'You decided to "save energy." So you sat back, put on a playlist, and the universe rickrolled you. Senior year starts in 5 months with nothing added to the bank.'} }
       ] }
   ],
   12: [
@@ -630,18 +630,32 @@ var CUTSCENE_GIFS = {
   'rickroll':   RICKROLL_GIF
 };
 
+// Fund-step cutscenes that should also trigger the Rick Astley audio track
+var CUTSCENE_PLAYS_RICKROLL = { 'rickroll': true };
+
 function renderCutscene(cs, yieldAmt, onDone) {
   var gif = CUTSCENE_GIFS[cs.gif] || TERRY_TATE_GIF;
   var html = '<div class="info-box reveal-flash" style="text-align:center;">';
   html += '<h2 style="color:#8b0000;">'+cs.title+'</h2>';
-  html += '<img src="'+gif+'" alt="cutscene" style="max-width:min(480px,75vw); margin:1.5vh auto; display:block; border:5px solid #d4af37; border-radius:10px; box-shadow:0 0 25px rgba(255,50,50,0.6);" onerror="this.style.display=\'none\'">';
+  // Rickroll GIF banner on EVERY cutscene — Rick rolls you no matter what you picked
+  html += '<div style="position:relative; max-width:min(440px,75vw); margin:1vh auto; border:5px solid #d4af37; border-radius:10px; overflow:hidden; box-shadow:0 0 25px rgba(255,50,50,0.6);">';
+  html += '<img src="'+RICKROLL_GIF+'" alt="Rickrolled" style="width:100%; display:block;" onerror="this.style.display=\'none\'">';
+  html += '<div style="position:absolute; bottom:6px; left:0; right:0; background:rgba(0,0,0,0.85); color:#d4af37; font-family:\'Bangers\'; font-size:clamp(0.9rem,2vw,1.3rem); letter-spacing:2px; padding:5px;">COURTESY OF CAPTAIN INSANO</div>';
+  html += '</div>';
+  // Main cutscene GIF (Terry / Bobby / etc.)
+  html += '<img src="'+gif+'" alt="cutscene" style="max-width:min(440px,75vw); margin:1vh auto; display:block; border:4px solid #d4af37; border-radius:8px;" onerror="this.style.display=\'none\'">';
+  html += '<p style="font-family:\'Bangers\'; color:#8b0000; font-size:clamp(1rem,2vw,1.4rem); letter-spacing:1.5px; margin-top:0.5vh;">YOU GOT RICKROLLED. ALSO\u2026</p>';
   html += '<p style="font-size:1.15em; margin-top:1vh;">'+cs.msg+'</p>';
   html += '<p style="margin-top:1vh;">You raised <span class="big-num">'+money(yieldAmt)+'</span>.</p>';
   html += '<p style="margin-top:0.5vh;">Bank balance: <span class="big-num">'+money(state.balance)+'</span></p>';
   html += '</div>';
   html += '<button class="btn" id="cs-next" style="margin-top:1vh;">CONTINUE &raquo;</button>';
   document.getElementById('fund-content').innerHTML = html;
-  document.getElementById('cs-next').onclick = onDone;
+  playRickroll();
+  document.getElementById('cs-next').onclick = function(){
+    stopRickroll();
+    onDone();
+  };
 }
 
 function startGrade(grade) {
@@ -911,17 +925,12 @@ function triggerBobby(kind) {
     html += '<img src="'+RICKROLL_GIF+'" alt="Rickrolled" style="width:100%; display:block;" onerror="this.style.display=\'none\'">';
     html += '<div style="position:absolute; bottom:8px; left:0; right:0; text-align:center; background:rgba(0,0,0,0.85); color:#d4af37; font-family:\'Bangers\'; font-size:clamp(1rem,2.5vw,1.8rem); letter-spacing:2px; padding:6px;">COURTESY OF CAPTAIN INSANO</div>';
     html += '</div>';
+    html += '<div style="text-align:center; margin:1vh auto; max-width:600px;"><p style="font-family:\'Bangers\'; font-size:clamp(1.3rem,2.5vw,1.8rem); color:#8b0000; letter-spacing:1.5px;">BOBBY HEARD YOUR PLAYLIST</p><p style="font-family:\'Bangers\'; font-size:clamp(1rem,2vw,1.4rem); color:#444; letter-spacing:1px;">HE IS NOT OKAY WITH IT</p></div>';
     html += '<img src="'+BOBBY_TACKLE_GIF+'" alt="Bobby Boucher tackle" style="max-width:min(400px,70vw); border:4px solid #d4af37; border-radius:8px; margin:1vh auto; display:block;" onerror="this.style.display=\'none\'">';
-    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>The AUX cable was compromised.</strong></p><p>Someone&#39;s phone played The Song. Bobby Boucher heard it from across the parking lot and power-drove your entire dance floor.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Prom is over. You&#39;re over.</p></div>';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>The AUX cable was compromised.</strong></p><p>Someone&#39;s phone played The Song. Bobby Boucher heard <em>your music taste</em> from across the parking lot and concluded that this prom should not exist. He power-drove the entire dance floor.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Your playlist is the problem. Prom is over. You&#39;re over.</p></div>';
   }
   document.getElementById('bobby-body').innerHTML = html;
-  // Bg music keeps playing through cutscenes... EXCEPT rickroll.
-  if (kind === 'playlist') {
-    var bg = document.getElementById('bg-music');
-    if (bg) { try { bg.pause(); bg.volume = 0; } catch(e) {} }
-    var rick = document.getElementById('rick-music');
-    if (rick) { try { rick.volume = 0.7; rick.currentTime = 0; rick.play().catch(function(){}); } catch(e) {} }
-  }
+  // show('sBobby') handles audio (rickroll on, bg muted)
   show('sBobby');
 }
 
@@ -1106,12 +1115,14 @@ function finalize() {
     bg.className='screen-bg bg-win';
     stamp.innerHTML = '<div class="stamp gold">&#x1F3C6; SURPLUS</div>';
     title.textContent = 'YOU FINISHED IN THE BLACK.';
-    box.innerHTML = '<p>You ended the year with '+money(bal)+' left over. Class gifts, after-prom breakfast, or carry-forward to help next year&#39;s class &mdash; your call.</p><p>The math worked out.</p>';
+    box.innerHTML = '<p>You ended the year with '+money(bal)+' left over. Class gifts, after-prom breakfast, or carry-forward to help next year&#39;s class &mdash; your call.</p>' +
+      '<p>The math worked out.</p>' + rickrollReward('Nice job! Save your energy for senior year. To help you do that\u2026');
   } else if (tier==='ok') {
     bg.className='screen-bg bg-ok';
     stamp.innerHTML = '<div class="stamp good">&#x2705; ON BUDGET</div>';
     title.textContent = 'YOU HIT THE TARGET.';
-    box.innerHTML = '<p>You covered every line. Prom, Grad Nite, luncheon, yearbooks &mdash; all paid for. This is what a healthy senior budget looks like.</p>';
+    box.innerHTML = '<p>You covered every line. Prom, Grad Nite, luncheon, yearbooks &mdash; all paid for. This is what a healthy senior budget looks like.</p>' +
+      rickrollReward('Nice work. Here\u2019s your reward:');
   } else if (tier==='pinched') {
     bg.className='screen-bg bg-bad';
     stamp.innerHTML = '<div class="stamp">&#x26D4; FCMAT VIOLATION</div>';
@@ -1121,7 +1132,8 @@ function finalize() {
       '<p style="margin-top:1vh;">Projected or expected future ticket sales don&#39;t count. It&#39;s not money yet. Signing a contract you can&#39;t cover right now is basically an IOU, and <strong>your advisor legally cannot approve it</strong>.</p>' +
       '<p style="margin-top:1vh;">This is why fundraising has to happen <strong>before</strong> you sign anything. Revenue + savings = costs, at time of signing.</p>' +
       bobbyHelmetTeachingMoment() +
-      '<p style="margin-top:1vh;">Try again &mdash; fundraise more in the fall/winter, or pick cheaper options, until your plan clears the cash-on-hand check.</p>';
+      '<p style="margin-top:1vh;">Try again &mdash; fundraise more in the fall/winter, or pick cheaper options, until your plan clears the cash-on-hand check.</p>' +
+      rickrollReward('Also, while you fix your plan\u2026 enjoy this:');
   } else {
     bg.className='screen-bg bg-bad';
     stamp.innerHTML = '<div class="stamp">&#x26D4; FCMAT VIOLATION</div>';
@@ -1130,7 +1142,8 @@ function finalize() {
       '<p style="margin-top:1vh;"><strong>Why this matters:</strong> at the time you sign contracts for venue, Disney, or any vendor, the money has to already be in the bank &mdash; savings + fundraising actually completed + tickets actually sold. Not "we plan to raise it later."</p>' +
       '<p style="margin-top:1vh;">Your ASB advisor literally cannot sign a purchase order or approve a contract if the money isn&#39;t there. This is California state law for student body funds.</p>' +
       bobbyHelmetTeachingMoment() +
-      '<p style="margin-top:1vh;">Run it again. Either raise a lot more in the fall/winter, or scale down the plan (cheaper venue, one-park Grad Nite, potluck luncheon) until Revenue + Savings &#x2265; Costs <strong>before</strong> any contract gets signed.</p>';
+      '<p style="margin-top:1vh;">Run it again. Either raise a lot more in the fall/winter, or scale down the plan (cheaper venue, one-park Grad Nite, potluck luncheon) until Revenue + Savings &#x2265; Costs <strong>before</strong> any contract gets signed.</p>' +
+      rickrollReward('And while you regroup\u2026 enjoy this:');
   }
 
   var h = '<div style="font-family:\'Bangers\'; font-size:1.3em; color:#d4af37; letter-spacing:2px; text-align:center; margin-bottom:1vh;">FINAL LEDGER</div>';
@@ -1146,6 +1159,16 @@ function finalize() {
 }
 
 function restart() { startGrade(state.grade); }
+
+// Rickroll reward block — appears on every ending. The Captain Insano experience.
+function rickrollReward(setupText) {
+  return '<div style="margin-top:2vh; padding:2vh 1vw; background:rgba(0,0,0,0.85); border:4px solid #d4af37; border-radius:10px; text-align:center;">' +
+    '<p style="font-family:\'Bangers\'; color:#d4af37; font-size:clamp(1.1rem,2.4vw,1.7rem); letter-spacing:1.5px;">'+setupText+'</p>' +
+    '<div style="position:relative; max-width:min(420px,75vw); margin:1vh auto; border:4px solid #d4af37; border-radius:8px; overflow:hidden;">' +
+    '<img src="'+RICKROLL_GIF+'" alt="Rickrolled" style="width:100%; display:block;" onerror="this.style.display=\'none\'">' +
+    '<div style="position:absolute; bottom:6px; left:0; right:0; background:rgba(0,0,0,0.85); color:#d4af37; font-family:\'Bangers\'; font-size:clamp(0.9rem,2vw,1.3rem); letter-spacing:2px; padding:5px;">COURTESY OF CAPTAIN INSANO</div>' +
+    '</div></div>';
+}
 
 // Teaching moment: commingling ASB funds is a separate FCMAT violation.
 // Each club/team account is its own pot by law — you can't "borrow" from
@@ -1194,12 +1217,25 @@ function playBg() {
   try { a.volume = 0.25; a.play().catch(function(){}); } catch(e) {}
 }
 function stopBg() {
-  // Hard stop — pause, rewind, mute. Belt and suspenders.
   ['bg-music','bg-walkin'].forEach(function(id){
     var a = document.getElementById(id);
     if (!a) return;
     try { a.pause(); a.currentTime = 0; a.volume = 0; } catch(e) {}
   });
+}
+
+// Rickroll audio control — Happy Happy Game Show goes silent, Rick takes over.
+function playRickroll() {
+  var bg = document.getElementById('bg-music');
+  if (bg) { try { bg.pause(); bg.volume = 0; } catch(e) {} }
+  var rick = document.getElementById('rick-music');
+  if (rick) { try { rick.volume = 0.7; rick.currentTime = 0; rick.play().catch(function(){}); } catch(e) {} }
+}
+function stopRickroll() {
+  var rick = document.getElementById('rick-music');
+  if (rick) { try { rick.pause(); rick.currentTime = 0; } catch(e) {} }
+  var bg = document.getElementById('bg-music');
+  if (bg && audioUnlocked) { try { bg.volume = 0.25; bg.play().catch(function(){}); } catch(e) {} }
 }
 
 // Audio unlock + opening fanfare on first click (Chromebook autoplay compat)
