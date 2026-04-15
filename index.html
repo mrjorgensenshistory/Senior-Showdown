@@ -662,7 +662,24 @@ function renderCutscene(cs, yieldAmt, onDone) {
 
 function startGrade(grade) {
   state = freshState(grade);
+  setGradeMusic(grade);
   renderBank(); show('sFund'); runFundStep(0);
+}
+
+// Swap the bg loop track based on grade (10/11/12 each get a unique Kevin MacLeod tune)
+function setGradeMusic(grade) {
+  var track = 'audio/bg-11.mp3';
+  if (grade === 10) track = 'audio/bg-10.mp3';
+  else if (grade === 12) track = 'audio/bg-12.mp3';
+  var el = document.getElementById('bg-music');
+  if (!el) return;
+  // Only reload if the src actually changed
+  var cur = el.querySelector('source');
+  if (cur && cur.getAttribute('src') === track) return;
+  try { el.pause(); } catch(e) {}
+  if (cur) cur.setAttribute('src', track); else { var s = document.createElement('source'); s.src = track; s.type='audio/mpeg'; el.appendChild(s); }
+  try { el.load(); } catch(e) {}
+  if (audioUnlocked) { try { el.volume = 0.25; el.play().catch(function(){}); } catch(e) {} }
 }
 
 function runFundStep(idx) {
