@@ -371,7 +371,9 @@ var PHONE_RAGE_GIF   = 'memes/phone-rage.gif';
 var YOU_SURE_GIF     = 'memes/you-sure.gif';
 var RICKROLL_GIF     = 'memes/rickroll.gif';
 var BOBBY_TACKLE_GIF = 'memes/bobby-tackle.gif';
-var TERRY_TATE_GIF   = 'memes/terry-tate.gif';
+var TERRY_TATE_GIFS  = ['memes/terry-tate.gif','memes/terry-tate-2.gif','memes/terry-tate-3.gif','memes/terry-tate-4.gif'];
+function randomTerryTate(){ return TERRY_TATE_GIFS[Math.floor(Math.random()*TERRY_TATE_GIFS.length)]; }
+var TERRY_TATE_GIF   = TERRY_TATE_GIFS[0]; // fallback reference
 
 var FOODS = [
   { id:'mex', name:'Mexican',  ic:'&#x1F32E;', pp:15, desc:'Tacos, rice, beans. Drink &amp; dessert included.' },
@@ -623,7 +625,7 @@ var SPRING_AUCTION_STEP = {
 
 // Cutscene GIF lookup for fund-step skips
 var CUTSCENE_GIFS = {
-  'terry-tate': TERRY_TATE_GIF,
+  'terry-tate': TERRY_TATE_GIF, // overridden at render time via randomTerryTate()
   'bobby':      BOBBY_TACKLE_GIF,
   'phone':      PHONE_RAGE_GIF,
   'sure':       YOU_SURE_GIF,
@@ -634,7 +636,7 @@ var CUTSCENE_GIFS = {
 var CUTSCENE_PLAYS_RICKROLL = { 'rickroll': true };
 
 function renderCutscene(cs, yieldAmt, onDone) {
-  var gif = CUTSCENE_GIFS[cs.gif] || TERRY_TATE_GIF;
+  var gif = (cs.gif === 'terry-tate') ? randomTerryTate() : (CUTSCENE_GIFS[cs.gif] || randomTerryTate());
   var html = '<div class="info-box reveal-flash" style="text-align:center;">';
   html += '<h2 style="color:#8b0000;">'+cs.title+'</h2>';
   // Rickroll GIF banner on EVERY cutscene — Rick rolls you no matter what you picked
@@ -916,7 +918,7 @@ function triggerBobby(kind) {
     html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>BYO Phones for prom pics.</strong></p><p>One phone fell in the punch bowl. Another one went into the ocean. Three of them shattered on the dance floor. Zero usable photos. The parents are angrier than Bobby Boucher.</p><img src="'+WATERBOY_IMG+'" style="max-width:150px; margin-top:1.5vh; border:3px solid #d4af37; border-radius:6px;" onerror="this.style.display=\'none\'"><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Bobby Boucher is charging. You have seconds. Prom is prom-tackled.</p></div>';
   } else if (kind === 'sure') {
     html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F3C8; TERRY TATE DOESN&#39;T LIKE BARE BONES</h2>';
-    html += '<img src="'+TERRY_TATE_GIF+'" alt="Terry Tate Office Linebacker" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8);" onerror="this.style.display=\'none\'">';
+    html += '<img src="'+randomTerryTate()+'" alt="Terry Tate Office Linebacker" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8);" onerror="this.style.display=\'none\'">';
     html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>Bare bones decorations.</strong></p><p>You rented a $6,775 venue and then spent $0 on decorations. So prom was literally folding tables and a vibe. One parent took a picture and immediately asked to speak to the advisor.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Terry Tate took one look and charged anyway.</p></div>';
   } else if (kind === 'playlist') {
     // Rickroll via YouTube embed + Captain Insano caption
