@@ -510,16 +510,28 @@ var PRODUCTS = {
     icon: '&#x1F697;',
     name: 'Car Wash (one Saturday, ~3 hours)',
     unit: 'car',
-    unitCost: 0, // supplies handled separately
+    unitCost: 0,
     unitCostLabel: '$30 total for supplies (soap, sponges, buckets)',
-    fixedCost: 30, // flat supplies cost
-    story: 'You set up at the gas station lot on a Saturday, 10am-1pm. Classes buy supplies for <strong>$30 total</strong> (soap, sponges, buckets, hose). About <strong>45 cars</strong> come through in 3 hours. Donation-based &mdash; you set the suggested donation per car.',
+    fixedCost: 30,
+    story: 'You set up on a Saturday, 10am-1pm. Supplies cost <strong>$30 total</strong> (soap, sponges, buckets, hose).<br><br><strong>Physical capacity:</strong> you can wash 2 cars at a time, 10 minutes per car. That\u2019s 12 cars/hour &times; 3 hours = <strong>36 cars MAX, no matter what.</strong> Cheap price = lots of cars want in, but the line caps at 36. Higher price = fewer drivers stop, demand drops below capacity.',
     priceQuestion: 'What suggested donation per car?',
     defaultPrice: 10,
-    fixedVolume: 45,
-    volumeByPrice: function() { return 45; },
+    volumeByPrice: function(p) {
+      // Capacity cap: 36 cars in 3 hours
+      // Demand drops as price rises (people drive past for higher prices)
+      if (p <= 5)  return 36; // demand way exceeds capacity, capped
+      if (p <= 10) return 36; // still maxed out
+      if (p <= 15) return 30; // demand starts dropping below capacity
+      if (p <= 20) return 22;
+      if (p <= 25) return 14;
+      if (p <= 30) return 9;
+      return 5;
+    },
     volumeExplain: function(p, v) {
-      return 'About <strong>' + v + ' cars</strong> came through in 3 hours. People generally donate what you suggest (give or take).';
+      var note = '';
+      if (v >= 36) note = ' Demand was huge at this price &mdash; you maxed out the 36-car capacity (2 lanes &times; 10 min/car &times; 3 hours).';
+      else note = ' At this price, fewer drivers stopped &mdash; you didn\u2019t fill the lanes.';
+      return 'About <strong>' + v + ' cars</strong> came through.' + note;
     }
   }
 };
