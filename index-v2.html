@@ -453,6 +453,11 @@ function setMonth(m) { state.month=m; document.getElementById('month-tag').textC
 var SCHOOL_POOL = 470;
 
 // PRODUCT fundraisers teach cost analysis. Each has unit cost + volume curve based on price.
+// SCHOOL_POP = realistic ceiling on demand. You literally cannot sell more units than there are people willing to buy.
+var SCHOOL_POP = 450;   // total students at the school
+var SCHOOL_ADULTS = 20; // staff/faculty
+var SCHOOL_TOTAL = SCHOOL_POP + SCHOOL_ADULTS;
+
 var PRODUCTS = {
   donut_fall: {
     icon: '&#x1F369;',
@@ -460,9 +465,12 @@ var PRODUCTS = {
     unit: 'dozen',
     unitCost: 6,
     unitCostLabel: '$6 per dozen (wholesale from the bakery)',
-    story: 'You buy donuts wholesale at <strong>$6 per dozen</strong>. For 6 Friday mornings you sell them at the front gate before school. There are 450 students + 20 adults = <strong>470 potential customers</strong> walking past.',
+    pool: SCHOOL_TOTAL,
+    poolLabel: '450 students + 20 adults walking past the gate',
+    story: 'You buy donuts wholesale at <strong>$6 per dozen</strong>. For 6 Friday mornings you sell them at the front gate before school. There are <strong>450 students + 20 adults = 470 potential customers</strong>. Not everyone buys. Not every Friday.',
     priceQuestion: 'How much do you want to charge per dozen?',
     defaultPrice: 12,
+    demandSamples: [7, 10, 12, 15, 20],
     volumeByPrice: function(p) {
       if (p <= 8)  return 120;
       if (p <= 10) return 100;
@@ -481,9 +489,12 @@ var PRODUCTS = {
     unit: 'dozen',
     unitCost: 6,
     unitCostLabel: '$6 per dozen (wholesale)',
-    story: 'Same donut hustle, but only 4 Friday mornings this time. Pool of 470 potential customers.',
+    pool: SCHOOL_TOTAL,
+    poolLabel: '450 students + 20 adults',
+    story: 'Same donut hustle, but only 4 Friday mornings this time. Pool of <strong>450 students + 20 adults = 470 customers</strong>.',
     priceQuestion: 'How much per dozen?',
     defaultPrice: 12,
+    demandSamples: [7, 10, 12, 15, 20],
     volumeByPrice: function(p) {
       if (p <= 8)  return 80;
       if (p <= 10) return 65;
@@ -502,9 +513,12 @@ var PRODUCTS = {
     unit: 'cup',
     unitCost: 0.75,
     unitCostLabel: '$0.75 per cup (cocoa mix + cup + lid + whipped cream)',
-    story: 'Cold night, Friday football game. Your stand sits behind the bleachers. Cost per cup: <strong>$0.75</strong> (mix + cup + lid + whipped cream). About 200 fans in the stands.',
+    pool: 200,
+    poolLabel: '~200 fans in the stands',
+    story: 'Cold night, Friday football game. Your stand sits behind the bleachers. Cost per cup: <strong>$0.75</strong> (mix + cup + lid + whipped cream). About <strong>200 fans in the stands</strong> &mdash; some buy two cups if it&#39;s really cold.',
     priceQuestion: 'How much do you want to charge per cup?',
     defaultPrice: 3,
+    demandSamples: [1, 2, 3, 4, 5],
     volumeByPrice: function(p) {
       if (p <= 1) return 140;
       if (p <= 2) return 100;
@@ -524,9 +538,12 @@ var PRODUCTS = {
     unitCost: 0,
     unitCostLabel: '$30 total for supplies (soap, sponges, buckets)',
     fixedCost: 30,
+    pool: 36,
+    poolLabel: 'physical capacity: 36 cars max (2 lanes &times; 10 min &times; 3 hrs)',
     story: 'You set up on a Saturday, 10am-1pm. Supplies cost <strong>$30 total</strong> (soap, sponges, buckets, hose).<br><br><strong>Physical capacity:</strong> you can wash 2 cars at a time, 10 minutes per car. That\u2019s 12 cars/hour &times; 3 hours = <strong>36 cars MAX, no matter what.</strong> Cheap price = lots of cars want in, but the line caps at 36. Higher price = fewer drivers stop, demand drops below capacity.',
     priceQuestion: 'What suggested donation per car?',
     defaultPrice: 10,
+    demandSamples: [5, 10, 15, 20, 30],
     volumeByPrice: function(p) {
       // Capacity cap: 36 cars in 3 hours
       // Demand drops as price rises (people drive past for higher prices)
@@ -755,10 +772,24 @@ function runProductMath(prod, logLabel, onDone) {
   if (prod.fixedCost) html += '<p><strong>Fixed costs:</strong> $'+prod.fixedCost+' in supplies, no matter how many '+prod.unit+'s you move.</p>';
   html += '<div class="quote">"The price you charge changes how many people buy. Cheap = more volume. Expensive = fewer buyers."</div></div></div>';
 
+  // Supply/demand preview — shows the curve so students SEE how price changes volume
+  if (prod.demandSamples && prod.volumeByPrice) {
+    html += '<div class="math-panel" style="border-left:4px solid #d4af37;"><h3>SUPPLY &amp; DEMAND &mdash; BEFORE YOU PICK A PRICE</h3>';
+    html += '<p style="color:#555; font-size:0.95em; margin-bottom:1vh;">Realistic demand ceiling: <strong>'+prod.poolLabel+'</strong>. You can\'t sell a million '+prod.unit+'s &mdash; that\'s not how a school works. Here\'s the curve:</p>';
+    html += '<table style="width:100%; margin:1vh 0; border-collapse:collapse;"><thead><tr style="background:#fef6d5;"><th style="padding:0.5vh; border:1px solid #d4af37;">Price per '+prod.unit+'</th><th style="padding:0.5vh; border:1px solid #d4af37;">Expected '+prod.unit+'s sold</th><th style="padding:0.5vh; border:1px solid #d4af37;">% of pool</th></tr></thead><tbody>';
+    prod.demandSamples.forEach(function(pp){
+      var vv = prod.volumeByPrice(pp);
+      var pct = prod.pool ? Math.round((vv / prod.pool) * 100) : 0;
+      html += '<tr><td style="padding:0.4vh; border:1px solid #ddd; text-align:center;">'+money(pp)+'</td><td style="padding:0.4vh; border:1px solid #ddd; text-align:center;">'+vv+'</td><td style="padding:0.4vh; border:1px solid #ddd; text-align:center; color:#555;">'+pct+'%</td></tr>';
+    });
+    html += '</tbody></table>';
+    html += '<p style="font-size:0.9em; color:#555; margin-top:0.5vh;"><em>Cheaper = more buyers. Pricier = fewer. This is supply and demand, not a glitch.</em></p></div>';
+  }
+
   html += '<div class="math-panel"><h3>STEP 1 &mdash; SET YOUR PRICE</h3>';
   html += '<div class="math-row"><label>'+prod.priceQuestion+'</label>';
   html += '<input type="number" id="pm-price" min="0" step="0.5" placeholder="'+prod.defaultPrice+'"></div>';
-  html += '<p style="margin-top:1vh; color:#555; font-size:0.95em;">Type a number in the box, then click below.</p></div>';
+  html += '<p style="margin-top:1vh; color:#555; font-size:0.95em;">Pick any price &mdash; not just the ones in the table above. The curve scales in between. Type a number, then click below.</p></div>';
   html += '<button class="btn" id="pm-price-ok">LOCK IN MY PRICE &raquo;</button>';
 
   document.getElementById('fund-content').innerHTML = html;
@@ -772,6 +803,8 @@ function runProductMath(prod, logLabel, onDone) {
 function productMathStep2(prod, price, logLabel, onDone) {
   // Show volume sold at that price, then ask them to compute profit
   var volume = prod.volumeByPrice(price);
+  // Realism cap: you can't sell more than the pool of people willing to buy
+  if (prod.pool && volume > prod.pool) volume = prod.pool;
   var revenue = volume * price;
   var variableCost = volume * prod.unitCost;
   var fixedCost = prod.fixedCost || 0;
