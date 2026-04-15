@@ -1089,14 +1089,21 @@ function finalize() {
     box.innerHTML = '<p>You covered every line. Prom, Grad Nite, luncheon, yearbooks &mdash; all paid for. This is what a healthy senior budget looks like.</p>';
   } else if (tier==='pinched') {
     bg.className='screen-bg bg-bad';
-    stamp.innerHTML = '<div class="stamp">&#x26A0;&#xFE0F; SHORT</div>';
-    title.textContent = 'YOU CAME UP SHORT.';
-    box.innerHTML = '<p>You ended the year '+money(Math.abs(bal))+' in the red. For context, last year&#39;s Class of &#39;25 landed at -$4,111 &mdash; ASB covered the gap and the next class started tighter.</p><p>Look at the ledger below. Try a different mix &mdash; different venue, different pricing, different fundraising &mdash; and see what changes.</p>';
+    stamp.innerHTML = '<div class="stamp">&#x26D4; FCMAT VIOLATION</div>';
+    title.textContent = 'THIS ISN\u2019T ALLOWED.';
+    box.innerHTML = '<p style="font-weight:bold; color:#8b0000; font-size:1.15em;">Your plan ends '+money(Math.abs(bal))+' in the red. California school ASB rules (FCMAT) do not allow this.</p>' +
+      '<p style="margin-top:1vh;"><strong>The cash-on-hand rule:</strong> at the moment you sign a contract &mdash; prom venue, Disney, DJ, anything &mdash; your bank balance PLUS already-collected ticket sales and fundraising has to cover the expense.</p>' +
+      '<p style="margin-top:1vh;">Projected or expected future ticket sales don&#39;t count. It&#39;s not money yet. Signing a contract you can&#39;t cover right now is basically an IOU, and <strong>your advisor legally cannot approve it</strong>.</p>' +
+      '<p style="margin-top:1vh;">This is why fundraising has to happen <strong>before</strong> you sign anything. Revenue + savings = costs, at time of signing.</p>' +
+      '<p style="margin-top:1vh;">Try again &mdash; fundraise more in the fall/winter, or pick cheaper options, until your plan clears the cash-on-hand check.</p>';
   } else {
     bg.className='screen-bg bg-bad';
-    stamp.innerHTML = '<div class="stamp">&#x1F4A5; DEEP RED</div>';
-    title.textContent = 'SIGNIFICANT SHORTFALL.';
-    box.innerHTML = '<p>The gap is '+money(Math.abs(bal))+'. At this level the school has to absorb the shortfall, which limits what next year&#39;s class can do.</p><p>Run it again with different choices. Small changes in package price, venue, or food tier move the number a lot.</p>';
+    stamp.innerHTML = '<div class="stamp">&#x26D4; FCMAT VIOLATION</div>';
+    title.textContent = 'SIGNIFICANT SHORTFALL \u2014 NOT ALLOWED.';
+    box.innerHTML = '<p style="font-weight:bold; color:#8b0000; font-size:1.15em;">Your plan ends '+money(Math.abs(bal))+' in the red. That is a massive FCMAT cash-on-hand violation.</p>' +
+      '<p style="margin-top:1vh;"><strong>Why this matters:</strong> at the time you sign contracts for venue, Disney, or any vendor, the money has to already be in the bank &mdash; savings + fundraising actually completed + tickets actually sold. Not "we plan to raise it later."</p>' +
+      '<p style="margin-top:1vh;">Your ASB advisor literally cannot sign a purchase order or approve a contract if the money isn&#39;t there. This is California state law for student body funds.</p>' +
+      '<p style="margin-top:1vh;">Run it again. Either raise a lot more in the fall/winter, or scale down the plan (cheaper venue, one-park Grad Nite, potluck luncheon) until Revenue + Savings &#x2265; Costs <strong>before</strong> any contract gets signed.</p>';
   }
 
   var h = '<div style="font-family:\'Bangers\'; font-size:1.3em; color:#d4af37; letter-spacing:2px; text-align:center; margin-bottom:1vh;">FINAL LEDGER</div>';
