@@ -986,6 +986,12 @@ function renderPricingLab() {
   html += '<div class="math-row"><label><strong>Senior Package Price</strong> ($) &mdash; what you charge each senior</label><input type="number" id="p-pkg" min="0" step="5" placeholder="'+breakEvenPkg+'"></div>';
   html += '<div class="math-row"><label><strong>Prom-Only Ticket</strong> ($) &mdash; for juniors/sophs buying only prom</label><input type="number" id="p-pro" min="0" step="5" placeholder="120"></div>';
   html += '<div class="math-row"><label><strong>Grad Nite-Only Ticket</strong> ($) &mdash; seniors who want only Disney</label><input type="number" id="p-gno" min="0" step="5" placeholder="275"></div>';
+  html += '<h3 style="margin-top:2vh;">HOW MANY DO YOU THINK YOU&#39;LL SELL?</h3>';
+  html += '<p style="font-size:0.95em; color:#555; margin-bottom:1vh;">You have <strong>'+SENIOR_COUNT+' seniors</strong>. Packages + Grad-Nite-Only can&#39;t exceed that (a senior is one person). Prom-Only is open to juniors/sophs &mdash; cap <strong>100</strong>, or <strong>0</strong> if you want seniors-only prom.</p>';
+  html += '<div class="math-row"><label><strong>Senior Packages sold</strong> (0&ndash;'+SENIOR_COUNT+')</label><input type="number" id="q-pkg" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder="'+SENIOR_COUNT+'"></div>';
+  html += '<div class="math-row"><label><strong>Grad Nite-Only tickets sold</strong> (seniors w/o package)</label><input type="number" id="q-gno" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder="2"></div>';
+  html += '<div class="math-row"><label><strong>Prom-Only tickets sold</strong> (0&ndash;100, underclassmen)</label><input type="number" id="q-pro" min="0" max="100" step="1" placeholder="16"></div>';
+  html += '<p id="q-warn" style="color:#8b0000; font-weight:bold; font-size:0.95em; min-height:1.2em;"></p>';
   html += '<p style="font-size:0.95em; color:#555; margin-top:1vh;">Drop numbers into the boxes. Edit as many times as you want &mdash; the projection below updates live.</p>';
   html += '</div>';
 
@@ -996,12 +1002,17 @@ function renderPricingLab() {
 
   document.getElementById('lab-content').innerHTML = html;
 
-  ['p-pkg','p-pro','p-gno'].forEach(function(id){ document.getElementById(id).addEventListener('input', updateProjection); });
+  ['p-pkg','p-pro','p-gno','q-pkg','q-gno','q-pro'].forEach(function(id){ document.getElementById(id).addEventListener('input', updateProjection); });
   document.getElementById('lock-btn').onclick = function(){
     var pkg = +document.getElementById('p-pkg').value || 0;
     var pro = +document.getElementById('p-pro').value || 0;
     var gno = +document.getElementById('p-gno').value || 0;
+    var qPkg = +document.getElementById('q-pkg').value;
+    var qGno = +document.getElementById('q-gno').value;
+    var qPro = +document.getElementById('q-pro').value;
     if (!pkg || !pro || !gno) { alert('Fill in all three prices to continue.'); return; }
+    if (isNaN(qPkg) || isNaN(qGno) || isNaN(qPro)) { alert('Fill in all three quantities (how many you expect to sell). Use 0 if none.'); return; }
+    if (qPkg + qGno > SENIOR_COUNT) { alert('Senior Packages + Grad-Nite-Only can\'t exceed '+SENIOR_COUNT+' seniors. Adjust.'); return; }
     state.prices = { pkg:pkg, promTicket:pro, gradNiteOnly:gno };
     finalize();
   };
@@ -1036,10 +1047,33 @@ function updateProjection() {
   var pro = +document.getElementById('p-pro').value || 0;
   var gno = +document.getElementById('p-gno').value || 0;
 
+  var qPkgEl = document.getElementById('q-pkg');
+  var qGnoEl = document.getElementById('q-gno');
+  var qProEl = document.getElementById('q-pro');
+  var qPkg = qPkgEl && qPkgEl.value !== '' ? +qPkgEl.value : NaN;
+  var qGno = qGnoEl && qGnoEl.value !== '' ? +qGnoEl.value : NaN;
+  var qPro = qProEl && qProEl.value !== '' ? +qProEl.value : NaN;
+
+  // Clamp
+  if (!isNaN(qPkg)) qPkg = Math.max(0, Math.min(SENIOR_COUNT, qPkg));
+  if (!isNaN(qGno)) qGno = Math.max(0, Math.min(SENIOR_COUNT, qGno));
+  if (!isNaN(qPro)) qPro = Math.max(0, Math.min(100, qPro));
+
   var c = state.calc;
-  var pkgBuyers = pkg ? simulateTakeRate(pkg, c.hardPerSenior) : 0;
-  var promOnlyBuyers = pro ? simulatePromOnly(pro) : 0;
-  var gradOnlyBuyers = gno ? simulateGradOnly(gno) : 0;
+  // If player hasn't filled a quantity, show 0 (not a simulated guess — they must decide)
+  var pkgBuyers      = isNaN(qPkg) ? 0 : qPkg;
+  var gradOnlyBuyers = isNaN(qGno) ? 0 : qGno;
+  var promOnlyBuyers = isNaN(qPro) ? 0 : qPro;
+
+  // Warn if seniors overflow
+  var warnEl = document.getElementById('q-warn');
+  if (warnEl) {
+    if (pkgBuyers + gradOnlyBuyers > SENIOR_COUNT) {
+      warnEl.textContent = '\u26A0 Packages + Grad-Nite-Only = '+(pkgBuyers+gradOnlyBuyers)+'. You only have '+SENIOR_COUNT+' seniors.';
+    } else {
+      warnEl.textContent = '';
+    }
+  }
 
   // Revenue
   var pkgRev = pkgBuyers * pkg;
