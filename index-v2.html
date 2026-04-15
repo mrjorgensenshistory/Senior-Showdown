@@ -412,7 +412,7 @@ var state = {};
 function freshState(grade) {
   var startBal = grade===10 ? 358 : grade===11 ? 900 : 821;
   return {
-    grade: grade, balance: startBal, log: [{label:'Starting balance', delta:startBal}],
+    grade: grade, balance: startBal, startBalance: startBal, log: [{label:'Starting balance', delta:startBal}],
     fund: {}, // fundraiser choices
     // Math-lab choices:
     gradNite: null, venue:null, food:null, luncheon:null,
@@ -620,7 +620,7 @@ var FUND_STEPS = {
         { label:'&#x1F697; CAR WASH &mdash; one Saturday, ~3 hours', product:'car_wash' },
         { label:'&#x1F369; DONUT SALE &mdash; 6 Friday mornings', product:'donut_fall' },
         { label:'&#x2615; HOT CHOCOLATE STAND &mdash; one football game', product:'hot_cocoa' },
-        { label:'&#x1F4A4; Skip fall fundraising', yield:0, cutscene:{gif:'terry-tate', title:'TERRY TATE SEES YOU', msg:'Fourteen months to prom. Every skip now = panic later. Terry is taking notes.'} }
+        { label:'&#x1F4A4; Skip fall fundraising', yield:0, cutscene:{gif:'terry-tate', title:'TERRY TATE SEES YOU', msg:'Fourteen months to prom. Every skip now = a bigger ask later. Terry is taking notes.'} }
       ] },
     { month:'NOVEMBER &mdash; 11TH GRADE',
       prompt:'<h3>Concessions Season.</h3><p>Basketball home games. Last year&#39;s winning class pulled around $1,300.</p>',
@@ -651,7 +651,7 @@ var FUND_STEPS = {
       options:[
         { label:'&#x1F525; Every home game', yield:1200 },
         { label:'&#x1F91D; Half the shifts', yield:600 },
-        { label:'&#x1F4F4; Skip', yield:50, cutscene:{gif:'bobby', title:'SKIPPING CONCESSIONS MID-PANIC', msg:'Prom is three months away and the class chose to not show up. Bobby is on the field.'} }
+        { label:'&#x1F4F4; Skip', yield:50, cutscene:{gif:'bobby', title:'SKIPPING CONCESSIONS THIS LATE?', msg:'Prom is three months away and the class chose to not show up. Bobby is on the field.'} }
       ] }
     // Spring Senior Auction is injected later — runs BEFORE the Luncheon lab step,
     // because by spring the big stuff (venue, Disney, prom vendors) is already locked.
@@ -878,6 +878,7 @@ function productMathStep3(prod, price, volume, revenue, variableCost, fixedCost,
     html += '<h2 style="color:#8b0000;">&#x274C; CLOSE, BUT NOT QUITE</h2>';
     html += '<p>You entered <strong>'+money(guess)+'</strong>. Actual profit is <strong>'+money(profit)+'</strong>. Here&#39;s the breakdown:</p>';
   }
+  var margin = price - prod.unitCost;
   html += '<table>';
   html += '<tr><th>Line</th><th>Math</th><th>Amount</th></tr>';
   html += '<tr><td>Revenue</td><td>'+volume+' &times; '+money(price)+'</td><td><strong>'+money(revenue)+'</strong></td></tr>';
@@ -885,6 +886,16 @@ function productMathStep3(prod, price, volume, revenue, variableCost, fixedCost,
   if (fixedCost) html += '<tr><td>Fixed supplies</td><td>flat</td><td>&minus;'+money(fixedCost)+'</td></tr>';
   html += '<tr><td><strong>PROFIT</strong></td><td>Revenue &minus; Cost</td><td><strong style="color:#1e5a2e;">'+money(profit)+'</strong></td></tr>';
   html += '</table>';
+  // ============ MARGIN TEACHING MOMENT ============
+  html += '<div style="background:#fff8dc; border:2px solid #d4af37; border-radius:8px; padding:1.2vh 1.5vw; margin:1.5vh auto; max-width:640px;">';
+  html += '<h3 style="margin:0 0 0.8vh 0; color:#5a3a0a;">&#x1F4A1; THE SHORTCUT: MARGIN</h3>';
+  html += '<p style="margin:0.3vh 0;"><strong>Margin</strong> = what you make on <em>each</em> '+prod.unit+' you sell.</p>';
+  html += '<p style="margin:0.3vh 0;">Margin = price &minus; cost = '+money(price)+' &minus; '+money(prod.unitCost)+' = <strong>'+money(margin)+' per '+prod.unit+'</strong></p>';
+  html += '<p style="margin:0.3vh 0;">Multiply by quantity: '+money(margin)+' &times; '+volume+' '+prod.unit+'s = <strong>'+money(margin*volume)+'</strong>';
+  if (fixedCost) html += ' &minus; '+money(fixedCost)+' fixed = <strong>'+money(profit)+'</strong>';
+  html += '</p>';
+  html += '<p style="margin:0.6vh 0 0 0; font-size:0.92em; color:#5a3a0a;"><em>Real ASB treasurers use margin to forecast. "If we sell 200 at a $4 margin, we net $800." Memorize the formula.</em></p>';
+  html += '</div>';
   html += '<p style="margin-top:1vh;">This is what your class actually banks: <span class="big-num">'+money(profit)+'</span></p>';
   html += '</div>';
   html += '<button class="btn" id="pm-next">CONTINUE &raquo;</button>';
@@ -1090,7 +1101,7 @@ function renderPricingLab() {
   html += '<p style="font-size:0.95em; color:#555; margin-bottom:1vh;">You have <strong>'+SENIOR_COUNT+' seniors</strong>. Prom-Only is open to juniors/sophs. <strong>Realistically, about 90 attendees fit on the prom buses.</strong></p>';
   html += '<div class="math-row"><label><strong>Senior Packages sold</strong> (0&ndash;'+SENIOR_COUNT+')</label><input type="number" id="q-pkg" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder="'+SENIOR_COUNT+'"></div>';
   html += '<div class="math-row"><label><strong>Grad Nite-Only tickets sold</strong> (seniors w/o package)</label><input type="number" id="q-gno" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder="2"></div>';
-  html += '<div class="math-row"><label><strong>Prom-Only tickets sold</strong> (underclassmen &mdash; but remember the 100 total cap)</label><input type="number" id="q-pro" min="0" step="1" placeholder="16"></div>';
+  html += '<div class="math-row"><label><strong>Prom-Only tickets sold</strong> (underclassmen &mdash; but remember the 90-seat prom-bus cap)</label><input type="number" id="q-pro" min="0" step="1" placeholder="16"></div>';
   html += '<p id="q-warn" style="color:#8b0000; font-weight:bold; font-size:0.95em; min-height:1.2em;"></p>';
   html += '<p style="font-size:0.95em; color:#555; margin-top:1vh;">Drop numbers into the boxes. Edit as many times as you want &mdash; the projection below updates live.</p>';
   html += '</div>';
@@ -1488,6 +1499,15 @@ function hhResults(onDone) {
   html += '<tr><td>Volunteer pizza</td><td>flat</td><td>&minus;'+money(pizzaCost)+'</td></tr>';
   html += '<tr><td><strong>PROFIT</strong></td><td>Revenue &minus; Cost</td><td><strong style="color:'+(profit>=0?'#1e5a2e':'#8b0000')+';">'+money(profit)+'</strong></td></tr>';
   html += '</table>';
+  // ============ MARGIN / FORECASTING MOMENT ============
+  html += '<div style="background:#fff8dc; border:2px solid #d4af37; border-radius:8px; padding:1.2vh 1.5vw; margin:1.5vh auto; max-width:640px;">';
+  html += '<h3 style="margin:0 0 0.8vh 0; color:#5a3a0a;">&#x1F4A1; FORECASTING: MARGIN PER TICKET</h3>';
+  html += '<p style="margin:0.3vh 0;">Haunted House has NO cost per ticket &mdash; you just need to cover the <strong>'+money(totalExp)+' fixed setup</strong>.</p>';
+  html += '<p style="margin:0.3vh 0;">So every ticket you sell past <strong>break-even</strong> is pure margin.</p>';
+  html += '<p style="margin:0.3vh 0;">Break-even tickets = '+money(totalExp)+' &divide; '+money(h.price)+' = <strong>'+Math.ceil(totalExp/h.price)+' tickets</strong></p>';
+  html += '<p style="margin:0.3vh 0;">You sold '+tickets+'. Extra beyond break-even = '+Math.max(0, tickets - Math.ceil(totalExp/h.price))+' tickets &times; '+money(h.price)+' = <strong>roughly your profit</strong>.</p>';
+  html += '<p style="margin:0.6vh 0 0 0; font-size:0.92em; color:#5a3a0a;"><em>This is how real event planners decide whether to run it: compute break-even first, then forecast how many you can realistically sell past it.</em></p>';
+  html += '</div>';
   html += '<p style="margin-top:1vh;">This goes into your class bank.</p></div>';
   html += '<button class="btn" id="hh-done">CONTINUE &raquo;</button>';
 
@@ -1527,7 +1547,9 @@ function run10thEndParty() {
 
 // STEP 1 — show raised, make them compute 20% + $500 budget
 function epStep1_Budget() {
-  var raised = Math.max(0, state.balance); // treat negatives as zero for teaching
+  // "Raised this year" = everything fundraised, MINUS the seed balance the class started with.
+  // Seed money isn't something they earned — can't bank or spend it like it is.
+  var raised = Math.max(0, state.balance - (state.startBalance || 0));
   var expected = Math.round(raised * 0.20 + 500);
 
   var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F483;&#x1F57A;</div>';
@@ -1645,7 +1667,11 @@ function epResults() {
 
   // Game-over conditions
   if (total > budget) { state.party.total = total; triggerBobby('partymoney'); return; }
-  if (total < 150)     { state.party.total = total; triggerBobby('emptylot');    return; }
+  // "Empty lot" fires when they spend under 30% of the budget AND picked the bleakest dessert path.
+  // Picking a frugal-but-real combo (school gym + school food = $140) shouldn't auto-trigger.
+  if (budget > 0 && total < Math.max(100, budget * 0.30) && state.party.dessert === 'none' && state.party.side === 'nochips') {
+    state.party.total = total; triggerBobby('emptylot'); return;
+  }
 
   // SUCCESS — show summary, then go to sEnd
   var html = '<div class="info-box reveal-flash"><h2 style="color:#1e5a2e;">&#x1F389; PARTY PLANNED!</h2>';
