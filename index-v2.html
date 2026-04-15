@@ -941,7 +941,7 @@ function triggerBobby(kind) {
   } else if (kind === 'nobus') {
     html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F3C8; BOBBY DIDN&#39;T GET A SEAT ON THE BUS</h2>';
     html += '<img src="'+BOBBY_TACKLE_GIF+'" alt="Bobby Boucher tackle" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8); margin-bottom:1vh;" onerror="this.style.display=\'none\'">';
-    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.3em;"><strong>You oversold prom.</strong></p><p>Senior Packages plus Prom-Only tickets went over <strong>100</strong>. The venue and the bus max out at 100 bodies. Bobby Boucher bought a ticket, showed up, and there was no seat for him.</p><img src="'+WATERBOY_IMG+'" style="max-width:150px; margin-top:1.5vh; border:3px solid #d4af37; border-radius:6px;" onerror="this.style.display=\'none\'"><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Bobby does NOT miss prom. He is charging the entire senior class instead. Prom-tackled.</p></div>';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.3em;"><strong>You oversold prom.</strong></p><p>Senior Packages plus Prom-Only tickets went over <strong>90</strong>. The prom buses realistically seat about 90 &mdash; we&#39;ve never sold more. Bobby Boucher bought a ticket, showed up, and there was no seat for him.</p><img src="'+WATERBOY_IMG+'" style="max-width:150px; margin-top:1.5vh; border:3px solid #d4af37; border-radius:6px;" onerror="this.style.display=\'none\'"><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Bobby does NOT miss prom. He is charging the entire senior class instead. Prom-tackled.</p></div>';
   } else if (kind === 'playlist') {
     // Rickroll via YouTube embed + Captain Insano caption
     html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F4F1; YOU\'VE BEEN RICKROLLED</h2>';
@@ -1009,7 +1009,7 @@ function renderPricingLab() {
   html += '<div class="math-row"><label><strong>Prom-Only Ticket</strong> ($) &mdash; for juniors/sophs buying only prom</label><input type="number" id="p-pro" min="0" step="5" placeholder="120"></div>';
   html += '<div class="math-row"><label><strong>Grad Nite-Only Ticket</strong> ($) &mdash; seniors who want only Disney</label><input type="number" id="p-gno" min="0" step="5" placeholder="275"></div>';
   html += '<h3 style="margin-top:2vh;">HOW MANY DO YOU THINK YOU&#39;LL SELL?</h3>';
-  html += '<p style="font-size:0.95em; color:#555; margin-bottom:1vh;">You have <strong>'+SENIOR_COUNT+' seniors</strong>. Prom-Only is open to juniors/sophs. <strong>The bus has 100 seats.</strong></p>';
+  html += '<p style="font-size:0.95em; color:#555; margin-bottom:1vh;">You have <strong>'+SENIOR_COUNT+' seniors</strong>. Prom-Only is open to juniors/sophs. <strong>Realistically, about 90 attendees fit on the prom buses.</strong></p>';
   html += '<div class="math-row"><label><strong>Senior Packages sold</strong> (0&ndash;'+SENIOR_COUNT+')</label><input type="number" id="q-pkg" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder="'+SENIOR_COUNT+'"></div>';
   html += '<div class="math-row"><label><strong>Grad Nite-Only tickets sold</strong> (seniors w/o package)</label><input type="number" id="q-gno" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder="2"></div>';
   html += '<div class="math-row"><label><strong>Prom-Only tickets sold</strong> (underclassmen &mdash; but remember the 100 total cap)</label><input type="number" id="q-pro" min="0" step="1" placeholder="16"></div>';
@@ -1038,8 +1038,8 @@ function renderPricingLab() {
     if (!pkg || !pro || !gno) { alert('Fill in all three prices to continue.'); return; }
     if (isNaN(qPkg) || isNaN(qGno) || isNaN(qPro)) { alert('Fill in all three quantities (how many you expect to sell). Use 0 if none.'); return; }
     if (qPkg + qGno > SENIOR_COUNT) { alert('Senior Packages + Grad-Nite-Only can\'t exceed '+SENIOR_COUNT+' seniors. Adjust.'); return; }
-    // AIRTIGHT 100-cap: packages + prom-only can NEVER exceed 100 (bus capacity). Bobby, no bypass.
-    if (qPkg + qPro > 100) { triggerBobby('nobus'); return; }
+    // AIRTIGHT 90-cap: realistic prom attendance limit. Bobby, no bypass.
+    if (qPkg + qPro > 90) { triggerBobby('nobus'); return; }
     if (!validateWorksheet()) { alert('Finish the budget worksheet first. Every box needs a green check.'); return; }
     state.prices = { pkg:pkg, promTicket:pro, gradNiteOnly:gno };
     finalize();
