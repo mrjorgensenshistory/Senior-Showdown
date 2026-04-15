@@ -907,8 +907,8 @@ function triggerBobby(kind) {
     html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>The AUX cable was compromised.</strong></p><p>Someone&#39;s phone played The Song. Bobby Boucher heard it from across the parking lot and power-drove your entire dance floor.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Prom is over. You&#39;re over.</p></div>';
   }
   document.getElementById('bobby-body').innerHTML = html;
-  playSfx('sfx-lose', 0.7);
-  stopBg();
+  stopBg();              // mute the background track FIRST
+  // No sfx-lose on cutscenes — the GIF + Bobby/Terry visual is the gag, sound stings just step on it
   show('sBobby');
 }
 
@@ -1181,8 +1181,12 @@ function playBg() {
   try { a.volume = 0.25; a.play().catch(function(){}); } catch(e) {}
 }
 function stopBg() {
-  var a = document.getElementById('bg-music');
-  if (!a) return; try { a.pause(); } catch(e) {}
+  // Hard stop — pause, rewind, mute. Belt and suspenders.
+  ['bg-music','bg-walkin'].forEach(function(id){
+    var a = document.getElementById(id);
+    if (!a) return;
+    try { a.pause(); a.currentTime = 0; a.volume = 0; } catch(e) {}
+  });
 }
 
 // Audio unlock + opening fanfare on first click (Chromebook autoplay compat)
