@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Senior Showdown: Build Your Senior Year</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&family=Fredoka+One&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-family:'Bebas Neue','Arial Black',Impact,sans-serif; color:#fff; }
+
+.screen { display:none; position:absolute; top:0; left:0; width:100%; height:100%; overflow-y:auto; }
+.screen.active { display:flex; flex-direction:column; align-items:center; animation:fade .4s ease-out; }
+@keyframes fade { from { opacity:0; transform:translateY(10px);} to { opacity:1; transform:none;} }
+
+.screen-bg { position:fixed; top:0; left:0; width:100%; height:100%; background-size:cover; z-index:-1; }
+.content { position:relative; z-index:2; text-align:center; padding:3vh 4vw; max-width:1200px; width:100%; }
+
+.bg-title { background: radial-gradient(ellipse at center,#1e5a2e 0%,#0a1a0f 100%); }
+.bg-intro { background: linear-gradient(135deg,#0a1a0f 0%,#1e5a2e 50%,#0a1a0f 100%); }
+.bg-hub { background: radial-gradient(ellipse at top,#d4af37 0%,#8b6914 50%,#2a1a05 100%); }
+.bg-fund { background: linear-gradient(160deg,#1b3a5c 0%,#0a1a2e 100%); }
+.bg-lab { background: linear-gradient(160deg,#2e1b4a 0%,#1a0a2e 100%); }
+.bg-win { background: radial-gradient(ellipse at center,#d4af37 0%,#8b6914 40%,#1e5a2e 100%); }
+.bg-ok { background: radial-gradient(ellipse at center,#1e5a2e 0%,#0a1a0f 100%); }
+.bg-bad { background: radial-gradient(ellipse at center,#6a2020 0%,#1a0505 100%); }
+
+.title-mono { font-family:'Bangers','Arial Black',Impact,sans-serif; letter-spacing:3px; color:#d4af37; text-shadow: 4px 4px 0 #000,-1px -1px 0 #fff6a0; }
+.title-huge { font-size:clamp(2.8rem,7vw,5.5rem); line-height:1; }
+.title-big { font-size:clamp(2rem,5vw,3.5rem); }
+.subtitle { font-size:clamp(1.1rem,2.2vw,1.6rem); color:#f5f5dc; letter-spacing:2px; margin-top:2vh; }
+
+.btn {
+  display:inline-block; background:#f5f5dc; color:#0a1a0f; border:4px solid #d4af37;
+  padding:1.8vh 5vw; font-family:'Bebas Neue','Arial Black',Impact,sans-serif; font-size:clamp(1.2rem,2.4vw,1.8rem);
+  cursor:pointer; margin:1vh; text-decoration:none; min-width:30vw; text-align:center;
+  letter-spacing:2px; font-weight:bold; border-radius:6px;
+  box-shadow: 0 4px 0 #8b6914, 0 6px 15px rgba(0,0,0,.5);
+  transition: transform .15s, background .15s;
+}
+.btn:hover { background:#fff6a0; transform:translateY(-2px); }
+.btn:active { transform:translateY(2px); box-shadow: 0 2px 0 #8b6914; }
+
+/* Image-button grid for Venue Expert choices */
+.pick-grid {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:1.5vw; width:95%; max-width:1000px; margin:2vh auto;
+}
+.pick-card {
+  background:linear-gradient(180deg,#fff 0%,#f5f5dc 100%); color:#0a1a0f;
+  border:4px solid #d4af37; border-radius:10px; padding:1.5vh 1vw;
+  cursor:pointer; text-align:center; position:relative;
+  box-shadow: 0 4px 0 #8b6914, 0 8px 15px rgba(0,0,0,.4);
+  transition: transform .15s, box-shadow .15s;
+  display:flex; flex-direction:column; align-items:center;
+}
+.pick-card:hover { transform:translateY(-4px) scale(1.02); box-shadow: 0 8px 0 #8b6914, 0 12px 20px rgba(0,0,0,.5); }
+.pick-card.selected { background:#fff6a0; border-color:#1e5a2e; transform:translateY(-2px); }
+.pick-card .ic { font-size:clamp(2.4rem,5vw,4rem); margin-bottom:0.5vh; }
+.pick-card .vimg { width:100%; height:110px; object-fit:cover; border-radius:6px; margin-bottom:0.5vh; border:2px solid #d4af37; background:linear-gradient(135deg,#333,#111); }
+.pick-card .vimg-fallback { width:100%; height:110px; display:flex; align-items:center; justify-content:center; font-size:3.5rem; background:linear-gradient(135deg,#2a1a05,#0a1a0f); color:#d4af37; border-radius:6px; margin-bottom:0.5vh; border:2px solid #d4af37; }
+.pick-card .name { font-family:'Fredoka One','Bangers',sans-serif; font-size:clamp(1rem,2vw,1.4rem); color:#8b0000; letter-spacing:1px; }
+.pick-card .price { font-family:'Bangers'; font-size:clamp(1.1rem,2.2vw,1.6rem); color:#1e5a2e; margin:0.4vh 0; letter-spacing:1px; }
+.pick-card .desc { font-family:'Bebas Neue'; font-size:clamp(.85rem,1.5vw,1.05rem); color:#333; line-height:1.3; padding:0 0.5vw; }
+
+/* Fundraiser button — price HIDDEN per Michael */
+.fund-card { background:rgba(245,245,220,0.97); color:#0a1a0f; border:3px solid #d4af37;
+  padding:2vh 3vw; font-family:'Bebas Neue',Arial,sans-serif; font-size:clamp(1rem,2vw,1.4rem);
+  cursor:pointer; margin:1.5vh auto; width:85%; max-width:700px; text-align:left;
+  letter-spacing:1px; font-weight:bold; border-radius:6px;
+  box-shadow: 0 3px 0 #8b6914; transition:transform .15s,background .15s; display:block; }
+.fund-card:hover { background:#fff6a0; transform:translateX(4px); }
+.fund-card .fdesc { font-family:'Bebas Neue'; font-size:0.85em; color:#555; margin-top:0.4vh; font-weight:normal; }
+
+/* Expert character */
+.expert-wrap { display:flex; align-items:flex-start; gap:2vw; margin:2vh auto; max-width:1100px; width:95%; }
+.expert-portrait {
+  flex:0 0 140px; width:140px; height:180px; background:linear-gradient(180deg,#d4af37,#8b6914);
+  border:4px solid #d4af37; border-radius:10px; display:flex; align-items:center; justify-content:center;
+  font-size:5rem; box-shadow:0 4px 15px rgba(0,0,0,.5); position:sticky; top:1vh;
+}
+.expert-bubble {
+  flex:1; background:rgba(245,245,220,0.97); color:#0a1a0f;
+  border:4px solid #d4af37; border-radius:14px; padding:2vh 2vw;
+  font-family:'Bebas Neue',Arial,sans-serif; font-size:clamp(1rem,2vw,1.35rem); line-height:1.5;
+  letter-spacing:0.5px; position:relative;
+  box-shadow: 0 6px 18px rgba(0,0,0,.5);
+}
+.expert-bubble::before { content:''; position:absolute; left:-18px; top:30px; width:0; height:0;
+  border:10px solid transparent; border-right-color:#d4af37; border-left:none; }
+.expert-bubble h3 { font-family:'Fredoka One'; color:#8b0000; letter-spacing:1px; margin-bottom:1vh; font-size:clamp(1.1rem,2.5vw,1.6rem); }
+.expert-bubble .quote { font-style:italic; color:#555; margin-top:1vh; font-size:0.9em; border-left:3px solid #d4af37; padding-left:1vw; }
+
+/* Info box for generic screens */
+.info-box { background:rgba(245,245,220,0.97); color:#0a1a0f; padding:3vh 4vw;
+  max-width:90%; font-size:clamp(1rem,2vw,1.35rem); line-height:1.55;
+  border:4px solid #d4af37; margin:0 auto 2vh auto; border-radius:8px;
+  text-align:left; box-shadow:0 8px 20px rgba(0,0,0,.6); }
+.info-box h2 { font-family:'Fredoka One'; color:#8b0000; margin-bottom:1vh; font-size:1.6em; letter-spacing:1px; }
+.info-box .big-num { font-family:'Bangers'; font-size:1.6em; color:#1e5a2e; letter-spacing:2px; }
+.info-box table { width:100%; border-collapse:collapse; margin:1vh 0; font-size:0.95em; }
+.info-box th, .info-box td { padding:0.6vh 0.8vw; text-align:left; border-bottom:1px dashed #8b6914; }
+.info-box th { background:#d4af37; color:#0a1a0f; font-family:'Fredoka One'; letter-spacing:1px; }
+
+/* Live bank + month */
+.bank { position:fixed; top:12px; right:12px; z-index:100;
+  background:#0a1a0f; color:#d4af37; border:3px solid #d4af37;
+  padding:8px 18px; font-family:'Bangers',monospace; font-size:clamp(1rem,2vw,1.5rem);
+  letter-spacing:2px; border-radius:6px; min-width:180px; text-align:right; }
+.bank .label { color:#f5f5dc; font-size:0.6em; display:block; }
+.bank .amt.neg { color:#ff6666; }
+.bank.flash { animation:flash .6s; }
+@keyframes flash { 0%,100% { background:#0a1a0f; } 50% { background:#d4af37; color:#0a1a0f; } }
+.month-tag { position:fixed; top:12px; left:12px; z-index:100;
+  background:rgba(10,26,15,0.88); color:#f5f5dc; border:2px solid #d4af37;
+  padding:6px 14px; font-size:clamp(.9rem,1.6vw,1.2rem); letter-spacing:2px; border-radius:4px; }
+
+/* Grade select cards */
+.cards { display:flex; justify-content:center; gap:2vw; flex-wrap:wrap; width:95%; max-width:1100px; margin:3vh auto 0; }
+.card { position:relative; width:28%; min-width:260px; cursor:pointer; text-decoration:none;
+  background: linear-gradient(180deg,#2a1a05 0%,#0a1a0f 100%); border:4px solid #d4af37;
+  border-radius:10px; padding:2vh 1.5vw; color:#fff; box-shadow:0 8px 20px rgba(0,0,0,.6);
+  transition:transform .2s; }
+.card:hover { transform:translateY(-6px) scale(1.02); }
+.card .icon { font-size:clamp(3rem,7vw,5rem); display:block; }
+.card .card-title { font-family:'Bangers'; font-size:clamp(1.4rem,3vw,2.2rem); color:#d4af37; letter-spacing:2px; margin:1vh 0; }
+.card .card-desc { font-size:clamp(.85rem,1.6vw,1.1rem); color:#f5f5dc; line-height:1.4; }
+.card .card-bal { margin-top:1.5vh; padding-top:1vh; border-top:2px dashed #d4af37; color:#d4af37; font-family:'Bangers'; font-size:clamp(1rem,2vw,1.4rem); letter-spacing:1px; }
+
+/* Math lab inputs */
+.math-panel { background:rgba(245,245,220,0.97); color:#0a1a0f;
+  border:4px solid #d4af37; border-radius:10px; padding:2vh 2vw; max-width:900px; width:95%;
+  margin:2vh auto; font-family:'Bebas Neue',Arial,sans-serif; text-align:left; box-shadow:0 8px 20px rgba(0,0,0,.6); }
+.math-panel h3 { font-family:'Fredoka One'; color:#8b0000; letter-spacing:1px; margin-bottom:1vh; font-size:1.4em; }
+.math-row { display:flex; justify-content:space-between; align-items:center; padding:0.7vh 0; font-size:clamp(1rem,2vw,1.3rem); border-bottom:1px dashed #aaa; flex-wrap:wrap; }
+.math-row label { flex:1; min-width:200px; }
+.math-row input[type=number] { width:120px; padding:0.6vh 0.8vw; font-family:'Bangers'; font-size:1.3em;
+  border:3px solid #1e5a2e; border-radius:6px; text-align:center; background:#fff; color:#1e5a2e; letter-spacing:1px; }
+.math-row input[type=number]:focus { outline:none; border-color:#d4af37; background:#fff6a0; }
+.math-row .val { font-family:'Bangers'; color:#1e5a2e; font-size:1.2em; letter-spacing:1px; min-width:120px; text-align:right; }
+.math-row .val.neg { color:#8b0000; }
+.math-row.total { font-size:clamp(1.2rem,2.5vw,1.7rem); padding-top:1.5vh; margin-top:1vh; border-top:3px solid #8b0000; border-bottom:none; font-family:'Bangers'; }
+
+/* Final tally */
+.final-tally { background:rgba(10,26,15,0.92); border:4px solid #d4af37; border-radius:10px;
+  padding:2vh 3vw; margin:2vh auto; max-width:700px; color:#f5f5dc; }
+.final-tally .row { display:flex; justify-content:space-between; padding:0.7vh 0;
+  font-size:clamp(1rem,2vw,1.3rem); border-bottom:1px dashed #8b6914; }
+.final-tally .row:last-child { border-bottom:none; font-size:clamp(1.3rem,2.8vw,2rem);
+  font-family:'Bangers'; color:#d4af37; padding-top:1.5vh; border-top:3px solid #d4af37; margin-top:1vh; }
+.final-tally .pos { color:#8fff8f; font-weight:bold; }
+.final-tally .neg { color:#ff9999; font-weight:bold; }
+
+.stamp { font-family:'Bangers'; font-size:clamp(1.8rem,5vw,3.2rem);
+  color:#8b0000; border:6px double #8b0000; padding:1vh 3vw; display:inline-block;
+  transform:rotate(-6deg); letter-spacing:4px; margin:1.5vh 0; background:rgba(245,245,220,0.9); }
+.stamp.good { color:#1e5a2e; border-color:#1e5a2e; }
+.stamp.gold { color:#8b6914; border-color:#d4af37; background:rgba(212,175,55,0.2); }
+
+.ribbon { display:inline-block; background:#8b0000; color:#f5f5dc; padding:4px 18px;
+  font-family:'Bangers'; font-size:1.2em; letter-spacing:2px; transform:rotate(-2deg); margin:1vh 0; border-radius:4px; }
+.ribbon.gold { background:#d4af37; color:#0a1a0f; }
+
+.nav-right {
+  position:fixed; right:18px; top:50%; transform:translateY(-50%); z-index:120;
+  display:flex; flex-direction:column; gap:10px;
+}
+.nav-right .btn { min-width:180px; font-size:1rem; padding:1.2vh 1vw; margin:0; }
+
+/* Fullscreen toggle — always visible, top-right under bank */
+.fs-toggle {
+  position:fixed; bottom:14px; right:14px; z-index:130;
+  background:#0a1a0f; color:#d4af37; border:3px solid #d4af37;
+  padding:8px 14px; font-family:'Bangers',monospace; font-size:clamp(0.85rem,1.5vw,1.1rem);
+  letter-spacing:1px; border-radius:6px; cursor:pointer;
+  box-shadow: 0 3px 10px rgba(0,0,0,.6);
+  transition: background .15s, transform .15s;
+}
+.fs-toggle:hover { background:#d4af37; color:#0a1a0f; transform:scale(1.05); }
+
+/* Screens that use the nav-right pattern for advance buttons */
+.primary-advance { /* floats on right-middle like end-screen nav */ }
+
+.credits { position:fixed; bottom:6px; left:10px; font-size:0.8rem; color:#f5f5dc;
+  font-family:Arial; z-index:99; opacity:.8; }
+
+.reveal-flash { animation: reveal 1.2s ease-out; }
+@keyframes reveal { 0% { transform:scale(0.8); opacity:0;} 60% { transform:scale(1.1); opacity:1;} 100% { transform:scale(1); opacity:1;} }
+</style></head><body>
+
+<div class="bank" id="bank" style="display:none;">
+  <span class="label">CLASS BANK</span>
+  <span class="amt" id="bank-amt">$0</span>
+</div>
+<div class="month-tag" id="month-tag" style="display:none;"></div>
+<button class="fs-toggle" id="fs-toggle" onclick="toggleFullscreen()" title="Fullscreen">&#x26F6; FULLSCREEN</button>
+
+<!-- ================== TITLE ================== -->
+<div class="screen active bg-title" id="s0">
+  <div class="content" style="margin-top:10vh;">
+    <div class="ribbon gold">IYKYK SCHOOL PRESENTS</div>
+    <h1 class="title-mono title-huge">SENIOR<br>SHOWDOWN</h1>
+    <div class="subtitle">BUILD YOUR SENIOR YEAR</div>
+    <div style="height:5vh"></div>
+    <button class="btn" onclick="show('sIntro')">&#x1F4B0; CLICK HERE TO PLAY</button>
+    <div style="margin-top:3vh; font-size:0.9rem; color:#ccc; font-family:Arial;">
+      Based on real Senior Class data and lots of blood, sweat, and tears.
+    </div>
+  </div>
+</div>
+
+<!-- ================== INTRO — real numbers reveal ================== -->
+<div class="screen bg-intro" id="sIntro">
+  <div class="content">
+    <div class="info-box">
+      <h2>THE SITUATION</h2>
+      <p>You&#39;re planning your senior year. Here are the <strong>real fixed prices</strong> you&#39;re working with:</p>
+      <table>
+        <tr><th>Fixed per-student</th><th>Price</th></tr>
+        <tr><td>Yearbook</td><td>$45</td></tr>
+        <tr><td>Senior Luncheon (catered)</td><td>$20</td></tr>
+        <tr><td>Disneyland Grad Nite &mdash; Park Hopper</td><td>$259</td></tr>
+        <tr><td>Disneyland Grad Nite &mdash; One Park Only</td><td>$180</td></tr>
+        <tr><td>Disneyland Bus (fixed, whole class)</td><td>$1,200</td></tr>
+      </table>
+      <p style="margin-top:1vh;">Your class has <strong>66 seniors</strong>. Some will buy a full Senior Package. Some will buy individual tickets. Some won&#39;t buy anything.</p>
+      <p style="margin-top:1vh;">A <strong>Senior Package</strong> is EVERYTHING. It covers:<br>
+        &nbsp;&nbsp;&#x2022; <strong>Prom</strong> (venue entry + dinner)<br>
+        &nbsp;&nbsp;&#x2022; <strong>Disneyland Grad Nite</strong> (your choice of tier)<br>
+        &nbsp;&nbsp;&#x2022; <strong>Yearbook</strong><br>
+        &nbsp;&nbsp;&#x2022; <strong>Senior Luncheon</strong></p>
+      <p style="margin-top:1vh; font-style:italic; color:#8b0000;">One price. All four events. That&#39;s the whole package.</p>
+      <p style="margin-top:1vh;"><strong>Your job:</strong> Fundraise this year, then set your prices and build out your prom. Every dollar you cut off the package price means $66 you have to fundraise to make up. Every dollar you add means some classmates might opt out.</p>
+    </div>
+  </div>
+  <div class="nav-right">
+    <button class="btn" onclick="show('sHub')" style="font-size:1.2rem;">&#x1F393; PICK MY GRADE &raquo;</button>
+    <button class="btn" onclick="show('s0')" style="font-size:0.9rem; min-width:150px;">&laquo; TITLE</button>
+  </div>
+</div>
+
+<!-- ================== GRADE SELECT HUB ================== -->
+<div class="screen bg-hub" id="sHub">
+  <div class="content">
+    <h2 class="title-mono title-big">CHOOSE YOUR CLASS</h2>
+    <div class="subtitle" style="color:#0a1a0f;">Different grades start with different balances and time horizons.</div>
+    <div class="cards">
+      <a class="card" onclick="startGrade(10)">
+        <span class="icon">&#x1F9D1;&#x200D;&#x1F393;</span>
+        <div class="card-title">10TH GRADE</div>
+        <div class="card-desc">Class of &#39;28. Three years until graduation. Lots of time to build up savings.</div>
+        <div class="card-bal">Starting: $358</div>
+      </a>
+      <a class="card" onclick="startGrade(11)">
+        <span class="icon">&#x1F4DA;</span>
+        <div class="card-title">11TH GRADE</div>
+        <div class="card-desc">Class of &#39;27. 14 months until prom. Your upcoming adventure.</div>
+        <div class="card-bal">Starting: $900</div>
+      </a>
+      <a class="card" onclick="startGrade(12)">
+        <span class="icon">&#x1F514;</span>
+        <div class="card-title">12TH GRADE</div>
+        <div class="card-desc">Class of &#39;26. Five months until prom. Mostly pricing decisions now.</div>
+        <div class="card-bal">Starting: $821</div>
+      </a>
+    </div>
+    <div style="margin-top:3vh;">
+      <button class="btn" style="min-width:20vw; font-size:1rem;" onclick="show('sIntro')">&laquo; BACK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================== FUNDRAISING YEAR (grade-specific) ================== -->
+<div class="screen bg-fund" id="sFund">
+  <div class="content" id="fund-content"></div>
+</div>
+
+<!-- ================== SENIOR YEAR MATH LAB ================== -->
+<div class="screen bg-lab" id="sLab">
+  <div class="content" id="lab-content"></div>
+</div>
+
+<!-- ================== GAME OVER CUTSCENE (Bobby Boucher easter eggs) ================== -->
+<div class="screen" id="sBobby" style="background:#000;">
+  <div class="content" style="text-align:center; padding:1vh 2vw;">
+    <div class="stamp" style="font-size:clamp(2rem,6vw,4rem); border-width:8px;">&#x1F3C8; GAME OVER &#x1F3C8;</div>
+    <div id="bobby-body"></div>
+    <div style="height:4vh"></div>
+    <button class="btn" onclick="show('s0')" style="font-size:1.4rem;">&#x1F504; START OVER</button>
+  </div>
+</div>
+
+<!-- ================== ENDING ================== -->
+<div class="screen" id="sEnd">
+  <div class="screen-bg" id="end-bg"></div>
+  <div class="content">
+    <div id="end-stamp"></div>
+    <h2 class="title-mono" style="font-size:clamp(2rem,5vw,3.2rem); margin-bottom:1vh;" id="end-title"></h2>
+    <div class="info-box" id="end-box"></div>
+    <div class="final-tally" id="end-tally"></div>
+    <div style="height:10vh"></div>
+  </div>
+  <!-- Fixed-position nav so buttons are ALWAYS visible -->
+  <div class="nav-right">
+    <button class="btn" onclick="restart()">&#x1F504; TRY AGAIN</button>
+    <button class="btn" onclick="show('sHub')">&#x1F3AD; PICK NEW GRADE</button>
+    <button class="btn" onclick="show('s0')">&#x1F3E0; TITLE</button>
+  </div>
+</div>
+
+<div class="credits">For educational use only.</div>
+
+<!-- AUDIO — Royalty-free WWTBAM-style soundtrack (CC0 / Pixabay — no attribution needed)
+     Drop files in audio/ folder. Recommended free sources (all CC0):
+       Pixabay Quiz Music:  https://pixabay.com/music/search/quiz/
+       Pixabay Game Show:   https://pixabay.com/music/search/game%20show/
+       Pixabay Tension:     https://pixabay.com/music/search/tension/
+
+     Files expected:
+       audio/bg-think.mp3        — tension/think loop (search "quiz timer" or "quiz tension")
+       audio/bg-walkin.mp3       — opening fanfare (search "game show intro")
+       audio/sfx-select.mp3      — selection sting (search "quiz correct" or short ding)
+       audio/sfx-lockin.mp3      — final-answer drum hit (search "dramatic hit")
+       audio/sfx-win.mp3         — win fanfare (search "game show win" / "victory")
+       audio/sfx-lose.mp3        — lose sting (search "game show lose" / "wrong answer")
+     Game is silent if files are missing — safe to ship without audio. -->
+<audio id="bg-music" loop preload="auto"><source src="audio/bg-think.mp3" type="audio/mpeg"></audio>
+<audio id="bg-walkin" preload="auto"><source src="audio/bg-walkin.mp3" type="audio/mpeg"></audio>
+<audio id="sfx-select" preload="auto"><source src="audio/sfx-select.mp3" type="audio/mpeg"></audio>
+<audio id="sfx-lockin" preload="auto"><source src="audio/sfx-lockin.mp3" type="audio/mpeg"></audio>
+<audio id="sfx-win" preload="auto"><source src="audio/sfx-win.mp3" type="audio/mpeg"></audio>
+<audio id="sfx-lose" preload="auto"><source src="audio/sfx-lose.mp3" type="audio/mpeg"></audio>
+
+<script>
+// ============ CONSTANTS ============
+var SENIOR_COUNT = 66;
+var YEARBOOK_COST = 45;
+var LUNCHEON_CATERED = 20;
+var LUNCHEON_POTLUCK = 4;
+var GRADNITE_HOPPER = 259;
+var GRADNITE_ONEPARK = 180;
+var GRADNITE_BUS = 1200;
+
+// Pop-culture venue lineup. All images served locally from ./venues/ and ./memes/ —
+// self-contained, works on GitHub Pages with zero external dependencies.
+var VENUES = [
+  { id:'hawkins', name:'Hawkins High Gym',              ic:'&#x1F3D0;',
+    img:'venues/hawkins-gym.jpg',
+    rent:0,    bus:0,
+    desc:'From Stranger Things. Free. Decorate on-site. Home court advantage.' },
+  { id:'eutsd',   name:'Enchantment Under The Sea',     ic:'&#x1F41F;',
+    img:'venues/eutsd.jpg',
+    rent:1000, bus:0,
+    desc:'From Back to the Future. Clubhouse. $1,000 all-in. No bus needed.' },
+  { id:'hogwarts',name:'The Great Hall',                ic:'&#x1F9D9;',
+    img:'venues/great-hall.jpg',
+    rent:3500, bus:3000,
+    desc:'From Harry Potter. Candlelit long tables. Bus required. May have spiders.' },
+  { id:'overlook',name:'The Overlook Hotel',            ic:'&#x1F3E8;',
+    img:'venues/overlook-hotel.jpg',
+    rent:5000, bus:4194,
+    desc:'From The Shining. Slightly closer drive. Slightly haunted. Shorter bus.' },
+  { id:'titanic', name:'Titanic First-Class Ballroom',  ic:'&#x1F6A2;',
+    img:'venues/titanic.jpg',
+    rent:6775, bus:5694,
+    desc:'From Titanic. Fanciest tier. Full bus. Hopefully no icebergs.' }
+];
+// The Waterboy poster — used for all Bobby Boucher game-overs (Bobby is important)
+var WATERBOY_IMG = 'venues/waterboy.jpg';
+var PHONE_RAGE_GIF   = 'memes/phone-rage.gif';
+var YOU_SURE_GIF     = 'memes/you-sure.gif';
+var RICKROLL_GIF     = 'memes/rickroll.gif';
+var BOBBY_TACKLE_GIF = 'memes/bobby-tackle.gif';
+var TERRY_TATE_GIF   = 'memes/terry-tate.gif';
+
+var FOODS = [
+  { id:'mex', name:'Mexican',  ic:'&#x1F32E;', pp:15, desc:'Tacos, rice, beans. Drink &amp; dessert included.' },
+  { id:'ita', name:'Italian',  ic:'&#x1F35D;', pp:20, desc:'Pasta, salad, bread. Drink &amp; dessert included.' },
+  { id:'stk', name:'Steak',    ic:'&#x1F969;', pp:25, desc:'Steak dinner. Drink &amp; dessert included.' },
+  { id:'crk', name:'Just Crackers', ic:'&#x1F36A;', pp:0, desc:'Saltines. Water. Maybe cheese if you&#39;re lucky.', bobby:'crackers' }
+];
+// +20% tip on all food (Crackers triggers Bobby Boucher game-over)
+
+var LUNCHEONS = [
+  { id:'cat', name:'Catered',  ic:'&#x1F37D;&#xFE0F;', pp:20, desc:'Classic. Easy setup. Pro handles it.' },
+  { id:'pot', name:'Potluck',  ic:'&#x1F35E;', pp:4,  desc:'Cheap. Families bring food. A lot of setup work.' }
+];
+
+var DJ_OPTIONS = [
+  { id:'dj_pro',  name:'Hired DJ',      ic:'&#x1F3A7;', cost:700, desc:'Standard pro DJ package.' },
+  { id:'dj_none', name:'Playlist + BT Speaker', ic:'&#x1F4F1;', cost:0, desc:'Someone&#39;s Spotify. No DJ.', bobby:'playlist' }
+];
+var PHOTO_OPTIONS = [
+  { id:'ph_pro',  name:'Pro Photographer', ic:'&#x1F4F7;', cost:600, desc:'Prints, digital gallery, done right.' },
+  { id:'ph_none', name:'BYO Phones',       ic:'&#x1F4F1;', cost:0,   desc:'Everyone takes their own pics.', bobby:'phone' }
+];
+var DECOR_OPTIONS = [
+  { id:'de_pro',  name:'Full Decorations', ic:'&#x1F388;', cost:1000, desc:'Arch, lights, backdrop, table pieces.' },
+  { id:'de_diy',  name:'DIY Decorations',  ic:'&#x1F3A8;', cost:250,  desc:'Class makes it. Some materials + labor.' },
+  { id:'de_none', name:'Bare Bones',       ic:'&#x26AA;',  cost:0,    desc:'Venue as-is.', bobby:'sure' }
+];
+var TABLEWARE_OPTIONS = [
+  { id:'tw_yes', name:'Tableware Package', ic:'&#x1F374;', cost:200, desc:'Plates, napkins, utensils, linens.' },
+  { id:'tw_no',  name:'Venue Provides',    ic:'&#x274C;',  cost:0,   desc:'Full-service venues include it. Gym does not.' }
+];
+
+// ============ STATE ============
+var state = {};
+function freshState(grade) {
+  var startBal = grade===10 ? 358 : grade===11 ? 900 : 821;
+  return {
+    grade: grade, balance: startBal, log: [{label:'Starting balance', delta:startBal}],
+    fund: {}, // fundraiser choices
+    // Math-lab choices:
+    gradNite: null, venue:null, food:null, luncheon:null,
+    dj:null, photo:null, decor:null, tableware:null,
+    prices: { pkg:'', promTicket:'', gradNiteOnly:'', promOnly:'' }
+  };
+}
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  document.getElementById('bank').style.display = (id==='sFund' || id==='sLab' || id==='sEnd') ? 'block' : 'none';
+  document.getElementById('month-tag').style.display = (id==='sFund') ? 'block' : 'none';
+  window.scrollTo(0,0);
+  document.getElementById(id).scrollTop = 0;
+}
+function money(n) { var neg = n<0; var s = '$'+Math.abs(Math.round(n)).toLocaleString(); return neg ? '-'+s : s; }
+function renderBank() {
+  var el = document.getElementById('bank-amt');
+  el.textContent = money(state.balance); el.classList.toggle('neg', state.balance<0);
+}
+function adjust(n, label) {
+  state.balance += n; if (label) state.log.push({label:label, delta:n});
+  renderBank(); var b = document.getElementById('bank');
+  b.classList.remove('flash'); void b.offsetWidth; b.classList.add('flash');
+}
+function setMonth(m) { state.month=m; document.getElementById('month-tag').textContent = '\u23F3  ' + m; }
+
+// ============ FUNDRAISING YEAR ============
+// School pool for fundraisers: 450 students + 20 adults ≈ 470 potential customers
+var SCHOOL_POOL = 470;
+
+// PRODUCT fundraisers teach cost analysis. Each has unit cost + volume curve based on price.
+var PRODUCTS = {
+  donut_fall: {
+    icon: '&#x1F369;',
+    name: 'Donut Sale (6 Friday mornings)',
+    unit: 'dozen',
+    unitCost: 6,
+    unitCostLabel: '$6 per dozen (wholesale from the bakery)',
+    story: 'You buy donuts wholesale at <strong>$6 per dozen</strong>. For 6 Friday mornings you sell them at the front gate before school. There are 450 students + 20 adults = <strong>470 potential customers</strong> walking past.',
+    priceQuestion: 'How much do you want to charge per dozen?',
+    defaultPrice: 12,
+    volumeByPrice: function(p) {
+      if (p <= 8)  return 120;
+      if (p <= 10) return 100;
+      if (p <= 12) return 80;
+      if (p <= 15) return 55;
+      if (p <= 20) return 35;
+      return 20;
+    },
+    volumeExplain: function(p, v) {
+      return 'At <strong>' + money(p) + '/dozen</strong>, about <strong>' + v + ' dozen</strong> sold over 6 Fridays. Cheaper donuts move faster; pricier ones move slower.';
+    }
+  },
+  donut_spring: {
+    icon: '&#x1F369;',
+    name: 'Spring Donut Sale (4 weeks)',
+    unit: 'dozen',
+    unitCost: 6,
+    unitCostLabel: '$6 per dozen (wholesale)',
+    story: 'Same donut hustle, but only 4 Friday mornings this time. Pool of 470 potential customers.',
+    priceQuestion: 'How much per dozen?',
+    defaultPrice: 12,
+    volumeByPrice: function(p) {
+      if (p <= 8)  return 80;
+      if (p <= 10) return 65;
+      if (p <= 12) return 50;
+      if (p <= 15) return 35;
+      if (p <= 20) return 22;
+      return 12;
+    },
+    volumeExplain: function(p, v) {
+      return 'At <strong>' + money(p) + '/dozen</strong>, about <strong>' + v + ' dozen</strong> sold over 4 Fridays.';
+    }
+  },
+  hot_cocoa: {
+    icon: '&#x2615;',
+    name: 'Hot Chocolate Stand (one football game)',
+    unit: 'cup',
+    unitCost: 0.75,
+    unitCostLabel: '$0.75 per cup (cocoa mix + cup + lid + whipped cream)',
+    story: 'Cold night, Friday football game. Your stand sits behind the bleachers. Cost per cup: <strong>$0.75</strong> (mix + cup + lid + whipped cream). About 200 fans in the stands.',
+    priceQuestion: 'How much do you want to charge per cup?',
+    defaultPrice: 3,
+    volumeByPrice: function(p) {
+      if (p <= 1) return 140;
+      if (p <= 2) return 100;
+      if (p <= 3) return 70;
+      if (p <= 4) return 40;
+      if (p <= 5) return 22;
+      return 10;
+    },
+    volumeExplain: function(p, v) {
+      return 'At <strong>' + money(p) + '/cup</strong>, about <strong>' + v + ' cups</strong> sold during the game.';
+    }
+  },
+  car_wash: {
+    icon: '&#x1F697;',
+    name: 'Car Wash (one Saturday, ~3 hours)',
+    unit: 'car',
+    unitCost: 0, // supplies handled separately
+    unitCostLabel: '$30 total for supplies (soap, sponges, buckets)',
+    fixedCost: 30, // flat supplies cost
+    story: 'You set up at the gas station lot on a Saturday, 10am-1pm. Classes buy supplies for <strong>$30 total</strong> (soap, sponges, buckets, hose). About <strong>45 cars</strong> come through in 3 hours. Donation-based &mdash; you set the suggested donation per car.',
+    priceQuestion: 'What suggested donation per car?',
+    defaultPrice: 10,
+    fixedVolume: 45,
+    volumeByPrice: function() { return 45; },
+    volumeExplain: function(p, v) {
+      return 'About <strong>' + v + ' cars</strong> came through in 3 hours. People generally donate what you suggest (give or take).';
+    }
+  }
+};
+
+// Fund option types:
+//   { label, product: 'donut_fall' }   — triggers math lesson, profit auto-calculated
+//   { label, yield: 500 }              — simple reveal, static yield
+var FUND_STEPS = {
+  10: [
+    { month:'AUGUST &mdash; 10TH GRADE',
+      prompt:'<h3>Fall fundraiser pick.</h3><p>You get ONE shot at a big fall push. What does your class want to run?</p>',
+      options:[
+        { label:'&#x1F697; CAR WASH &mdash; one Saturday, ~3 hours', product:'car_wash' },
+        { label:'&#x1F369; DONUT SALE &mdash; 6 Friday mornings', product:'donut_fall' },
+        { label:'&#x2615; HOT CHOCOLATE STAND &mdash; one football game', product:'hot_cocoa' },
+        { label:'&#x1F4A4; Skip fall fundraising', yield:0, cutscene:{gif:'terry-tate', title:'TERRY TATE HEARD ABOUT THAT', msg:'While other classes stack money, you just skipped. Terry does not approve of coasting.'} }
+      ] },
+    { month:'DECEMBER &mdash; 10TH GRADE',
+      prompt:'<h3>Winter Concessions.</h3><p>Staff splits profit by hours worked. Real payout depends on class turnout.</p>',
+      options:[
+        { label:'&#x1F525; All officers sign up for EVERY home game', yield:1200 },
+        { label:'&#x1F91D; Officers split &mdash; half the shifts', yield:600 },
+        { label:'&#x1F4F4; Skip &mdash; we&#39;re busy', yield:50, cutscene:{gif:'bobby', title:'WATER. BOY.', msg:'Everyone was "too busy." Other classes worked the whole season. You made $50 in vending machine change.'} }
+      ] }
+  ],
+  11: [
+    { month:'SEPTEMBER &mdash; 11TH GRADE',
+      prompt:'<h3>Fall fundraiser pick.</h3><p>You have 14 months to build up your bank. First move?</p>',
+      options:[
+        { label:'&#x1F697; CAR WASH &mdash; one Saturday, ~3 hours', product:'car_wash' },
+        { label:'&#x1F369; DONUT SALE &mdash; 6 Friday mornings', product:'donut_fall' },
+        { label:'&#x2615; HOT CHOCOLATE STAND &mdash; one football game', product:'hot_cocoa' },
+        { label:'&#x1F4A4; Skip fall fundraising', yield:0, cutscene:{gif:'terry-tate', title:'TERRY TATE SEES YOU', msg:'Fourteen months to prom. Every skip now = panic later. Terry is taking notes.'} }
+      ] },
+    { month:'NOVEMBER &mdash; 11TH GRADE',
+      prompt:'<h3>Concessions Season.</h3><p>Basketball home games. Last year&#39;s winning class pulled around $1,300.</p>',
+      options:[
+        { label:'&#x1F525; Every home game', yield:1200 },
+        { label:'&#x1F4C5; Half the shifts', yield:600 },
+        { label:'&#x1F4F4; Skip', yield:50, cutscene:{gif:'bobby', title:'THE OTHER CLASSES BANKED $1,300', msg:'You banked $50 in change. Bobby Boucher is disappointed in the entire operation.'} }
+      ] },
+    { month:'MARCH &mdash; 11TH GRADE',
+      prompt:'<h3>Spring push.</h3><p>Last fundraiser before you cross into senior year.</p>',
+      options:[
+        { label:'&#x1F697; Spring Car Wash (~3 hrs)', product:'car_wash' },
+        { label:'&#x1F369; Spring Donut Sale (4 weeks)', product:'donut_spring' },
+        { label:'&#x2615; Hot Chocolate at sports finals', product:'hot_cocoa' },
+        { label:'&#x1F4A4; Save energy for senior year', yield:0, cutscene:{gif:'terry-tate', title:'&quot;SAVE ENERGY,&quot; THEY SAID', msg:'Senior year starts in 5 months with nothing added to the bank. That sound you hear is Terry Tate warming up.'} }
+      ] }
+  ],
+  12: [
+    { month:'FALL &mdash; 12TH GRADE',
+      prompt:'<h3>Fall Senior Auction.</h3><p>Families bid on donated items, dinners with teachers, class bundles. This money helps cover the big-ticket items (venue deposit, Disney reservation) coming up.</p>',
+      options:[
+        { label:'&#x1F4E3; Fall auction &mdash; organized, pre-promoted', yield:1000 },
+        { label:'&#x1F4CB; Fall auction &mdash; basic', yield:600 },
+        { label:'&#x274C; Skip fall auction', yield:0, cutscene:{gif:'terry-tate', title:'SKIPPED THE FALL AUCTION?', msg:'Venue deposit and Disney reservation are coming. That money had to come from somewhere. Terry is running up the hallway.'} }
+      ] },
+    { month:'WINTER &mdash; 12TH GRADE',
+      prompt:'<h3>Winter Concessions.</h3><p>Basketball season. Pays by hours worked.</p>',
+      options:[
+        { label:'&#x1F525; Every home game', yield:1200 },
+        { label:'&#x1F91D; Half the shifts', yield:600 },
+        { label:'&#x1F4F4; Skip', yield:50, cutscene:{gif:'bobby', title:'SKIPPING CONCESSIONS MID-PANIC', msg:'Prom is three months away and the class chose to not show up. Bobby is on the field.'} }
+      ] }
+    // Spring Senior Auction is injected later — runs BEFORE the Luncheon lab step,
+    // because by spring the big stuff (venue, Disney, prom vendors) is already locked.
+  ]
+};
+
+// 12th grade Spring Auction step — injected right before luncheon in the Lab flow
+var SPRING_AUCTION_STEP = {
+  month:'SPRING &mdash; 12TH GRADE',
+  prompt:'<h3>Spring Senior Auction.</h3><p>Prom and Disney are already locked at this point. Spring fundraising exists to cover the Senior Luncheon and anything still short.</p>',
+  options:[
+    { label:'&#x1F4E3; Spring auction &mdash; organized, pre-promoted', yield:1000 },
+    { label:'&#x1F4CB; Spring auction &mdash; basic', yield:600 },
+    { label:'&#x274C; Skip spring auction', yield:0, cutscene:{gif:'terry-tate', title:'LUNCHEON IS IN 6 WEEKS', msg:'Spring auction skipped. The luncheon still needs to be paid for. Terry Tate has entered the chat.'} }
+  ]
+};
+
+// Cutscene GIF lookup for fund-step skips
+var CUTSCENE_GIFS = {
+  'terry-tate': TERRY_TATE_GIF,
+  'bobby':      BOBBY_TACKLE_GIF,
+  'phone':      PHONE_RAGE_GIF,
+  'sure':       YOU_SURE_GIF,
+  'rickroll':   RICKROLL_GIF
+};
+
+function renderCutscene(cs, yieldAmt, onDone) {
+  var gif = CUTSCENE_GIFS[cs.gif] || TERRY_TATE_GIF;
+  var html = '<div class="info-box reveal-flash" style="text-align:center;">';
+  html += '<h2 style="color:#8b0000;">'+cs.title+'</h2>';
+  html += '<img src="'+gif+'" alt="cutscene" style="max-width:min(480px,75vw); margin:1.5vh auto; display:block; border:5px solid #d4af37; border-radius:10px; box-shadow:0 0 25px rgba(255,50,50,0.6);" onerror="this.style.display=\'none\'">';
+  html += '<p style="font-size:1.15em; margin-top:1vh;">'+cs.msg+'</p>';
+  html += '<p style="margin-top:1vh;">You raised <span class="big-num">'+money(yieldAmt)+'</span>.</p>';
+  html += '<p style="margin-top:0.5vh;">Bank balance: <span class="big-num">'+money(state.balance)+'</span></p>';
+  html += '</div>';
+  html += '<button class="btn" id="cs-next" style="margin-top:1vh;">CONTINUE &raquo;</button>';
+  document.getElementById('fund-content').innerHTML = html;
+  document.getElementById('cs-next').onclick = onDone;
+}
+
+function startGrade(grade) {
+  state = freshState(grade);
+  renderBank(); show('sFund'); runFundStep(0);
+}
+
+function runFundStep(idx) {
+  var steps = FUND_STEPS[state.grade];
+  if (idx >= steps.length) { show('sLab'); runLab(); return; }
+  var step = steps[idx];
+  setMonth(step.month);
+  var html = '<div class="info-box">' + step.prompt + '</div>';
+  step.options.forEach(function(opt, i){
+    html += '<a class="fund-card" data-i="'+i+'">' + opt.label + '</a>';
+  });
+  document.getElementById('fund-content').innerHTML = html;
+  document.querySelectorAll('#fund-content .fund-card').forEach(function(el){
+    el.onclick = function(){
+      var i = +el.getAttribute('data-i');
+      var opt = step.options[i];
+      var cleanLabel = opt.label.replace(/&#x[0-9A-F;]+/gi,'').replace(/<[^>]+>/g,'').trim();
+      if (opt.product) {
+        runProductMath(PRODUCTS[opt.product], step.month + ': ' + cleanLabel, function(){
+          runFundStep(idx+1);
+        });
+      } else {
+        adjust(opt.yield, step.month + ': ' + cleanLabel);
+        if (opt.cutscene) {
+          renderCutscene(opt.cutscene, opt.yield, function(){ runFundStep(idx+1); });
+        } else {
+          document.getElementById('fund-content').innerHTML =
+            '<div class="info-box reveal-flash"><h2>&#x1F4B0; RESULT</h2>' +
+            '<p style="font-size:1.3em;">You raised <span class="big-num">' + money(opt.yield) + '</span>.</p>' +
+            '<p style="margin-top:1vh;">New bank balance: <span class="big-num">' + money(state.balance) + '</span></p></div>' +
+            '<button class="btn" id="next-fund">CONTINUE &raquo;</button>';
+          document.getElementById('next-fund').onclick = function(){ runFundStep(idx+1); };
+        }
+      }
+    };
+  });
+}
+
+// One-off fund step runner (used to inject Spring Auction mid-Lab for 12th graders)
+function runInjectedFundStep(step, onDone) {
+  setMonth(step.month);
+  var html = '<div class="info-box">' + step.prompt + '</div>';
+  step.options.forEach(function(opt, i){ html += '<a class="fund-card" data-i="'+i+'">' + opt.label + '</a>'; });
+  document.getElementById('fund-content').innerHTML = html;
+  document.querySelectorAll('#fund-content .fund-card').forEach(function(el){
+    el.onclick = function(){
+      var i = +el.getAttribute('data-i');
+      var opt = step.options[i];
+      var cleanLabel = opt.label.replace(/&#x[0-9A-F;]+/gi,'').replace(/<[^>]+>/g,'').trim();
+      adjust(opt.yield, step.month + ': ' + cleanLabel);
+      if (opt.cutscene) {
+        renderCutscene(opt.cutscene, opt.yield, onDone);
+      } else {
+        document.getElementById('fund-content').innerHTML =
+          '<div class="info-box reveal-flash"><h2>&#x1F4B0; RESULT</h2>' +
+          '<p style="font-size:1.3em;">You raised <span class="big-num">' + money(opt.yield) + '</span>.</p>' +
+          '<p style="margin-top:1vh;">New bank balance: <span class="big-num">' + money(state.balance) + '</span></p></div>' +
+          '<button class="btn" id="next-fund">CONTINUE &raquo;</button>';
+        document.getElementById('next-fund').onclick = onDone;
+      }
+    };
+  });
+}
+
+// ============ PRODUCT MATH ENGINE — teaches cost analysis ============
+function runProductMath(prod, logLabel, onDone) {
+  // Step 1: show story + ask for sell price
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F469;&#x200D;&#x1F4BC;</div>';
+  html += '<div class="expert-bubble"><h3>'+prod.icon+' '+prod.name+'</h3>';
+  html += '<p><strong>Your cost:</strong> '+prod.unitCostLabel+'</p>';
+  html += '<p>'+prod.story+'</p>';
+  if (prod.fixedCost) html += '<p><strong>Fixed costs:</strong> $'+prod.fixedCost+' in supplies, no matter how many '+prod.unit+'s you move.</p>';
+  html += '<div class="quote">"The price you charge changes how many people buy. Cheap = more volume. Expensive = fewer buyers."</div></div></div>';
+
+  html += '<div class="math-panel"><h3>STEP 1 &mdash; SET YOUR PRICE</h3>';
+  html += '<div class="math-row"><label>'+prod.priceQuestion+'</label>';
+  html += '<input type="number" id="pm-price" min="0" step="0.5" placeholder="'+prod.defaultPrice+'"></div>';
+  html += '<p style="margin-top:1vh; color:#555; font-size:0.95em;">Type a number in the box, then click below.</p></div>';
+  html += '<button class="btn" id="pm-price-ok">LOCK IN MY PRICE &raquo;</button>';
+
+  document.getElementById('fund-content').innerHTML = html;
+  document.getElementById('pm-price-ok').onclick = function(){
+    var price = +document.getElementById('pm-price').value || 0;
+    if (price <= 0) { alert('Enter a price greater than 0.'); return; }
+    productMathStep2(prod, price, logLabel, onDone);
+  };
+}
+
+function productMathStep2(prod, price, logLabel, onDone) {
+  // Show volume sold at that price, then ask them to compute profit
+  var volume = prod.volumeByPrice(price);
+  var revenue = volume * price;
+  var variableCost = volume * prod.unitCost;
+  var fixedCost = prod.fixedCost || 0;
+  var totalCost = variableCost + fixedCost;
+  var profit = revenue - totalCost;
+
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F469;&#x200D;&#x1F4BC;</div>';
+  html += '<div class="expert-bubble"><h3>STEP 2 &mdash; HERE&#39;S WHAT HAPPENED</h3>';
+  html += '<p>'+prod.volumeExplain(price, volume)+'</p>';
+  html += '<p style="margin-top:1vh;">Now YOU do the math. Figure out your <strong>profit</strong>.</p>';
+  html += '<div class="quote">"Profit = Revenue &minus; Cost. Revenue = how many you sold &times; your price. Cost = how many you sold &times; your cost per '+prod.unit+'';
+  if (fixedCost) html += ' &plus; any fixed costs';
+  html += '."</div></div></div>';
+
+  html += '<div class="math-panel"><h3>WORK IT OUT</h3>';
+  html += '<div class="math-row"><label>'+prod.unit.toUpperCase()+'S SOLD</label><span class="val">'+volume+'</span></div>';
+  html += '<div class="math-row"><label>YOUR PRICE per '+prod.unit+'</label><span class="val">'+money(price)+'</span></div>';
+  html += '<div class="math-row"><label>YOUR COST per '+prod.unit+'</label><span class="val neg">'+money(prod.unitCost)+'</span></div>';
+  if (fixedCost) html += '<div class="math-row"><label>FIXED SUPPLIES COST</label><span class="val neg">'+money(fixedCost)+'</span></div>';
+  html += '<div class="math-row"><label><strong>Your profit (enter below):</strong></label><input type="number" id="pm-profit" step="1" placeholder="$"></div>';
+  html += '</div>';
+  html += '<button class="btn" id="pm-check">CHECK MY ANSWER &raquo;</button>';
+
+  document.getElementById('fund-content').innerHTML = html;
+  document.getElementById('pm-check').onclick = function(){
+    var guess = +document.getElementById('pm-profit').value;
+    var correct = Math.abs(guess - profit) < 1; // within $1 tolerance
+    productMathStep3(prod, price, volume, revenue, variableCost, fixedCost, profit, guess, correct, logLabel, onDone);
+  };
+}
+
+function productMathStep3(prod, price, volume, revenue, variableCost, fixedCost, profit, guess, correct, logLabel, onDone) {
+  var html = '<div class="info-box reveal-flash">';
+  if (correct) {
+    html += '<h2 style="color:#1e5a2e;">&#x2705; CORRECT!</h2>';
+    html += '<p>Nailed it. Your math:</p>';
+  } else {
+    html += '<h2 style="color:#8b0000;">&#x274C; CLOSE, BUT NOT QUITE</h2>';
+    html += '<p>You entered <strong>'+money(guess)+'</strong>. Actual profit is <strong>'+money(profit)+'</strong>. Here&#39;s the breakdown:</p>';
+  }
+  html += '<table>';
+  html += '<tr><th>Line</th><th>Math</th><th>Amount</th></tr>';
+  html += '<tr><td>Revenue</td><td>'+volume+' &times; '+money(price)+'</td><td><strong>'+money(revenue)+'</strong></td></tr>';
+  html += '<tr><td>Cost of goods</td><td>'+volume+' &times; '+money(prod.unitCost)+'</td><td>&minus;'+money(variableCost)+'</td></tr>';
+  if (fixedCost) html += '<tr><td>Fixed supplies</td><td>flat</td><td>&minus;'+money(fixedCost)+'</td></tr>';
+  html += '<tr><td><strong>PROFIT</strong></td><td>Revenue &minus; Cost</td><td><strong style="color:#1e5a2e;">'+money(profit)+'</strong></td></tr>';
+  html += '</table>';
+  html += '<p style="margin-top:1vh;">This is what your class actually banks: <span class="big-num">'+money(profit)+'</span></p>';
+  html += '</div>';
+  html += '<button class="btn" id="pm-next">CONTINUE &raquo;</button>';
+
+  document.getElementById('fund-content').innerHTML = html;
+  adjust(profit, logLabel + ' (profit)');
+  document.getElementById('pm-next').onclick = onDone;
+}
+
+// ============ SENIOR YEAR MATH LAB ============
+// Flow: Grad Nite → Venue → Food → Luncheon → DJ → Photo → Decor → Tableware → Pricing cells → Results
+
+// Real-world timing order:
+//   Late September — Prom venue (everything downstream depends on it)
+//   November        — Disney Grad Nite reservation deadline (can't add later)
+//   Winter/Spring   — DJ, Photo, Decor, Tableware, Food, Luncheon
+var LAB_STEPS = [
+  { key:'venue',     title:'PROM VENUE  (late September)',
+    list:VENUES.map(function(v){return {id:v.id,name:v.name,ic:v.ic,img:v.img,cost:v.rent,desc:v.desc+(v.bus>0?' Bus: '+money(v.bus):' No bus needed.')};}),
+    expert:'<strong>First decision of the year &mdash; late September.</strong> Everything downstream depends on this. Pick a local venue and you skip the bus entirely. Pick a drive venue and you&#39;re also committing to a charter bus.',
+    quote:'"Venue first. Bus is automatic from whatever you pick. Every mile of bus is money that doesn&#39;t go into your prom."' },
+  { key:'gradNite',  title:'GRAD NITE  (reserve by November)',
+    list:[{id:'hop',name:'Park Hopper',ic:'&#x1F3A2;',cost:259,desc:'Both parks, full night.'},{id:'one',name:'One Park Only',ic:'&#x1F3A1;',cost:180,desc:'Single park. Cheaper.'}],
+    expert:'<strong>Disneyland needs your commitment by November.</strong> You tell them WHICH ticket (Hopper or One-Park) AND how many you&#39;re reserving. You cannot add more later &mdash; and if you under-reserve, they&#39;ll likely short you. Bus is $1,200 either way, split across the class.',
+    quote:'"Under-reserve and some seniors don&#39;t get a ticket at all. Over-reserve and you eat the cost of empty seats. Disney is not flexible."' },
+  { key:'food',      title:'PROM DINNER',      list:FOODS.map(function(f){return {id:f.id,name:f.name,ic:f.ic,cost:f.pp,desc:f.desc+(f.pp>0?' $'+f.pp+'/person. +20% tip.':'')};}),
+    expert:'Food time. You wouldn&#39;t want football players angry if you don&#39;t feed them enough, would you? Prom food goes by headcount plus a 20% tip.',
+    quote:'"Tip is on the food subtotal. Every caterer charges it. It is not optional."' },
+  { key:'dj',        title:'DJ',               list:DJ_OPTIONS.map(function(d){return {id:d.id,name:d.name,ic:d.ic,cost:d.cost,desc:d.desc};}),
+    expert:'Pro DJ costs $700 and reads the crowd. Playlist is free and reads whoever has the AUX cord.',
+    quote:'"A DJ is 30% music, 70% not letting your cousin take over."' },
+  { key:'photo',     title:'PHOTOGRAPHER',     list:PHOTO_OPTIONS.map(function(p){return {id:p.id,name:p.name,ic:p.ic,cost:p.cost,desc:p.desc};}),
+    expert:'Pro photographer gets you prints and a gallery. BYO phones means whatever you captured, you captured.',
+    quote:'"In 20 years the only thing left from prom is the pictures. Or the memes of them."' },
+  { key:'decor',     title:'DECORATIONS',      list:DECOR_OPTIONS.map(function(d){return {id:d.id,name:d.name,ic:d.ic,cost:d.cost,desc:d.desc};}),
+    expert:'Decorations make a photo a memory. Or don&#39;t.',
+    quote:'"Full is $1,000. DIY is $250 and a whole weekend. Bare bones is whatever the venue already has."' },
+  { key:'tableware', title:'TABLEWARE',        list:TABLEWARE_OPTIONS.map(function(t){return {id:t.id,name:t.name,ic:t.ic,cost:t.cost,desc:t.desc};}),
+    expert:'Plates, napkins, utensils, linens. Full-service venues usually include this. A school gym does not.',
+    quote:'"No forks, no food."' },
+  { key:'luncheon',  title:'SENIOR LUNCHEON  (covered by spring fundraising)',
+    list:LUNCHEONS.map(function(l){return {id:l.id,name:l.name,ic:l.ic,cost:l.pp,desc:l.desc+' $'+l.pp+'/senior.'};}),
+    expert:'Senior Luncheon is near graduation. By the time you&#39;re picking this, Disney and prom are already locked &mdash; spring fundraisers exist specifically to cover the luncheon. Catered is easy. Potluck is cheap but your class has to actually organize Aunt Carol&#39;s famous tuna casserole.',
+    quote:'"Potluck saves money. Also costs weekends."' }
+];
+
+var labIdx = 0;
+function runLab() {
+  labIdx = 0;
+  renderLabStep();
+}
+
+function renderLabStep() {
+  var c = document.getElementById('lab-content');
+  if (labIdx >= LAB_STEPS.length) { renderPricingLab(); return; }
+  var step = LAB_STEPS[labIdx];
+  // For 12th grade: inject Spring Senior Auction right before the Luncheon step
+  if (state.grade === 12 && step.key === 'luncheon' && !state.didSpringAuction) {
+    state.didSpringAuction = true;
+    show('sFund');
+    runInjectedFundStep(SPRING_AUCTION_STEP, function(){
+      show('sLab');
+      renderLabStep();
+    });
+    return;
+  }
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F483;&#x1F57A;</div>';
+  html += '<div class="expert-bubble"><h3>' + step.title + '</h3>' + '<p>' + step.expert + '</p><div class="quote">' + step.quote + '</div></div></div>';
+  html += '<div class="pick-grid">';
+  step.list.forEach(function(opt){
+    html += '<div class="pick-card" data-id="'+opt.id+'">';
+    if (opt.img) {
+      // If image fails to load, fall back to emoji fallback div
+      html += '<img class="vimg" src="'+opt.img+'" alt="'+opt.name+'" onerror="this.outerHTML=\'<div class=vimg-fallback>'+opt.ic+'</div>\'">';
+    } else {
+      html += '<div class="ic">'+opt.ic+'</div>';
+    }
+    html += '<div class="name">'+opt.name+'</div>';
+    html += '<div class="price">'+money(opt.cost)+'</div>';
+    html += '<div class="desc">'+opt.desc+'</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  c.innerHTML = html;
+  document.querySelectorAll('#lab-content .pick-card').forEach(function(el){
+    el.onclick = function(){
+      var id = el.getAttribute('data-id');
+      // Check for Bobby Boucher easter egg
+      var picked = step.list.find(function(o){return o.id===id;});
+      var rawSource = (step.key==='food' ? FOODS : step.key==='dj' ? DJ_OPTIONS : step.key==='photo' ? PHOTO_OPTIONS : step.key==='decor' ? DECOR_OPTIONS : null);
+      var bobbyFlag = null;
+      if (rawSource) {
+        var raw = rawSource.find(function(o){return o.id===id;});
+        if (raw && raw.bobby) bobbyFlag = raw.bobby;
+      }
+      if (bobbyFlag) { triggerBobby(bobbyFlag); return; }
+      state[step.key] = id;
+      labIdx++;
+      setTimeout(renderLabStep, 200);
+    };
+  });
+}
+
+// ============ BOBBY BOUCHER GAME OVER ============
+function triggerBobby(kind) {
+  var body = document.getElementById('bobby-body');
+  var html = '';
+  if (kind === 'crackers') {
+    html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">BOBBY BOUCHER SMELLS WEAK FOOTBALL PLAYERS</h2>';
+    html += '<img src="'+BOBBY_TACKLE_GIF+'" alt="Bobby Boucher tackle" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8); margin-bottom:1vh;" onerror="this.style.display=\'none\'">';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.3em;"><strong>You tried to feed prom with SALTINES.</strong></p><p>Bobby Boucher caught wind. He is now running full speed at your senior class. This is a tackle you do not walk away from.</p><img src="'+WATERBOY_IMG+'" style="max-width:150px; margin-top:1.5vh; border:3px solid #d4af37; border-radius:6px;" onerror="this.style.display=\'none\'"><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">You have been prom-tackled into next week.</p></div>';
+  } else if (kind === 'phone') {
+    html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F4F1;&#x1F4A5; WHO LET THEM RECORD?</h2>';
+    html += '<img src="'+PHONE_RAGE_GIF+'" alt="Phone rage" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8);" onerror="this.style.display=\'none\'">';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>BYO Phones for prom pics.</strong></p><p>One phone fell in the punch bowl. Another one went into the ocean. Three of them shattered on the dance floor. Zero usable photos. The parents are angrier than Bobby Boucher.</p><img src="'+WATERBOY_IMG+'" style="max-width:150px; margin-top:1.5vh; border:3px solid #d4af37; border-radius:6px;" onerror="this.style.display=\'none\'"><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Bobby Boucher is charging. You have seconds. Prom is prom-tackled.</p></div>';
+  } else if (kind === 'sure') {
+    html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F3C8; TERRY TATE DOESN&#39;T LIKE BARE BONES</h2>';
+    html += '<img src="'+TERRY_TATE_GIF+'" alt="Terry Tate Office Linebacker" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8);" onerror="this.style.display=\'none\'">';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>Bare bones decorations.</strong></p><p>You rented a $6,775 venue and then spent $0 on decorations. So prom was literally folding tables and a vibe. One parent took a picture and immediately asked to speak to the advisor.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Terry Tate took one look and charged anyway.</p></div>';
+  } else if (kind === 'playlist') {
+    // Rickroll via YouTube embed + Captain Insano caption
+    html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F4F1; YOU\'VE BEEN RICKROLLED</h2>';
+    html += '<div style="position:relative; max-width:min(500px,80vw); margin:2vh auto; border:6px solid #d4af37; border-radius:10px; overflow:hidden; box-shadow:0 0 30px rgba(255,50,50,0.8);">';
+    html += '<img src="'+RICKROLL_GIF+'" alt="Rickrolled" style="width:100%; display:block;" onerror="this.style.display=\'none\'">';
+    html += '<div style="position:absolute; bottom:8px; left:0; right:0; text-align:center; background:rgba(0,0,0,0.85); color:#d4af37; font-family:\'Bangers\'; font-size:clamp(1rem,2.5vw,1.8rem); letter-spacing:2px; padding:6px;">COURTESY OF CAPTAIN INSANO</div>';
+    html += '</div>';
+    html += '<img src="'+BOBBY_TACKLE_GIF+'" alt="Bobby Boucher tackle" style="max-width:min(400px,70vw); border:4px solid #d4af37; border-radius:8px; margin:1vh auto; display:block;" onerror="this.style.display=\'none\'">';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>The AUX cable was compromised.</strong></p><p>Someone&#39;s phone played The Song. Bobby Boucher heard it from across the parking lot and power-drove your entire dance floor.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Prom is over. You&#39;re over.</p></div>';
+  }
+  document.getElementById('bobby-body').innerHTML = html;
+  playSfx('sfx-lose', 0.7);
+  stopBg();
+  show('sBobby');
+}
+
+// ============ PRICING LAB ============
+function renderPricingLab() {
+  // Compute ACTUAL per-senior package cost (what it takes to deliver: grad nite + prom share + yearbook + luncheon)
+  var gradNite = state.gradNite==='hop' ? GRADNITE_HOPPER : GRADNITE_ONEPARK;
+  var luncheon = state.luncheon==='cat' ? LUNCHEON_CATERED : LUNCHEON_POTLUCK;
+  var food = (function(){ var f = FOODS.find(function(x){return x.id===state.food;}); return f ? f.pp : 0; })();
+  var venue = VENUES.find(function(v){return v.id===state.venue;});
+  var dj = DJ_OPTIONS.find(function(x){return x.id===state.dj;}).cost;
+  var photo = PHOTO_OPTIONS.find(function(x){return x.id===state.photo;}).cost;
+  var decor = DECOR_OPTIONS.find(function(x){return x.id===state.decor;}).cost;
+  var tableware = TABLEWARE_OPTIONS.find(function(x){return x.id===state.tableware;}).cost;
+
+  // SENIOR PACKAGE = Prom (dinner + venue share) + Grad Nite + Yearbook + Luncheon
+  // Per-senior variable cost: grad nite + disney bus share + yearbook + luncheon + prom dinner + 20% tip
+  var promDinnerWithTip = food * 1.20;
+  var hardPerSenior = gradNite + (GRADNITE_BUS / SENIOR_COUNT) + YEARBOOK_COST + luncheon + promDinnerWithTip;
+  state.calc = { gradNite:gradNite, luncheon:luncheon, food:food, venue:venue, dj:dj, photo:photo, decor:decor, tableware:tableware, hardPerSenior:hardPerSenior, promDinnerWithTip:promDinnerWithTip };
+
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F483;&#x1F57A;</div>';
+  html += '<div class="expert-bubble"><h3>NOW THE MATH</h3><p>Remember &mdash; the <strong>Senior Package includes PROM</strong>. So here is the REAL per-senior cost if they buy the full package:</p>';
+  html += '<ul style="margin:1vh 0 1vh 2vw; line-height:1.6;">';
+  html += '<li><strong>Prom</strong> dinner: '+money(food)+' + 20% tip = <strong>'+money(promDinnerWithTip)+'</strong></li>';
+  html += '<li><strong>Grad Nite</strong> ticket: <strong>'+money(gradNite)+'</strong></li>';
+  html += '<li>Disney bus share ($1,200 &divide; 66): <strong>'+money(GRADNITE_BUS/SENIOR_COUNT)+'</strong></li>';
+  html += '<li><strong>Yearbook</strong>: <strong>'+money(YEARBOOK_COST)+'</strong></li>';
+  html += '<li><strong>Luncheon</strong>: <strong>'+money(luncheon)+'</strong></li>';
+  html += '</ul>';
+  html += '<p>Per-senior VARIABLE cost (stuff they directly consume): <span class="big-num" style="color:#8b0000;">'+money(hardPerSenior)+'</span></p>';
+
+  // Fixed prom overhead the whole class has to cover collectively
+  var fixedPromTotal = venue.rent + venue.bus + dj + photo + decor + tableware;
+  html += '<p style="margin-top:1vh;"><strong>Fixed prom overhead</strong> (the whole class splits this no matter how many buy a package):</p>';
+  html += '<ul style="margin:0.5vh 0 1vh 2vw; line-height:1.5;">';
+  html += '<li>Venue rent: '+money(venue.rent)+'</li>';
+  html += '<li>Prom bus: '+money(venue.bus)+'</li>';
+  html += '<li>DJ: '+money(dj)+' &middot; Photographer: '+money(photo)+' &middot; Decorations: '+money(decor)+' &middot; Tableware: '+money(tableware)+'</li>';
+  html += '</ul>';
+  html += '<p>Total fixed prom overhead: <span class="big-num" style="color:#8b0000;">'+money(fixedPromTotal)+'</span></p>';
+  html += '<p style="margin-top:1vh; font-weight:bold;">If you price the Senior Package at the full break-even number, 66 students cover everything. If you drop the price below that, your bank savings + prom-only tickets + Grad-Nite-only tickets + fundraising have to close the gap.</p>';
+  html += '<div class="quote">"Every $1 you drop the package price = $66 missing. Every $1 you raise it = some classmates opting out. You&#39;re in charge."</div></div></div>';
+
+  // Break-even package price if 66 seniors all buy in
+  var breakEvenPkg = Math.ceil(hardPerSenior + (fixedPromTotal / SENIOR_COUNT));
+  html += '<div class="math-panel">';
+  html += '<h3>SET YOUR PRICES</h3>';
+  html += '<p style="margin-bottom:1vh;">Break-even Senior Package price if all 66 seniors buy: <span class="big-num">'+money(breakEvenPkg)+'</span></p>';
+  html += '<p style="margin-bottom:1vh; font-size:0.95em;">You can price it LOWER (more seniors buy, but you owe the gap in fundraising) or HIGHER (fewer seniors buy, but each one covers more).</p>';
+  html += '<div class="math-row"><label><strong>Senior Package Price</strong> ($) &mdash; what you charge each senior</label><input type="number" id="p-pkg" min="0" step="5" placeholder="'+breakEvenPkg+'"></div>';
+  html += '<div class="math-row"><label><strong>Prom-Only Ticket</strong> ($) &mdash; for juniors/sophs buying only prom</label><input type="number" id="p-pro" min="0" step="5" placeholder="120"></div>';
+  html += '<div class="math-row"><label><strong>Grad Nite-Only Ticket</strong> ($) &mdash; seniors who want only Disney</label><input type="number" id="p-gno" min="0" step="5" placeholder="275"></div>';
+  html += '<p style="font-size:0.95em; color:#555; margin-top:1vh;">Drop numbers into the boxes. Edit as many times as you want &mdash; the projection below updates live.</p>';
+  html += '</div>';
+
+  html += '<div class="math-panel" id="proj-panel">';
+  html += '<h3>YOUR LIVE PROJECTION</h3><p style="color:#555;">Updates as you type. Adjust until it looks right.</p><div id="proj-out"></div></div>';
+
+  html += '<button class="btn" id="lock-btn" style="margin:2vh;">LOCK IT IN &mdash; SHOW ME THE RESULTS &raquo;</button>';
+
+  document.getElementById('lab-content').innerHTML = html;
+
+  ['p-pkg','p-pro','p-gno'].forEach(function(id){ document.getElementById(id).addEventListener('input', updateProjection); });
+  document.getElementById('lock-btn').onclick = function(){
+    var pkg = +document.getElementById('p-pkg').value || 0;
+    var pro = +document.getElementById('p-pro').value || 0;
+    var gno = +document.getElementById('p-gno').value || 0;
+    if (!pkg || !pro || !gno) { alert('Fill in all three prices to continue.'); return; }
+    state.prices = { pkg:pkg, promTicket:pro, gradNiteOnly:gno };
+    finalize();
+  };
+  updateProjection();
+}
+
+// Realistic take-rate curves for 66 seniors based on package price
+function simulateTakeRate(pkgPrice, hardPerSenior) {
+  // If price is at or below hard cost, almost everyone buys in.
+  // If it's way above, fewer buy.
+  if (pkgPrice <= hardPerSenior - 30) return 62;
+  if (pkgPrice <= hardPerSenior) return 58;
+  if (pkgPrice <= hardPerSenior + 20) return 55;
+  if (pkgPrice <= hardPerSenior + 40) return 50;
+  if (pkgPrice <= hardPerSenior + 80) return 42;
+  return 35;
+}
+function simulatePromOnly(promPrice) {
+  if (promPrice <= 100) return 20;
+  if (promPrice <= 130) return 16;
+  if (promPrice <= 160) return 12;
+  return 8;
+}
+function simulateGradOnly(gnoPrice) {
+  if (gnoPrice <= 220) return 4;
+  if (gnoPrice <= 280) return 2;
+  return 1;
+}
+
+function updateProjection() {
+  var pkg = +document.getElementById('p-pkg').value || 0;
+  var pro = +document.getElementById('p-pro').value || 0;
+  var gno = +document.getElementById('p-gno').value || 0;
+
+  var c = state.calc;
+  var pkgBuyers = pkg ? simulateTakeRate(pkg, c.hardPerSenior) : 0;
+  var promOnlyBuyers = pro ? simulatePromOnly(pro) : 0;
+  var gradOnlyBuyers = gno ? simulateGradOnly(gno) : 0;
+
+  // Revenue
+  var pkgRev = pkgBuyers * pkg;
+  var proRev = promOnlyBuyers * pro;
+  var gnoRev = gradOnlyBuyers * gno;
+  var totalRev = pkgRev + proRev + gnoRev;
+
+  // Attendance
+  var gradNiteAttendees = pkgBuyers + gradOnlyBuyers;
+  var promAttendees = pkgBuyers + promOnlyBuyers;
+
+  // Expenses
+  var disneyTix = gradNiteAttendees * c.gradNite;
+  var disneyBus = GRADNITE_BUS;
+  var yearbookExp = pkgBuyers * YEARBOOK_COST;
+  var luncheonExp = pkgBuyers * c.luncheon;
+  var promFood = promAttendees * c.food * 1.20; // +20% tip
+  var venueCost = c.venue.rent;
+  var busCost = c.venue.bus;
+  var otherProm = c.dj + c.photo + c.decor + c.tableware;
+  var totalExp = disneyTix + disneyBus + yearbookExp + luncheonExp + promFood + venueCost + busCost + otherProm;
+
+  // Net (including current bank carry)
+  var net = state.balance + totalRev - totalExp;
+
+  var html = '';
+  html += '<div class="math-row"><label>Senior Packages sold ('+pkgBuyers+' of '+SENIOR_COUNT+')</label><span class="val">'+money(pkgRev)+'</span></div>';
+  html += '<div class="math-row"><label>Prom-Only tickets ('+promOnlyBuyers+' buyers)</label><span class="val">'+money(proRev)+'</span></div>';
+  html += '<div class="math-row"><label>Grad Nite-Only ('+gradOnlyBuyers+' buyers)</label><span class="val">'+money(gnoRev)+'</span></div>';
+  html += '<div class="math-row"><label>&nbsp;&nbsp;&nbsp;&rarr; Total ticket revenue</label><span class="val">'+money(totalRev)+'</span></div>';
+  html += '<div class="math-row"><label>Bank carried into senior year</label><span class="val">'+money(state.balance)+'</span></div>';
+  html += '<div class="math-row"><label>&nbsp;&nbsp;&nbsp;&rarr; Grad Nite tickets ('+gradNiteAttendees+' &times; '+money(c.gradNite)+')</label><span class="val neg">'+money(-disneyTix)+'</span></div>';
+  html += '<div class="math-row"><label>&nbsp;&nbsp;&nbsp;&rarr; Disney bus</label><span class="val neg">'+money(-disneyBus)+'</span></div>';
+  html += '<div class="math-row"><label>&nbsp;&nbsp;&nbsp;&rarr; Yearbooks ('+pkgBuyers+' &times; $45)</label><span class="val neg">'+money(-yearbookExp)+'</span></div>';
+  html += '<div class="math-row"><label>&nbsp;&nbsp;&nbsp;&rarr; Luncheon ('+pkgBuyers+' &times; '+money(c.luncheon)+')</label><span class="val neg">'+money(-luncheonExp)+'</span></div>';
+  html += '<div class="math-row"><label>&nbsp;&nbsp;&nbsp;&rarr; Prom food ('+promAttendees+' &times; '+money(c.food)+' + 20% tip)</label><span class="val neg">'+money(-promFood)+'</span></div>';
+  html += '<div class="math-row"><label>&nbsp;&nbsp;&nbsp;&rarr; Venue ('+c.venue.name+')</label><span class="val neg">'+money(-venueCost)+'</span></div>';
+  html += '<div class="math-row"><label>&nbsp;&nbsp;&nbsp;&rarr; Prom bus</label><span class="val neg">'+money(-busCost)+'</span></div>';
+  html += '<div class="math-row"><label>&nbsp;&nbsp;&nbsp;&rarr; DJ + Photo + Decor + Tableware</label><span class="val neg">'+money(-otherProm)+'</span></div>';
+  html += '<div class="math-row total"><label>PROJECTED BALANCE (end of senior year)</label><span class="val '+(net<0?'neg':'')+'">'+money(net)+'</span></div>';
+
+  document.getElementById('proj-out').innerHTML = html;
+  state.projection = { pkgBuyers:pkgBuyers, promOnlyBuyers:promOnlyBuyers, gradOnlyBuyers:gradOnlyBuyers,
+    totalRev:totalRev, totalExp:totalExp, net:net,
+    disneyTix:disneyTix, disneyBus:disneyBus, yearbookExp:yearbookExp, luncheonExp:luncheonExp,
+    promFood:promFood, venueCost:venueCost, busCost:busCost, otherProm:otherProm,
+    gradNiteAttendees:gradNiteAttendees, promAttendees:promAttendees };
+}
+
+// ============ FINAL TALLY ============
+function finalize() {
+  var p = state.projection;
+  var c = state.calc;
+  // Apply everything to the actual bank now
+  adjust(p.totalRev, 'Ticket revenue (pkg + prom-only + grad-only)');
+  adjust(-p.disneyTix, 'Disney Grad Nite tickets');
+  adjust(-p.disneyBus, 'Disney bus');
+  adjust(-p.yearbookExp, 'Yearbooks');
+  adjust(-p.luncheonExp, 'Senior Luncheon');
+  adjust(-p.promFood, 'Prom food + 20% tip');
+  adjust(-p.venueCost, 'Prom venue: ' + c.venue.name);
+  if (p.busCost>0) adjust(-p.busCost, 'Prom bus');
+  adjust(-p.otherProm, 'DJ + Photo + Decor + Tableware');
+
+  var bal = state.balance;
+  var tier = bal >= 2000 ? 'platinum' : bal >= 0 ? 'ok' : bal >= -2000 ? 'pinched' : 'deep';
+
+  var bg = document.getElementById('end-bg');
+  var stamp = document.getElementById('end-stamp');
+  var title = document.getElementById('end-title');
+  var box = document.getElementById('end-box');
+  var tally = document.getElementById('end-tally');
+
+  if (tier==='platinum') {
+    bg.className='screen-bg bg-win';
+    stamp.innerHTML = '<div class="stamp gold">&#x1F3C6; SURPLUS</div>';
+    title.textContent = 'YOU FINISHED IN THE BLACK.';
+    box.innerHTML = '<p>You ended the year with '+money(bal)+' left over. Class gifts, after-prom breakfast, or carry-forward to help next year&#39;s class &mdash; your call.</p><p>The math worked out.</p>';
+  } else if (tier==='ok') {
+    bg.className='screen-bg bg-ok';
+    stamp.innerHTML = '<div class="stamp good">&#x2705; ON BUDGET</div>';
+    title.textContent = 'YOU HIT THE TARGET.';
+    box.innerHTML = '<p>You covered every line. Prom, Grad Nite, luncheon, yearbooks &mdash; all paid for. This is what a healthy senior budget looks like.</p>';
+  } else if (tier==='pinched') {
+    bg.className='screen-bg bg-bad';
+    stamp.innerHTML = '<div class="stamp">&#x26A0;&#xFE0F; SHORT</div>';
+    title.textContent = 'YOU CAME UP SHORT.';
+    box.innerHTML = '<p>You ended the year '+money(Math.abs(bal))+' in the red. For context, last year&#39;s Class of &#39;25 landed at -$4,111 &mdash; ASB covered the gap and the next class started tighter.</p><p>Look at the ledger below. Try a different mix &mdash; different venue, different pricing, different fundraising &mdash; and see what changes.</p>';
+  } else {
+    bg.className='screen-bg bg-bad';
+    stamp.innerHTML = '<div class="stamp">&#x1F4A5; DEEP RED</div>';
+    title.textContent = 'SIGNIFICANT SHORTFALL.';
+    box.innerHTML = '<p>The gap is '+money(Math.abs(bal))+'. At this level the school has to absorb the shortfall, which limits what next year&#39;s class can do.</p><p>Run it again with different choices. Small changes in package price, venue, or food tier move the number a lot.</p>';
+  }
+
+  var h = '<div style="font-family:\'Bangers\'; font-size:1.3em; color:#d4af37; letter-spacing:2px; text-align:center; margin-bottom:1vh;">FINAL LEDGER</div>';
+  state.log.forEach(function(e){
+    var cls = e.delta>=0 ? 'pos' : 'neg';
+    var sign = e.delta>=0 ? '+' : '';
+    h += '<div class="row"><span>'+e.label+'</span><span class="'+cls+'">'+sign+money(e.delta)+'</span></div>';
+  });
+  h += '<div class="row"><span>ENDING BALANCE</span><span class="'+(bal>=0?'pos':'neg')+'">'+money(bal)+'</span></div>';
+  tally.innerHTML = h;
+
+  show('sEnd');
+}
+
+function restart() { startGrade(state.grade); }
+
+// ============ FULLSCREEN ============
+function toggleFullscreen() {
+  var el = document.documentElement;
+  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+    var req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+    if (req) req.call(el).catch(function(){});
+  } else {
+    var exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+    if (exit) exit.call(document).catch(function(){});
+  }
+}
+document.addEventListener('fullscreenchange', function(){
+  var btn = document.getElementById('fs-toggle');
+  if (!btn) return;
+  btn.innerHTML = document.fullscreenElement ? '&#x2715; EXIT FULL' : '&#x26F6; FULLSCREEN';
+});
+
+// ============ AUDIO ENGINE ============
+// WWTBAM-style soundtrack. Files in ./audio/ — game is silent if missing.
+function playSfx(id, vol) {
+  var a = document.getElementById(id);
+  if (!a) return;
+  try { a.volume = vol || 0.6; a.currentTime = 0; a.play().catch(function(){}); } catch(e) {}
+}
+function playBg() {
+  var a = document.getElementById('bg-music');
+  if (!a) return;
+  try { a.volume = 0.25; a.play().catch(function(){}); } catch(e) {}
+}
+function stopBg() {
+  var a = document.getElementById('bg-music');
+  if (!a) return; try { a.pause(); } catch(e) {}
+}
+
+// Audio unlock + opening fanfare on first click (Chromebook autoplay compat)
+var audioUnlocked = false;
+document.addEventListener('click', function firstClick() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+  try { var ctx = new (window.AudioContext||window.webkitAudioContext)(); var buf = ctx.createBuffer(1,1,22050); var src = ctx.createBufferSource(); src.buffer = buf; src.connect(ctx.destination); src.start(0); } catch(e) {}
+  playSfx('bg-walkin', 0.5);
+  setTimeout(playBg, 2800); // start think-music loop after walk-in
+});
+
+// Hook sound effects into existing flow
+var _originalRenderLabStep = renderLabStep;
+renderLabStep = function(){ _originalRenderLabStep(); document.querySelectorAll('#lab-content .pick-card').forEach(function(el){ var orig = el.onclick; el.onclick = function(){ playSfx('sfx-select', 0.5); orig(); }; }); };
+
+var _originalRunFundStep = runFundStep;
+runFundStep = function(idx){ _originalRunFundStep(idx); document.querySelectorAll('#fund-content .fund-card').forEach(function(el){ var orig = el.onclick; el.onclick = function(){ playSfx('sfx-select', 0.5); setTimeout(function(){ playSfx('sfx-lockin', 0.5); }, 300); orig(); }; }); };
+
+var _originalFinalize = finalize;
+finalize = function(){ playSfx('sfx-lockin', 0.6); _originalFinalize(); setTimeout(function(){ var bal = state.balance; stopBg(); if (bal >= 0) playSfx('sfx-win', 0.7); else playSfx('sfx-lose', 0.7); }, 800); };
+</script>
+</body></html>

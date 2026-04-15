@@ -1,0 +1,13 @@
+# OS junk
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Editor junk
+.vscode/
+.idea/
+*.swp
+*~
+
+# Keep the folders tracked even if empty
+!audio/.gitkeep
