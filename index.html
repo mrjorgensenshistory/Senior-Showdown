@@ -324,6 +324,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
        audio/sfx-lose.mp3        — lose sting (search "game show lose" / "wrong answer")
      Game is silent if files are missing — safe to ship without audio. -->
 <audio id="bg-music" loop preload="auto"><source src="audio/bg-think.mp3" type="audio/mpeg"></audio>
+<audio id="rick-music" loop preload="auto"><source src="audio/rickroll.mp3" type="audio/mpeg"></audio>
 <audio id="bg-walkin" preload="auto"><source src="audio/bg-walkin.mp3" type="audio/mpeg"></audio>
 <audio id="sfx-select" preload="auto"><source src="audio/sfx-select.mp3" type="audio/mpeg"></audio>
 <audio id="sfx-lockin" preload="auto"><source src="audio/sfx-lockin.mp3" type="audio/mpeg"></audio>
@@ -422,6 +423,13 @@ function show(id) {
   document.getElementById(id).classList.add('active');
   document.getElementById('bank').style.display = (id==='sFund' || id==='sLab' || id==='sEnd') ? 'block' : 'none';
   document.getElementById('month-tag').style.display = (id==='sFund') ? 'block' : 'none';
+  // Leaving the Bobby cutscene? kill the rickroll and restore bg music.
+  if (id !== 'sBobby') {
+    var rick = document.getElementById('rick-music');
+    if (rick) { try { rick.pause(); rick.currentTime = 0; } catch(e) {} }
+    var bg = document.getElementById('bg-music');
+    if (bg && audioUnlocked) { try { bg.volume = 0.25; bg.play().catch(function(){}); } catch(e) {} }
+  }
   window.scrollTo(0,0);
   document.getElementById(id).scrollTop = 0;
 }
@@ -907,8 +915,13 @@ function triggerBobby(kind) {
     html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>The AUX cable was compromised.</strong></p><p>Someone&#39;s phone played The Song. Bobby Boucher heard it from across the parking lot and power-drove your entire dance floor.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Prom is over. You&#39;re over.</p></div>';
   }
   document.getElementById('bobby-body').innerHTML = html;
-  stopBg();              // mute the background track FIRST
-  // No sfx-lose on cutscenes — the GIF + Bobby/Terry visual is the gag, sound stings just step on it
+  // Bg music keeps playing through cutscenes... EXCEPT rickroll.
+  if (kind === 'playlist') {
+    var bg = document.getElementById('bg-music');
+    if (bg) { try { bg.pause(); bg.volume = 0; } catch(e) {} }
+    var rick = document.getElementById('rick-music');
+    if (rick) { try { rick.volume = 0.7; rick.currentTime = 0; rick.play().catch(function(){}); } catch(e) {} }
+  }
   show('sBobby');
 }
 
@@ -1145,7 +1158,7 @@ function bobbyHelmetTeachingMoment() {
     '<p style="margin-top:0.6vh;">Little does Bobby know \u2026 you already spent it. On your senior class.</p>' +
     '<p style="margin-top:0.6vh; font-weight:bold;">Little do you know \u2026 Bobby just found out.</p>' +
     '<img src="'+BOBBY_TACKLE_GIF+'" alt="Bobby tackle" style="display:block; max-width:min(420px,75vw); margin:1.5vh auto; border:5px solid #d4af37; border-radius:10px; box-shadow:0 0 25px rgba(255,50,50,0.6);" onerror="this.style.display=\'none\'">' +
-    '<p style="margin-top:0.8vh;"><strong>The rule:</strong> every ASB account is legally separate. Football&#39;s $2,000 is football&#39;s. Class of \u201927&#39;s money is Class of \u201927&#39;s. <strong>You cannot spend from another account to cover your own shortfall.</strong> That\u2019s called commingling, and it\u2019s an FCMAT violation on top of the cash-on-hand one.</p>' +
+    '<p style="margin-top:0.8vh;"><strong>The rule:</strong> every ASB account is legally separate. Football&#39;s $2,000 is football&#39;s. Class of \u201927&#39;s money is Class of \u201927&#39;s. <strong>You cannot spend from another account to cover your own shortfall.</strong> That\u2019s called commingling, and it\u2019s a FCMAT violation on top of the cash-on-hand one.</p>' +
     '<p style="margin-top:0.6vh; font-style:italic;">Senior class is broke? Senior class fundraises. You don\u2019t touch football&#39;s money. Ever.</p>' +
     '<p style="margin-top:1vh; font-weight:bold; color:#8b0000; font-size:1.15em; text-align:center;">Go fix it until you have a positive balance!</p>' +
     '</div>';
@@ -1199,14 +1212,6 @@ document.addEventListener('click', function firstClick() {
   setTimeout(playBg, 2800); // start think-music loop after walk-in
 });
 
-// Hook sound effects into existing flow
-var _originalRenderLabStep = renderLabStep;
-renderLabStep = function(){ _originalRenderLabStep(); document.querySelectorAll('#lab-content .pick-card').forEach(function(el){ var orig = el.onclick; el.onclick = function(){ playSfx('sfx-select', 0.5); orig(); }; }); };
-
-var _originalRunFundStep = runFundStep;
-runFundStep = function(idx){ _originalRunFundStep(idx); document.querySelectorAll('#fund-content .fund-card').forEach(function(el){ var orig = el.onclick; el.onclick = function(){ playSfx('sfx-select', 0.5); setTimeout(function(){ playSfx('sfx-lockin', 0.5); }, 300); orig(); }; }); };
-
-var _originalFinalize = finalize;
-finalize = function(){ playSfx('sfx-lockin', 0.6); _originalFinalize(); setTimeout(function(){ var bal = state.balance; stopBg(); if (bal >= 0) playSfx('sfx-win', 0.7); else playSfx('sfx-lose', 0.7); }, 800); };
+// SFX stings removed per user direction — Happy Happy Game Show plays throughout, no interruptions.
 </script>
 </body></html>
