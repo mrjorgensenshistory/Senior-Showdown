@@ -920,6 +920,10 @@ function triggerBobby(kind) {
     html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F3C8; TERRY TATE DOESN&#39;T LIKE BARE BONES</h2>';
     html += '<img src="'+randomTerryTate()+'" alt="Terry Tate Office Linebacker" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8);" onerror="this.style.display=\'none\'">';
     html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>Bare bones decorations.</strong></p><p>You rented a $6,775 venue and then spent $0 on decorations. So prom was literally folding tables and a vibe. One parent took a picture and immediately asked to speak to the advisor.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Terry Tate took one look and charged anyway.</p></div>';
+  } else if (kind === 'nobus') {
+    html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F3C8; BOBBY DIDN&#39;T GET A SEAT ON THE BUS</h2>';
+    html += '<img src="'+BOBBY_TACKLE_GIF+'" alt="Bobby Boucher tackle" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8); margin-bottom:1vh;" onerror="this.style.display=\'none\'">';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.3em;"><strong>You oversold prom.</strong></p><p>Senior Packages plus Prom-Only tickets went over <strong>100</strong>. The venue and the bus max out at 100 bodies. Bobby Boucher bought a ticket, showed up, and there was no seat for him.</p><img src="'+WATERBOY_IMG+'" style="max-width:150px; margin-top:1.5vh; border:3px solid #d4af37; border-radius:6px;" onerror="this.style.display=\'none\'"><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Bobby does NOT miss prom. He is charging the entire senior class instead. Prom-tackled.</p></div>';
   } else if (kind === 'playlist') {
     // Rickroll via YouTube embed + Captain Insano caption
     html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F4F1; YOU\'VE BEEN RICKROLLED</h2>';
@@ -987,10 +991,11 @@ function renderPricingLab() {
   html += '<div class="math-row"><label><strong>Prom-Only Ticket</strong> ($) &mdash; for juniors/sophs buying only prom</label><input type="number" id="p-pro" min="0" step="5" placeholder="120"></div>';
   html += '<div class="math-row"><label><strong>Grad Nite-Only Ticket</strong> ($) &mdash; seniors who want only Disney</label><input type="number" id="p-gno" min="0" step="5" placeholder="275"></div>';
   html += '<h3 style="margin-top:2vh;">HOW MANY DO YOU THINK YOU&#39;LL SELL?</h3>';
-  html += '<p style="font-size:0.95em; color:#555; margin-bottom:1vh;">You have <strong>'+SENIOR_COUNT+' seniors</strong>. Packages + Grad-Nite-Only can&#39;t exceed that (a senior is one person). Prom-Only is open to juniors/sophs &mdash; cap <strong>100</strong>, or <strong>0</strong> if you want seniors-only prom.</p>';
+  html += '<p style="font-size:0.95em; color:#555; margin-bottom:1vh;">You have <strong>'+SENIOR_COUNT+' seniors</strong>. Packages + Grad-Nite-Only can&#39;t exceed that (a senior is one person). Prom-Only is open to juniors/sophs.</p>';
+  html += '<p style="font-size:0.95em; color:#8b0000; margin-bottom:1vh;"><strong>VENUE + BUS CAPACITY: 100 prom attendees total.</strong> Senior Packages + Prom-Only tickets can&#39;t go over 100. If you try to lock in more than 100, Bobby Boucher shows up mad about his seat. Balance the numbers yourself.</p>';
   html += '<div class="math-row"><label><strong>Senior Packages sold</strong> (0&ndash;'+SENIOR_COUNT+')</label><input type="number" id="q-pkg" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder="'+SENIOR_COUNT+'"></div>';
   html += '<div class="math-row"><label><strong>Grad Nite-Only tickets sold</strong> (seniors w/o package)</label><input type="number" id="q-gno" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder="2"></div>';
-  html += '<div class="math-row"><label><strong>Prom-Only tickets sold</strong> (0&ndash;100, underclassmen)</label><input type="number" id="q-pro" min="0" max="100" step="1" placeholder="16"></div>';
+  html += '<div class="math-row"><label><strong>Prom-Only tickets sold</strong> (underclassmen &mdash; but remember the 100 total cap)</label><input type="number" id="q-pro" min="0" step="1" placeholder="16"></div>';
   html += '<p id="q-warn" style="color:#8b0000; font-weight:bold; font-size:0.95em; min-height:1.2em;"></p>';
   html += '<p style="font-size:0.95em; color:#555; margin-top:1vh;">Drop numbers into the boxes. Edit as many times as you want &mdash; the projection below updates live.</p>';
   html += '</div>';
@@ -1013,6 +1018,7 @@ function renderPricingLab() {
     if (!pkg || !pro || !gno) { alert('Fill in all three prices to continue.'); return; }
     if (isNaN(qPkg) || isNaN(qGno) || isNaN(qPro)) { alert('Fill in all three quantities (how many you expect to sell). Use 0 if none.'); return; }
     if (qPkg + qGno > SENIOR_COUNT) { alert('Senior Packages + Grad-Nite-Only can\'t exceed '+SENIOR_COUNT+' seniors. Adjust.'); return; }
+    if (qPkg + qPro > 100) { triggerBobby('nobus'); return; }
     state.prices = { pkg:pkg, promTicket:pro, gradNiteOnly:gno };
     finalize();
   };
@@ -1057,7 +1063,7 @@ function updateProjection() {
   // Clamp
   if (!isNaN(qPkg)) qPkg = Math.max(0, Math.min(SENIOR_COUNT, qPkg));
   if (!isNaN(qGno)) qGno = Math.max(0, Math.min(SENIOR_COUNT, qGno));
-  if (!isNaN(qPro)) qPro = Math.max(0, Math.min(100, qPro));
+  if (!isNaN(qPro)) qPro = Math.max(0, qPro);
 
   var c = state.calc;
   // If player hasn't filled a quantity, show 0 (not a simulated guess — they must decide)
@@ -1065,14 +1071,17 @@ function updateProjection() {
   var gradOnlyBuyers = isNaN(qGno) ? 0 : qGno;
   var promOnlyBuyers = isNaN(qPro) ? 0 : qPro;
 
-  // Warn if seniors overflow
+  // Warn if seniors overflow OR prom capacity overflow
   var warnEl = document.getElementById('q-warn');
   if (warnEl) {
+    var msgs = [];
     if (pkgBuyers + gradOnlyBuyers > SENIOR_COUNT) {
-      warnEl.textContent = '\u26A0 Packages + Grad-Nite-Only = '+(pkgBuyers+gradOnlyBuyers)+'. You only have '+SENIOR_COUNT+' seniors.';
-    } else {
-      warnEl.textContent = '';
+      msgs.push('\u26A0 Packages + Grad-Nite-Only = '+(pkgBuyers+gradOnlyBuyers)+'. You only have '+SENIOR_COUNT+' seniors.');
     }
+    if (pkgBuyers + promOnlyBuyers > 100) {
+      msgs.push('\u26A0 Prom capacity blown: Packages + Prom-Only = '+(pkgBuyers+promOnlyBuyers)+'. Max is 100. Bobby is warming up.');
+    }
+    warnEl.innerHTML = msgs.join('<br>');
   }
 
   // Revenue
