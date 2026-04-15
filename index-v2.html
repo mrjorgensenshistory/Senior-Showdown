@@ -531,6 +531,30 @@ var PRODUCTS = {
       return 'At <strong>' + money(p) + '/cup</strong>, about <strong>' + v + ' cups</strong> sold during the game.';
     }
   },
+  bundt_cake: {
+    icon: '&#x1F370;',
+    name: 'Bundt Cake Sale (Spring)',
+    unit: 'cake',
+    unitCost: 7,
+    unitCostLabel: '$7 per cake (wholesale from the store)',
+    pool: SCHOOL_TOTAL,
+    poolLabel: '450 students + 20 adults',
+    story: 'Spring fundraiser. You buy Bundt cakes wholesale at <strong>$7 each</strong> and resell them. Parents love these for Mother\'s Day and spring birthdays. Pool: <strong>450 students + 20 adults = 470 potential customers</strong> (they take them home for family).',
+    priceQuestion: 'How much do you want to charge per Bundt cake?',
+    defaultPrice: 15,
+    demandSamples: [10, 12, 15, 18, 22],
+    volumeByPrice: function(p) {
+      if (p <= 10) return 120;
+      if (p <= 12) return 90;
+      if (p <= 15) return 60;
+      if (p <= 18) return 40;
+      if (p <= 22) return 22;
+      return 10;
+    },
+    volumeExplain: function(p, v) {
+      return 'At <strong>' + money(p) + ' per cake</strong>, about <strong>' + v + ' cakes</strong> sold. Families bought them home, some for Mother\'s Day, some just because they\'re good cake.';
+    }
+  },
   car_wash: {
     icon: '&#x1F697;',
     name: 'Car Wash (one Saturday, ~3 hours)',
@@ -569,20 +593,24 @@ var PRODUCTS = {
 //   { label, yield: 500 }              — simple reveal, static yield
 var FUND_STEPS = {
   10: [
-    { month:'AUGUST &mdash; 10TH GRADE',
-      prompt:'<h3>Fall fundraiser pick.</h3><p>You get ONE shot at a big fall push. What does your class want to run?</p>',
+    { month:'OCTOBER &mdash; 10TH GRADE',
+      prompt:'<h3>&#x1F383; Halloween Haunted House.</h3><p>Your class target this year: <strong>$1,500</strong>. First big event: a Haunted House for the whole school. You pick the theme, the decorations, the costumes, the ticket price &mdash; and whether you feed your volunteers. One night event.</p>',
       options:[
-        { label:'&#x1F697; CAR WASH &mdash; one Saturday, ~3 hours', product:'car_wash' },
-        { label:'&#x1F369; DONUT SALE &mdash; 6 Friday mornings', product:'donut_fall' },
-        { label:'&#x2615; HOT CHOCOLATE STAND &mdash; one football game', product:'hot_cocoa' },
-        { label:'&#x1F4A4; Skip fall fundraising', yield:0, cutscene:{gif:'terry-tate', title:'TERRY TATE HEARD ABOUT THAT', msg:'While other classes stack money, you just skipped. Terry does not approve of coasting.'} }
+        { label:'&#x1F47B; RUN THE HAUNTED HOUSE &mdash; design it yourself', hauntedHouse:true },
+        { label:'&#x1F4A4; Skip Halloween &mdash; too much work', yield:0, cutscene:{gif:'terry-tate', title:'TERRY TATE HEARD ABOUT THAT', msg:'Class of 10th skipped their own Halloween event. Other classes used the month to stack cash. Terry is taking attendance.'} }
       ] },
     { month:'DECEMBER &mdash; 10TH GRADE',
-      prompt:'<h3>Winter Concessions.</h3><p>Staff splits profit by hours worked. Real payout depends on class turnout.</p>',
+      prompt:'<h3>Winter Concessions.</h3><p>Basketball season home games. Staff splits profit by hours worked. Real payout depends on class turnout.</p>',
       options:[
-        { label:'&#x1F525; All officers sign up for EVERY home game', yield:1200 },
-        { label:'&#x1F91D; Officers split &mdash; half the shifts', yield:600 },
-        { label:'&#x1F4F4; Skip &mdash; we&#39;re busy', yield:50, cutscene:{gif:'bobby', title:'WATER. BOY.', msg:'Everyone was "too busy." Other classes worked the whole season. You made $50 in vending machine change.'} }
+        { label:'&#x1F525; All officers sign up for EVERY home game', yield:900 },
+        { label:'&#x1F91D; Officers split &mdash; half the shifts', yield:450 },
+        { label:'&#x1F4F4; Skip &mdash; we&#39;re busy', yield:40, cutscene:{gif:'bobby', title:'WATER. BOY.', msg:'Everyone was "too busy." Other classes worked the whole season. You made $40 in vending machine change.'} }
+      ] },
+    { month:'APRIL &mdash; 10TH GRADE',
+      prompt:'<h3>&#x1F370; Spring Bundt Cake Sale.</h3><p>Major spring fundraiser. Wholesale cost: <strong>$7 per cake</strong>. You set the price. Supply and demand does the rest.</p>',
+      options:[
+        { label:'&#x1F370; RUN THE BUNDT CAKE SALE', product:'bundt_cake' },
+        { label:'&#x1F4A4; Skip the cake sale', yield:0, cutscene:{gif:'terry-tate', title:'TERRY TATE SEES YOU', msg:'You passed on your biggest spring fundraiser. Terry is not clapping.'} }
       ] }
   ],
   11: [
@@ -702,7 +730,10 @@ function setGradeMusic(grade) {
 
 function runFundStep(idx) {
   var steps = FUND_STEPS[state.grade];
-  if (idx >= steps.length) { show('sLab'); runLab(); return; }
+  if (idx >= steps.length) {
+    if (state.grade === 10) { run10thEndParty(); return; }
+    show('sLab'); runLab(); return;
+  }
   var step = steps[idx];
   setMonth(step.month);
   var html = '<div class="info-box">' + step.prompt + '</div>';
@@ -719,6 +750,8 @@ function runFundStep(idx) {
         runProductMath(PRODUCTS[opt.product], step.month + ': ' + cleanLabel, function(){
           runFundStep(idx+1);
         });
+      } else if (opt.hauntedHouse) {
+        runHauntedHouse(function(){ runFundStep(idx+1); });
       } else {
         adjust(opt.yield, step.month + ': ' + cleanLabel);
         if (opt.cutscene) {
@@ -985,6 +1018,18 @@ function triggerBobby(kind) {
     html += '<div style="text-align:center; margin:1vh auto; max-width:600px;"><p style="font-family:\'Bangers\'; font-size:clamp(1.3rem,2.5vw,1.8rem); color:#8b0000; letter-spacing:1.5px;">BOBBY HEARD YOUR PLAYLIST</p><p style="font-family:\'Bangers\'; font-size:clamp(1rem,2vw,1.4rem); color:#444; letter-spacing:1px;">HE IS NOT OKAY WITH IT</p></div>';
     html += '<img src="'+BOBBY_TACKLE_GIF+'" alt="Bobby Boucher tackle" style="max-width:min(400px,70vw); border:4px solid #d4af37; border-radius:8px; margin:1vh auto; display:block;" onerror="this.style.display=\'none\'">';
     html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>The AUX cable was compromised.</strong></p><p>Someone&#39;s phone played The Song. Bobby Boucher heard <em>your music taste</em> from across the parking lot and concluded that this prom should not exist. He power-drove the entire dance floor.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Your playlist is the problem. Prom is over. You&#39;re over.</p></div>';
+  } else if (kind === 'nofood') {
+    html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F3C8; TERRY TATE: FEED YOUR VOLUNTEERS</h2>';
+    html += '<img src="'+randomTerryTate()+'" alt="Terry Tate Office Linebacker" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8);" onerror="this.style.display=\'none\'">';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>You ran a 5-hour Haunted House with 40 student volunteers and fed them NOTHING.</strong></p><p>Parents called. Advisor got an email. Somebody&#39;s mom showed up with a Costco tray and a lecture. The event got shut down halfway through opening night.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Terry Tate heard there was no pizza. Terry Tate CHARGED.</p></div>';
+  } else if (kind === 'partymoney') {
+    html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F3C8; BOBBY: THAT WAS PROM MONEY</h2>';
+    html += '<img src="'+BOBBY_TACKLE_GIF+'" alt="Bobby Boucher tackle" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8); margin-bottom:1vh;" onerror="this.style.display=\'none\'">';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.3em;"><strong>You blew the end-of-year party budget.</strong></p><p>That money was supposed to roll to next year. You spent it. Bobby Boucher is a junior next year and his prom bus just got smaller because of you.</p><img src="'+WATERBOY_IMG+'" style="max-width:150px; margin-top:1.5vh; border:3px solid #d4af37; border-radius:6px;" onerror="this.style.display=\'none\'"><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Prom-tackled two years early.</p></div>';
+  } else if (kind === 'emptylot') {
+    html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F3C8; TERRY TATE: THIS IS JUST DETENTION</h2>';
+    html += '<img src="'+randomTerryTate()+'" alt="Terry Tate Office Linebacker" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8);" onerror="this.style.display=\'none\'">';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>Your class stood in an empty parking lot eating nothing.</strong></p><p>You banked almost everything and threw no party. 10th graders need a reason to keep showing up to ASB meetings. You gave them concrete and awkward silence.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">That&#39;s not a party. That&#39;s detention. Terry Tate charged on principle.</p></div>';
   }
   document.getElementById('bobby-body').innerHTML = html;
   // show('sBobby') handles audio (rickroll on, bg muted)
@@ -1271,6 +1316,379 @@ function validateWorksheet() {
     }
   }
   return allGood && filled === cells.length;
+}
+
+// ============ 10TH GRADE: HAUNTED HOUSE ============
+var HAUNTED_THEMES = [
+  { id:'graveyard',  name:'Classic Graveyard',       ic:'&#x26B0;' },
+  { id:'asylum',     name:'Haunted Hospital',        ic:'&#x1F3E5;' },
+  { id:'carnival',   name:'Haunted Carnival',        ic:'&#x1F3AA;' },
+  { id:'witch',      name:'Witch&#39;s Forest',      ic:'&#x1F9D9;' },
+  { id:'upsidedown', name:'Stranger Things Upside Down', ic:'&#x1F4FC;' },
+  { id:'scooby',     name:'Scooby-Doo Mystery Mansion',  ic:'&#x1F436;' },
+  { id:'zombie',     name:'Zombie Apocalypse',       ic:'&#x1F9DF;' },
+  { id:'monsters',   name:'Universal Monster Mash',  ic:'&#x1F9DB;' }
+];
+var HAUNTED_COSTUMES = [
+  { id:'thrift', name:'Thrift-store costumes', cost:50,  desc:'Dig through closets + Goodwill. Scrappy.' },
+  { id:'basic',  name:'Basic costumes',        cost:150, desc:'Party City mid-tier.' },
+  { id:'legit',  name:'Legit costumes',        cost:400, desc:'Halloween-store premium masks + outfits.' }
+];
+var HAUNTED_DECOR = [
+  { id:'diy',     name:'DIY decorations',      cost:80,  desc:'Trash bags, cardboard tombstones, fog machine rental.' },
+  { id:'basic',   name:'Basic decor kit',      cost:200, desc:'Store-bought props, strobe, fog, spider webs.' },
+  { id:'premium', name:'Premium decor',        cost:500, desc:'Animatronics, black lights, full set pieces.' }
+];
+// Ticket demand curve (max $10, pool 450 students)
+function hauntedTicketVolume(price) {
+  if (price <= 3)  return 180;
+  if (price <= 5)  return 140;
+  if (price <= 7)  return 100;
+  if (price <= 9)  return 70;
+  if (price <= 10) return 55;
+  return 0; // shouldn't happen — capped at $10
+}
+var HAUNTED_TICKET_SAMPLES = [3, 5, 7, 9, 10];
+
+function runHauntedHouse(onDone) {
+  state.haunted = { price:null, theme:null, costumes:null, decor:null, pizza:null };
+  hhStep1(onDone);
+}
+
+// STEP 1 — Ticket price (max $10) with supply/demand preview
+function hhStep1(onDone) {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F383;</div>';
+  html += '<div class="expert-bubble"><h3>STEP 1 &mdash; SET TICKET PRICE</h3>';
+  html += '<p>Your Haunted House runs one night. School-wide. Tickets cannot go above <strong>$10</strong> &mdash; admin rule.</p>';
+  html += '<div class="quote">"Cheap tickets pack the line. Expensive tickets shorten it. You pick which problem you want."</div></div></div>';
+
+  // Supply/demand preview
+  html += '<div class="math-panel" style="border-left:4px solid #d4af37;"><h3>SUPPLY &amp; DEMAND &mdash; HAUNTED HOUSE TICKETS</h3>';
+  html += '<p style="color:#555; font-size:0.95em; margin-bottom:1vh;">Realistic pool: <strong>450 students</strong> (not all of them will come). Max ticket price: <strong>$10</strong>.</p>';
+  html += '<table style="width:100%; margin:1vh 0; border-collapse:collapse;"><thead><tr style="background:#fef6d5;"><th style="padding:0.5vh; border:1px solid #d4af37;">Ticket price</th><th style="padding:0.5vh; border:1px solid #d4af37;">Expected tickets sold</th><th style="padding:0.5vh; border:1px solid #d4af37;">% of pool</th></tr></thead><tbody>';
+  HAUNTED_TICKET_SAMPLES.forEach(function(pp){
+    var vv = hauntedTicketVolume(pp);
+    var pct = Math.round((vv / 450) * 100);
+    html += '<tr><td style="padding:0.4vh; border:1px solid #ddd; text-align:center;">'+money(pp)+'</td><td style="padding:0.4vh; border:1px solid #ddd; text-align:center;">'+vv+'</td><td style="padding:0.4vh; border:1px solid #ddd; text-align:center; color:#555;">'+pct+'%</td></tr>';
+  });
+  html += '</tbody></table></div>';
+
+  html += '<div class="math-panel"><h3>YOUR TICKET PRICE</h3>';
+  html += '<div class="math-row"><label>Price per ticket ($1 &ndash; $10)</label><input type="number" id="hh-price" min="1" max="10" step="0.5" placeholder="5"></div></div>';
+  html += '<button class="btn" id="hh-p1-ok">LOCK TICKET PRICE &raquo;</button>';
+
+  document.getElementById('fund-content').innerHTML = html;
+  document.getElementById('hh-p1-ok').onclick = function(){
+    var p = +document.getElementById('hh-price').value;
+    if (!p || p <= 0) { alert('Enter a ticket price between $1 and $10.'); return; }
+    if (p > 10) { alert('Max ticket price is $10. Admin rule.'); return; }
+    state.haunted.price = p;
+    hhStep2(onDone);
+  };
+}
+
+// STEP 2 — Theme picker
+function hhStep2(onDone) {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F383;</div>';
+  html += '<div class="expert-bubble"><h3>STEP 2 &mdash; PICK YOUR THEME</h3>';
+  html += '<p>Flavor pick &mdash; no extra cost. Just changes the vibe.</p></div></div>';
+  html += '<div class="pick-grid">';
+  HAUNTED_THEMES.forEach(function(t){
+    html += '<div class="pick-card" data-id="'+t.id+'"><div class="ic">'+t.ic+'</div><div class="vname">'+t.name+'</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('fund-content').innerHTML = html;
+  document.querySelectorAll('#fund-content .pick-card').forEach(function(el){
+    el.onclick = function(){
+      state.haunted.theme = el.getAttribute('data-id');
+      hhStep3(onDone);
+    };
+  });
+}
+
+// STEP 3 — Costumes tier
+function hhStep3(onDone) {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F383;</div>';
+  html += '<div class="expert-bubble"><h3>STEP 3 &mdash; COSTUMES</h3>';
+  html += '<p>Your volunteers need to look the part. Pick a tier.</p></div></div>';
+  html += '<div class="pick-grid">';
+  HAUNTED_COSTUMES.forEach(function(c){
+    html += '<div class="pick-card" data-id="'+c.id+'"><div class="ic">&#x1F47B;</div><div class="vname">'+c.name+'</div><div class="vprice">'+money(c.cost)+'</div><div class="vnote">'+c.desc+'</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('fund-content').innerHTML = html;
+  document.querySelectorAll('#fund-content .pick-card').forEach(function(el){
+    el.onclick = function(){
+      state.haunted.costumes = el.getAttribute('data-id');
+      hhStep4(onDone);
+    };
+  });
+}
+
+// STEP 4 — Decorations tier
+function hhStep4(onDone) {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F383;</div>';
+  html += '<div class="expert-bubble"><h3>STEP 4 &mdash; DECORATIONS</h3>';
+  html += '<p>The set. Dim lights, fog, props &mdash; how much?</p></div></div>';
+  html += '<div class="pick-grid">';
+  HAUNTED_DECOR.forEach(function(d){
+    html += '<div class="pick-card" data-id="'+d.id+'"><div class="ic">&#x1F578;</div><div class="vname">'+d.name+'</div><div class="vprice">'+money(d.cost)+'</div><div class="vnote">'+d.desc+'</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('fund-content').innerHTML = html;
+  document.querySelectorAll('#fund-content .pick-card').forEach(function(el){
+    el.onclick = function(){
+      state.haunted.decor = el.getAttribute('data-id');
+      hhStep5(onDone);
+    };
+  });
+}
+
+// STEP 5 — FEED YOUR VOLUNTEERS — the gate
+function hhStep5(onDone) {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F355;</div>';
+  html += '<div class="expert-bubble"><h3>STEP 5 &mdash; FEED YOUR VOLUNTEERS?</h3>';
+  html += '<p>You have about 40 volunteers running this for 5 hours. They need dinner. Pizza run: <strong>$120</strong> (10 large pies + drinks).</p>';
+  html += '<div class="quote">"Hungry volunteers = angry volunteers. Hungry teenage volunteers = catastrophe."</div></div></div>';
+  html += '<div class="pick-grid">';
+  html += '<div class="pick-card" data-id="yes"><div class="ic">&#x1F355;</div><div class="vname">GET PIZZA</div><div class="vprice">$120</div><div class="vnote">Feed the crew. Everybody stays happy.</div></div>';
+  html += '<div class="pick-card" data-id="no"><div class="ic">&#x1F6AB;</div><div class="vname">SKIP FOOD</div><div class="vprice">$0</div><div class="vnote">"They\'ll be fine for 5 hours." Will they?</div></div>';
+  html += '</div>';
+  document.getElementById('fund-content').innerHTML = html;
+  document.querySelectorAll('#fund-content .pick-card').forEach(function(el){
+    el.onclick = function(){
+      var choice = el.getAttribute('data-id');
+      state.haunted.pizza = choice;
+      if (choice === 'no') { triggerBobby('nofood'); return; }
+      hhResults(onDone);
+    };
+  });
+}
+
+// RESULTS — compute profit and show breakdown, then continue
+function hhResults(onDone) {
+  var h = state.haunted;
+  var tickets = hauntedTicketVolume(h.price);
+  var revenue = tickets * h.price;
+  var costumeCost = HAUNTED_COSTUMES.find(function(c){return c.id===h.costumes;}).cost;
+  var decorCost = HAUNTED_DECOR.find(function(d){return d.id===h.decor;}).cost;
+  var pizzaCost = 120;
+  var totalExp = costumeCost + decorCost + pizzaCost;
+  var profit = revenue - totalExp;
+
+  var themeName = HAUNTED_THEMES.find(function(t){return t.id===h.theme;}).name;
+
+  var html = '<div class="info-box reveal-flash"><h2>&#x1F383; HAUNTED HOUSE RESULTS</h2>';
+  html += '<p>Theme: <strong>'+themeName+'</strong>. One night. Let\'s count the damage.</p>';
+  html += '<table style="margin:1vh auto; width:90%;">';
+  html += '<tr><th>Line</th><th>Math</th><th>Amount</th></tr>';
+  html += '<tr><td>Tickets sold</td><td>'+tickets+' @ '+money(h.price)+'</td><td><strong>'+money(revenue)+'</strong></td></tr>';
+  html += '<tr><td>Costumes</td><td>flat</td><td>&minus;'+money(costumeCost)+'</td></tr>';
+  html += '<tr><td>Decorations</td><td>flat</td><td>&minus;'+money(decorCost)+'</td></tr>';
+  html += '<tr><td>Volunteer pizza</td><td>flat</td><td>&minus;'+money(pizzaCost)+'</td></tr>';
+  html += '<tr><td><strong>PROFIT</strong></td><td>Revenue &minus; Cost</td><td><strong style="color:'+(profit>=0?'#1e5a2e':'#8b0000')+';">'+money(profit)+'</strong></td></tr>';
+  html += '</table>';
+  html += '<p style="margin-top:1vh;">This goes into your class bank.</p></div>';
+  html += '<button class="btn" id="hh-done">CONTINUE &raquo;</button>';
+
+  document.getElementById('fund-content').innerHTML = html;
+  adjust(profit, 'Haunted House (net)');
+  document.getElementById('hh-done').onclick = onDone;
+}
+
+// ============ 10TH GRADE: END-OF-YEAR PARTY ============
+var PARTY_LOCATIONS = [
+  { id:'pool',   name:'Community Pool',  cost:400, ic:'&#x1F3CA;', desc:'Lifeguard + rental.' },
+  { id:'park',   name:'Park Pavilion',   cost:150, ic:'&#x1F332;', desc:'Pavilion reservation.' },
+  { id:'school', name:'School Gym',      cost:0,   ic:'&#x1F3EB;', desc:'Free, but it\'s the gym you already see every day.' }
+];
+var PARTY_FOOD = [
+  { id:'truck',   name:'Food Truck',           cost:900, ic:'&#x1F69A;', desc:'Can they actually cook 70 meals in 2 hours? Pricey.' },
+  { id:'pizza',   name:'Pizza',                cost:280, ic:'&#x1F355;', desc:'Always works.' },
+  { id:'school',  name:'School Cafeteria Food',cost:140, ic:'&#x1F35D;', desc:'Cheap. Nobody is excited.' },
+  { id:'hotdogs', name:'Hot Dogs (grill)',     cost:160, ic:'&#x1F32D;', desc:'Buns + dogs + grill stuff.' }
+];
+var PARTY_SIDE = [
+  { id:'chips',   name:'Chips',      cost:60, ic:'&#x1F35F;', desc:'Family size bags.' },
+  { id:'nochips', name:'No chips',   cost:0,  ic:'&#x274C;',   desc:'Skip the sides.' }
+];
+var PARTY_DESSERT = [
+  { id:'icetruck',  name:'Ice Cream Truck',      cost:350, ic:'&#x1F366;', desc:'Parks in the lot, kids pick their own.' },
+  { id:'snowcone',  name:'Snow Cones',           cost:180, ic:'&#x1F368;', desc:'Machine rental + syrups.' },
+  { id:'sandwich',  name:'Ice Cream Sandwiches', cost:90,  ic:'&#x1F36A;', desc:'Costco run.' },
+  { id:'none',      name:'No dessert',           cost:0,   ic:'&#x274C;',  desc:'Skip it.' }
+];
+
+function run10thEndParty() {
+  show('sLab');
+  state.party = { budget:null, loc:null, food:null, side:null, dessert:null };
+  epStep1_Budget();
+}
+
+// STEP 1 — show raised, make them compute 20% + $500 budget
+function epStep1_Budget() {
+  var raised = Math.max(0, state.balance); // treat negatives as zero for teaching
+  var expected = Math.round(raised * 0.20 + 500);
+
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F483;&#x1F57A;</div>';
+  html += '<div class="expert-bubble"><h3>&#x1F389; END-OF-YEAR PARTY &mdash; DO THE MATH</h3>';
+  html += '<p>You raised <strong class="big-num">'+money(raised)+'</strong> this year. Nice.</p>';
+  html += '<p>You <strong>bank 80%</strong> for future years. You can spend <strong>20%</strong> on a class party.</p>';
+  html += '<p>On top of that, the ASB general fund kicks in <strong>an extra $500</strong> for sophomore class parties.</p>';
+  html += '<div class="quote">"Your party budget = 20% of what you raised + $500. Figure out what that number is. I\'m not typing it for you."</div></div></div>';
+
+  html += '<div class="math-panel"><h3>COMPUTE YOUR PARTY BUDGET</h3>';
+  html += '<p style="color:#555; margin-bottom:1vh;">Formula: <strong>('+money(raised)+' &times; 0.20) + $500 = ?</strong></p>';
+  html += '<div class="math-row"><label>Your party budget ($)</label>';
+  html += '<span style="display:flex; align-items:center; gap:0.5vw;">';
+  html += '<input type="number" id="ep-budget" step="1" placeholder="?" style="width:8vw; min-width:100px; padding:0.4vh 0.5vw; font-size:1.1em; text-align:right;">';
+  html += '<span id="ep-budget-chk" style="font-weight:bold; font-size:1.3em; min-width:1.5em;"></span>';
+  html += '</span></div>';
+  html += '<p style="font-size:0.9em; color:#555; margin-top:1vh;">Tip: 20% is the same as dividing by 5.</p></div>';
+  html += '<button class="btn" id="ep-b-ok">LOCK IN BUDGET &raquo;</button>';
+
+  document.getElementById('lab-content').innerHTML = html;
+  var input = document.getElementById('ep-budget');
+  var chk = document.getElementById('ep-budget-chk');
+  input.addEventListener('input', function(){
+    var v = +input.value;
+    if (input.value === '') { chk.textContent=''; return; }
+    if (Math.abs(v - expected) <= 1) { chk.textContent='\u2713'; chk.style.color='#2a8f2a'; }
+    else { chk.textContent='\u2717'; chk.style.color='#c00'; }
+  });
+  document.getElementById('ep-b-ok').onclick = function(){
+    var v = +input.value;
+    if (Math.abs(v - expected) > 1) {
+      alert('Not quite. Compute 20% of '+money(raised)+', then add $500. Try again.');
+      return;
+    }
+    state.party.budget = expected;
+    epStep2_Location();
+  };
+}
+
+// STEP 2 — Location
+function epStep2_Location() {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F483;&#x1F57A;</div>';
+  html += '<div class="expert-bubble"><h3>PICK YOUR PARTY LOCATION</h3>';
+  html += '<p>Budget: <strong class="big-num">'+money(state.party.budget)+'</strong>. Location first.</p></div></div>';
+  html += '<div class="pick-grid">';
+  PARTY_LOCATIONS.forEach(function(l){
+    html += '<div class="pick-card" data-id="'+l.id+'"><div class="ic">'+l.ic+'</div><div class="vname">'+l.name+'</div><div class="vprice">'+money(l.cost)+'</div><div class="vnote">'+l.desc+'</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('lab-content').innerHTML = html;
+  document.querySelectorAll('#lab-content .pick-card').forEach(function(el){
+    el.onclick = function(){ state.party.loc = el.getAttribute('data-id'); epStep3_Food(); };
+  });
+}
+
+// STEP 3 — Food
+function epStep3_Food() {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F483;&#x1F57A;</div>';
+  html += '<div class="expert-bubble"><h3>FOOD &mdash; PICK ONE</h3>';
+  html += '<p>~70 sophomores showing up. Pick what they eat.</p></div></div>';
+  html += '<div class="pick-grid">';
+  PARTY_FOOD.forEach(function(f){
+    var note = f.desc;
+    html += '<div class="pick-card" data-id="'+f.id+'"><div class="ic">'+f.ic+'</div><div class="vname">'+f.name+'</div><div class="vprice">'+money(f.cost)+'</div><div class="vnote">'+note+'</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('lab-content').innerHTML = html;
+  document.querySelectorAll('#lab-content .pick-card').forEach(function(el){
+    el.onclick = function(){ state.party.food = el.getAttribute('data-id'); epStep4_Side(); };
+  });
+}
+
+// STEP 4 — Chips / no chips
+function epStep4_Side() {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F483;&#x1F57A;</div>';
+  html += '<div class="expert-bubble"><h3>SIDES</h3>';
+  html += '<p>Chips or no?</p></div></div>';
+  html += '<div class="pick-grid">';
+  PARTY_SIDE.forEach(function(s){
+    html += '<div class="pick-card" data-id="'+s.id+'"><div class="ic">'+s.ic+'</div><div class="vname">'+s.name+'</div><div class="vprice">'+money(s.cost)+'</div><div class="vnote">'+s.desc+'</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('lab-content').innerHTML = html;
+  document.querySelectorAll('#lab-content .pick-card').forEach(function(el){
+    el.onclick = function(){ state.party.side = el.getAttribute('data-id'); epStep5_Dessert(); };
+  });
+}
+
+// STEP 5 — Dessert
+function epStep5_Dessert() {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F366;</div>';
+  html += '<div class="expert-bubble"><h3>DESSERT</h3>';
+  html += '<p>Pick one &mdash; or skip.</p></div></div>';
+  html += '<div class="pick-grid">';
+  PARTY_DESSERT.forEach(function(d){
+    html += '<div class="pick-card" data-id="'+d.id+'"><div class="ic">'+d.ic+'</div><div class="vname">'+d.name+'</div><div class="vprice">'+money(d.cost)+'</div><div class="vnote">'+d.desc+'</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('lab-content').innerHTML = html;
+  document.querySelectorAll('#lab-content .pick-card').forEach(function(el){
+    el.onclick = function(){ state.party.dessert = el.getAttribute('data-id'); epResults(); };
+  });
+}
+
+// RESULTS — check vs. budget, trigger Bobby/Terry or win
+function epResults() {
+  var p = state.party;
+  var loc = PARTY_LOCATIONS.find(function(x){return x.id===p.loc;});
+  var food = PARTY_FOOD.find(function(x){return x.id===p.food;});
+  var side = PARTY_SIDE.find(function(x){return x.id===p.side;});
+  var dessert = PARTY_DESSERT.find(function(x){return x.id===p.dessert;});
+  var total = loc.cost + food.cost + side.cost + dessert.cost;
+  var budget = p.budget;
+  var diff = budget - total;
+
+  // Game-over conditions
+  if (total > budget) { state.party.total = total; triggerBobby('partymoney'); return; }
+  if (total < 150)     { state.party.total = total; triggerBobby('emptylot');    return; }
+
+  // SUCCESS — show summary, then go to sEnd
+  var html = '<div class="info-box reveal-flash"><h2 style="color:#1e5a2e;">&#x1F389; PARTY PLANNED!</h2>';
+  html += '<table style="margin:1vh auto; width:90%;">';
+  html += '<tr><th>Line</th><th>Amount</th></tr>';
+  html += '<tr><td>Location: '+loc.name+'</td><td>&minus;'+money(loc.cost)+'</td></tr>';
+  html += '<tr><td>Food: '+food.name+'</td><td>&minus;'+money(food.cost)+'</td></tr>';
+  html += '<tr><td>Side: '+side.name+'</td><td>&minus;'+money(side.cost)+'</td></tr>';
+  html += '<tr><td>Dessert: '+dessert.name+'</td><td>&minus;'+money(dessert.cost)+'</td></tr>';
+  html += '<tr><td><strong>TOTAL SPENT</strong></td><td><strong>'+money(total)+'</strong></td></tr>';
+  html += '<tr><td>Your budget</td><td>'+money(budget)+'</td></tr>';
+  html += '<tr><td><strong>Left over (stays in bank)</strong></td><td><strong style="color:#1e5a2e;">'+money(diff)+'</strong></td></tr>';
+  html += '</table>';
+  html += '<p>The 80% you banked stays for next year. Solid sophomore class.</p></div>';
+  html += '<button class="btn" id="ep-end">SEE FINAL LEDGER &raquo;</button>';
+
+  document.getElementById('lab-content').innerHTML = html;
+
+  // Apply the party spend to the bank log (but remember they're only spending out of 20% conceptually — the bank is the raised amount, so we record party cost)
+  adjust(-total, 'End-of-year party (20% spend + $500 gen fund)');
+  // Also credit the $500 from general fund since the "budget" assumed it
+  adjust(500, 'ASB general fund contribution ($500)');
+
+  document.getElementById('ep-end').onclick = function(){ finalize10th(); };
+}
+
+function finalize10th() {
+  // Stamp the ending screen with 10th-grade flavor
+  var bg = document.getElementById('end-bg');
+  var stamp = document.getElementById('end-stamp');
+  var title = document.getElementById('end-title');
+  var box = document.getElementById('end-box');
+  var tally = document.getElementById('end-tally');
+  bg.className='screen-bg bg-win';
+  stamp.textContent = '\u2705  SOPHOMORE YEAR = DONE';
+  stamp.className = 'stamp stamp-win';
+  title.textContent = 'CLASS BANK LOOKS GOOD';
+  box.innerHTML = '<p style="font-size:1.2em;">You ran a Haunted House, a Bundt Cake sale, worked winter concessions, AND threw a party without blowing the bank. Your class just sent a healthy balance into junior year. Future-you thanks present-you.</p>';
+  var t = '<table><tr><th>Line</th><th>Amount</th></tr>';
+  state.log.forEach(function(e){ t += '<tr><td>'+e.label+'</td><td>'+money(e.delta)+'</td></tr>'; });
+  t += '<tr><td><strong>FINAL BANK</strong></td><td><strong>'+money(state.balance)+'</strong></td></tr></table>';
+  tally.innerHTML = t;
+  show('sEnd');
 }
 
 // ============ FINAL TALLY ============
