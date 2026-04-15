@@ -1095,6 +1095,7 @@ function finalize() {
       '<p style="margin-top:1vh;"><strong>The cash-on-hand rule:</strong> at the moment you sign a contract &mdash; prom venue, Disney, DJ, anything &mdash; your bank balance PLUS already-collected ticket sales and fundraising has to cover the expense.</p>' +
       '<p style="margin-top:1vh;">Projected or expected future ticket sales don&#39;t count. It&#39;s not money yet. Signing a contract you can&#39;t cover right now is basically an IOU, and <strong>your advisor legally cannot approve it</strong>.</p>' +
       '<p style="margin-top:1vh;">This is why fundraising has to happen <strong>before</strong> you sign anything. Revenue + savings = costs, at time of signing.</p>' +
+      bobbyHelmetTeachingMoment() +
       '<p style="margin-top:1vh;">Try again &mdash; fundraise more in the fall/winter, or pick cheaper options, until your plan clears the cash-on-hand check.</p>';
   } else {
     bg.className='screen-bg bg-bad';
@@ -1103,6 +1104,7 @@ function finalize() {
     box.innerHTML = '<p style="font-weight:bold; color:#8b0000; font-size:1.15em;">Your plan ends '+money(Math.abs(bal))+' in the red. That is a massive FCMAT cash-on-hand violation.</p>' +
       '<p style="margin-top:1vh;"><strong>Why this matters:</strong> at the time you sign contracts for venue, Disney, or any vendor, the money has to already be in the bank &mdash; savings + fundraising actually completed + tickets actually sold. Not "we plan to raise it later."</p>' +
       '<p style="margin-top:1vh;">Your ASB advisor literally cannot sign a purchase order or approve a contract if the money isn&#39;t there. This is California state law for student body funds.</p>' +
+      bobbyHelmetTeachingMoment() +
       '<p style="margin-top:1vh;">Run it again. Either raise a lot more in the fall/winter, or scale down the plan (cheaper venue, one-park Grad Nite, potluck luncheon) until Revenue + Savings &#x2265; Costs <strong>before</strong> any contract gets signed.</p>';
   }
 
@@ -1119,6 +1121,23 @@ function finalize() {
 }
 
 function restart() { startGrade(state.grade); }
+
+// Teaching moment: commingling ASB funds is a separate FCMAT violation.
+// Each club/team account is its own pot by law — you can't "borrow" from
+// another account even if the balance on paper looks fine.
+function bobbyHelmetTeachingMoment() {
+  return '<div style="margin-top:2vh; padding:2vh 1.5vw; background:rgba(139,0,0,0.12); border:3px dashed #8b0000; border-radius:8px;">' +
+    '<h3 style="color:#8b0000; font-family:\'Fredoka One\'; letter-spacing:1px; margin-bottom:1vh;">&#x1F3C8; TEACHING MOMENT: THE HELMET</h3>' +
+    '<p>Bobby Boucher wants to buy a new helmet.</p>' +
+    '<p style="margin-top:0.6vh;">He checks the football account. It says <strong>$2,000</strong>. More than enough.</p>' +
+    '<p style="margin-top:0.6vh;">Little does Bobby know \u2026 you already spent it. On your senior class.</p>' +
+    '<p style="margin-top:0.6vh; font-weight:bold;">Little do you know \u2026 Bobby just found out.</p>' +
+    '<img src="'+BOBBY_TACKLE_GIF+'" alt="Bobby tackle" style="display:block; max-width:min(420px,75vw); margin:1.5vh auto; border:5px solid #d4af37; border-radius:10px; box-shadow:0 0 25px rgba(255,50,50,0.6);" onerror="this.style.display=\'none\'">' +
+    '<p style="margin-top:0.8vh;"><strong>The rule:</strong> every ASB account is legally separate. Football&#39;s $2,000 is football&#39;s. Class of \u201927&#39;s money is Class of \u201927&#39;s. <strong>You cannot spend from another account to cover your own shortfall.</strong> That\u2019s called commingling, and it\u2019s an FCMAT violation on top of the cash-on-hand one.</p>' +
+    '<p style="margin-top:0.6vh; font-style:italic;">Senior class is broke? Senior class fundraises. You don\u2019t touch football&#39;s money. Ever.</p>' +
+    '<p style="margin-top:1vh; font-weight:bold; color:#8b0000; font-size:1.15em; text-align:center;">Go fix it until you have a positive balance!</p>' +
+    '</div>';
+}
 
 // ============ FULLSCREEN ============
 function toggleFullscreen() {
