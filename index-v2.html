@@ -214,23 +214,21 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
   <div class="content">
     <div class="info-box">
       <h2>THE SITUATION</h2>
-      <p>You&#39;re planning your senior year. Here are the <strong>real fixed prices</strong> you&#39;re working with:</p>
-      <table>
-        <tr><th>Fixed per-student</th><th>Price</th></tr>
-        <tr><td>Yearbook</td><td>$45</td></tr>
-        <tr><td>Senior Luncheon (catered)</td><td>$20</td></tr>
-        <tr><td>Disneyland Grad Nite &mdash; Park Hopper</td><td>$259</td></tr>
-        <tr><td>Disneyland Grad Nite &mdash; One Park Only</td><td>$180</td></tr>
-        <tr><td>Disneyland Bus (fixed, whole class)</td><td>$1,200</td></tr>
-      </table>
-      <p style="margin-top:1vh;">Your class has <strong>66 seniors</strong>. Some will buy a full Senior Package. Some will buy individual tickets. Some won&#39;t buy anything.</p>
-      <p style="margin-top:1vh;">A <strong>Senior Package</strong> is EVERYTHING. It covers:<br>
-        &nbsp;&nbsp;&#x2022; <strong>Prom</strong> (venue entry + dinner)<br>
-        &nbsp;&nbsp;&#x2022; <strong>Disneyland Grad Nite</strong> (your choice of tier)<br>
-        &nbsp;&nbsp;&#x2022; <strong>Yearbook</strong><br>
-        &nbsp;&nbsp;&#x2022; <strong>Senior Luncheon</strong></p>
-      <p style="margin-top:1vh; font-style:italic; color:#8b0000;">One price. All four events. That&#39;s the whole package.</p>
-      <p style="margin-top:1vh;"><strong>Your job:</strong> Fundraise this year, then set your prices and build out your prom. Every dollar you cut off the package price means $66 you have to fundraise to make up. Every dollar you add means some classmates might opt out.</p>
+      <p>Every class needs to start saving <strong>now</strong> toward covering their <strong>Senior Package</strong> &mdash; the bundle that covers your entire senior year experience:</p>
+      <p style="margin:1.5vh 0;">
+        &nbsp;&nbsp;&#x2022; <strong>Prom</strong> &mdash; venue, dinner, DJ, photographer, decorations<br>
+        &nbsp;&nbsp;&#x2022; <strong>Disneyland Grad Nite</strong> &mdash; $180&ndash;$259 per person + bus<br>
+        &nbsp;&nbsp;&#x2022; <strong>Yearbook</strong> &mdash; $45 each<br>
+        &nbsp;&nbsp;&#x2022; <strong>Senior Luncheon</strong> &mdash; your last meal together before graduation</p>
+      <p style="margin-top:1vh;">That&#39;s <strong>thousands of dollars</strong> your class has to raise over four years. The more you save each year, the more options you&#39;ll have when senior year arrives. The less you save&hellip; the cheaper everything has to be. Or it doesn&#39;t happen at all.</p>
+      <p style="margin-top:1vh; font-weight:bold; color:#1e5a2e;">Start saving now = an easier senior year with more options. Just like life.</p>
+      <p style="margin-top:1.5vh;">In this game, you&#39;ll learn:</p>
+      <p style="margin:0.5vh 0;">
+        &nbsp;&nbsp;&#x2022; <strong>9th grade</strong> &mdash; How the forms and money procedures work<br>
+        &nbsp;&nbsp;&#x2022; <strong>10th grade</strong> &mdash; Haunted House, product fundraisers, building the bank<br>
+        &nbsp;&nbsp;&#x2022; <strong>11th grade</strong> &mdash; Bigger fundraisers, growing your savings for senior year<br>
+        &nbsp;&nbsp;&#x2022; <strong>12th grade</strong> &mdash; Prom, Grad Nite, pricing, budgeting &mdash; the real thing</p>
+      <p style="margin-top:1.5vh; font-style:italic; color:#8b0000;">Every dollar raised in 9th&ndash;11th grade carries forward. Every dollar wasted is a dollar your senior class doesn&#39;t have.</p>
     </div>
   </div>
   <div class="nav-right">
@@ -1117,7 +1115,7 @@ function renderPricingLab() {
   html += '<ul style="margin:1vh 0 1vh 2vw; line-height:1.6;">';
   html += '<li><strong>Prom</strong> dinner: '+money(food)+' + 20% tip = <strong>'+money(promDinnerWithTip)+'</strong></li>';
   html += '<li><strong>Grad Nite</strong> ticket: <strong>'+money(gradNite)+'</strong></li>';
-  html += '<li>Disney bus share ($1,200 &divide; 66): <strong>'+money(GRADNITE_BUS/SENIOR_COUNT)+'</strong></li>';
+  html += '<li>Disney bus share ($1,200 &divide; '+SENIOR_COUNT+'): <strong>'+money(GRADNITE_BUS/SENIOR_COUNT)+'</strong></li>';
   html += '<li><strong>Yearbook</strong>: <strong>'+money(YEARBOOK_COST)+'</strong></li>';
   html += '<li><strong>Luncheon</strong>: <strong>'+money(luncheon)+'</strong>'+(luncheon===LUNCHEON_CATERED ? ' (catered &mdash; can drop to $'+LUNCHEON_POTLUCK+' potluck if short)' : ' (potluck)')+'</li>';
   html += '</ul>';
@@ -1133,13 +1131,13 @@ function renderPricingLab() {
   html += '</ul>';
   html += '<p>Total fixed prom overhead: <span class="big-num" style="color:#8b0000;">'+money(fixedPromTotal)+'</span></p>';
   html += '<p style="margin-top:1vh; font-weight:bold;">If you price the Senior Package at the full break-even number, 66 students cover everything. If you drop the price below that, your bank savings + prom-only tickets + Grad-Nite-only tickets + fundraising have to close the gap.</p>';
-  html += '<div class="quote">"Every $1 you drop the package price = $66 missing. Every $1 you raise it = some classmates opting out. You&#39;re in charge."</div></div></div>';
+  html += '<div class="quote">"Every $1 you drop the package price = $'+SENIOR_COUNT+' missing. Every $1 you raise it = some classmates opting out. You&#39;re in charge."</div></div></div>';
 
-  // Break-even package price if 66 seniors all buy in
+  // Break-even package price if all seniors buy in
   var breakEvenPkg = Math.ceil(hardPerSenior + (fixedPromTotal / SENIOR_COUNT));
   html += '<div class="math-panel">';
   html += '<h3>SET YOUR PRICES</h3>';
-  html += '<p style="margin-bottom:1vh;">Break-even Senior Package price if all 66 seniors buy: <span class="big-num">'+money(breakEvenPkg)+'</span></p>';
+  html += '<p style="margin-bottom:1vh;">Break-even Senior Package price if all '+SENIOR_COUNT+' seniors buy: <span class="big-num">'+money(breakEvenPkg)+'</span></p>';
   html += '<p style="margin-bottom:1vh; font-size:0.95em;">You can price it LOWER (more seniors buy, but you owe the gap in fundraising) or HIGHER (fewer seniors buy, but each one covers more).</p>';
   html += '<div class="math-row"><label><strong>Senior Package Price</strong> ($) &mdash; what you charge each senior</label><input type="number" id="p-pkg" min="0" step="5" placeholder="'+breakEvenPkg+'"></div>';
   html += '<div class="math-row"><label><strong>Prom-Only Ticket</strong> ($) &mdash; for juniors/sophs buying only prom</label><input type="number" id="p-pro" min="0" step="5" placeholder="120"></div>';
@@ -1183,7 +1181,7 @@ function renderPricingLab() {
   updateProjection();
 }
 
-// Realistic take-rate curves for 66 seniors based on package price
+// Realistic take-rate curves based on package price vs. hard cost
 function simulateTakeRate(pkgPrice, hardPerSenior) {
   // If price is at or below hard cost, almost everyone buys in.
   // If it's way above, fewer buy.
