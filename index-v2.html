@@ -734,19 +734,12 @@ var FUND_STEPS = {
         { label:'&#x274C; Skip fall auction', yield:0, cutscene:{gif:'terry-tate', title:'SKIPPED THE FALL AUCTION?', msg:'Venue deposit and Disney reservation are coming. That money had to come from somewhere. Terry is running up the hallway.'} }
       ] },
     { month:'OCTOBER &mdash; 12TH GRADE',
-      prompt:'<h3>&#x1F451; HOMECOMING DANCE</h3><p>Your senior class is running Homecoming. Juniors attend too &mdash; the two classes <strong>split the net profit 50/50</strong>. You pick the venue, food, drinks, dessert, and ticket price. Real data from this year: 112 tickets sold at $50, total cost was $2,250, no food provided.</p><p><strong>Warning:</strong> If you charge over $30 per ticket, students expect real food &mdash; not just snacks. No food + expensive tickets = Terry Tate.</p>',
+      prompt:'<h3>&#x1F451; HOMECOMING DANCE</h3><p>Your senior class is running Homecoming. Juniors attend too &mdash; You pick the venue, food, drinks, dessert, and ticket price. Net profit goes to your senior class bank. Real data from this year: 112 tickets sold at $50, total cost was $2,250, no food provided.</p><p><strong>Warning:</strong> If you charge over $30 per ticket, students expect real food &mdash; not just snacks. No food + expensive tickets = Terry Tate.</p>',
       options:[
         { label:'&#x1F451; PLAN HOMECOMING', hocoEvent:true },
         { label:'&#x274C; Skip Homecoming', yield:0, cutscene:{gif:'terry-tate', title:'YOU SKIPPED HOMECOMING?', msg:'Homecoming is the biggest fall event. Every class looks forward to it. You cancelled it. Terry Tate is running down the hallway. GAME OVER.'} }
       ] },
-    { month:'FEBRUARY &mdash; 12TH GRADE',
-      prompt:'<h3>&#x1F36C; Valentine Candy-Grams.</h3><p>Last product fundraiser before prom-push. Wholesale: <strong>$1 per gram</strong>. Price it, sell it, bank the margin toward prom.</p>',
-      options:[
-        { label:'&#x1F36C; RUN THE VALENTINE CANDY-GRAM SALE', product:'candy_grams' },
-        { label:'&#x1F4A4; Skip Valentine\'s week', yield:0, cutscene:{gif:'bobby', title:'SKIPPING VALENTINE\'S THIS LATE?', msg:'Prom is two months away and your class chose not to move $700 in margin. Bobby is running.'} }
-      ] }
-    // Spring Senior Auction is injected later — runs BEFORE the Luncheon lab step,
-    // because by spring the big stuff (venue, Disney, prom vendors) is already locked.
+    // Valentine candy-grams, spring auction, spring car wash, and luncheon are injected AFTER prom pricing lab via runPostPromSequence().
   ]
 };
 
@@ -758,6 +751,14 @@ var SPRING_AUCTION_STEP = {
     { label:'&#x1F4E3; Spring auction &mdash; organized, pre-promoted', yield:1000 },
     { label:'&#x1F4CB; Spring auction &mdash; basic', yield:600 },
     { label:'&#x274C; Skip spring auction', yield:0, cutscene:{gif:'terry-tate', title:'LUNCHEON IS IN 6 WEEKS', msg:'Spring auction skipped. The luncheon still needs to be paid for. Terry Tate has entered the chat.'} }
+  ]
+};
+var VALENTINE_CANDYGRAM_STEP = {
+  month:'FEBRUARY &mdash; 12TH GRADE',
+  prompt:'<h3>&#x1F36C; Valentine Candy-Grams.</h3><p>Your senior package is locked. Now it\'s fundraiser season &mdash; every dollar you raise helps cover costs. Wholesale: <strong>$1 per gram</strong>. Price it, sell it, bank the margin.</p>',
+  options:[
+    { label:'&#x1F36C; RUN THE VALENTINE CANDY-GRAM SALE', product:'candy_grams' },
+    { label:'&#x1F4A4; Skip Valentine\'s week', yield:0, cutscene:{gif:'bobby', title:'SKIPPING VALENTINE\'S?', msg:'Prom is two months away and your class chose not to move $700 in margin. Bobby is running.'} }
   ]
 };
 var SPRING_CARWASH_STEP = {
@@ -2692,9 +2693,18 @@ function applyPromCosts() {
   runPostPromSequence();
 }
 
-// Spring Auction → Senior Luncheon → Final End Screen
+// Valentine Candy-Grams → Spring Auction → Spring Car Wash → Senior Luncheon → Final End Screen
 function runPostPromSequence() {
-  // Step 1: Spring Auction (if not done yet)
+  // Step 1: Valentine Candy-Grams (February, after senior package is locked)
+  if (!state.didValentineCandygrams) {
+    state.didValentineCandygrams = true;
+    show('sFund');
+    runInjectedFundStep(VALENTINE_CANDYGRAM_STEP, function(){
+      runPostPromSequence();
+    });
+    return;
+  }
+  // Step 2: Spring Auction (if not done yet)
   if (!state.didSpringAuction) {
     state.didSpringAuction = true;
     show('sFund');
@@ -2703,7 +2713,7 @@ function runPostPromSequence() {
     });
     return;
   }
-  // Step 2: Optional Spring Car Wash
+  // Step 3: Optional Spring Car Wash
   if (!state.didSpringCarwash) {
     state.didSpringCarwash = true;
     show('sFund');
@@ -2712,7 +2722,7 @@ function runPostPromSequence() {
     });
     return;
   }
-  // Step 3: Senior Luncheon
+  // Step 4: Senior Luncheon
   runSeniorLuncheonFinale();
 }
 
