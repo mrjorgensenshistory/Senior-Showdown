@@ -291,7 +291,8 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
     <div class="stamp" style="font-size:clamp(2rem,6vw,4rem); border-width:8px;">&#x1F3C8; GAME OVER &#x1F3C8;</div>
     <div id="bobby-body"></div>
     <div style="height:4vh"></div>
-    <button class="btn" onclick="show('s0')" style="font-size:1.4rem;">&#x1F504; START OVER</button>
+    <button class="btn" onclick="restart()" style="font-size:1.4rem;">&#x1F504; REPLAY THIS GRADE</button>
+    <button class="btn" onclick="show('sHub')" style="font-size:1rem; opacity:0.7;">&#x1F3E0; BACK TO GRADE SELECT</button>
   </div>
 </div>
 
@@ -443,7 +444,7 @@ function show(id) {
   window.scrollTo(0,0);
   document.getElementById(id).scrollTop = 0;
 }
-function money(n) { var neg = n<0; var s = '$'+Math.abs(Math.round(n)).toLocaleString(); return neg ? '-'+s : s; }
+function money(n) { var neg = n<0; var abs = Math.abs(n); var s = abs===Math.floor(abs) ? '$'+abs.toLocaleString() : '$'+abs.toFixed(2); return neg ? '-'+s : s; }
 function renderBank() {
   var el = document.getElementById('bank-amt');
   el.textContent = money(state.balance); el.classList.toggle('neg', state.balance<0);
@@ -549,14 +550,15 @@ var PRODUCTS = {
     story: 'Spring fundraiser. You buy Bundt cakes wholesale at <strong>$7 each</strong> and resell them. Parents love these for Mother\'s Day and spring birthdays. Pool: <strong>450 students + 20 adults = 470 potential customers</strong> (they take them home for family).',
     priceQuestion: 'How much do you want to charge per Bundt cake?',
     defaultPrice: 15,
-    demandSamples: [10, 12, 15, 18, 22],
+    demandSamples: [8, 9, 10, 11, 12],
     volumeByPrice: function(p) {
-      if (p <= 10) return 120;
-      if (p <= 12) return 90;
-      if (p <= 15) return 60;
-      if (p <= 18) return 40;
-      if (p <= 22) return 22;
-      return 10;
+      if (p <= 8)  return 60;
+      if (p <= 9)  return 45;
+      if (p <= 10) return 35;
+      if (p <= 11) return 22;
+      if (p <= 12) return 15;
+      if (p <= 15) return 5;
+      return 0;
     },
     volumeExplain: function(p, v) {
       return 'At <strong>' + money(p) + ' per cake</strong>, about <strong>' + v + ' cakes</strong> sold. Families bought them home, some for Mother\'s Day, some just because they\'re good cake.';
@@ -566,30 +568,60 @@ var PRODUCTS = {
     icon: '&#x1F36C;',
     name: 'Valentine Candy-Grams (February)',
     unit: 'gram',
-    unitCost: 0.75,
-    unitCostLabel: '$0.75 per gram (candy + tag + ribbon, bought in bulk)',
-    pool: 1200, // 470 people, but kids send multiples to friends/crushes/teachers
-    poolLabel: 'realistic ceiling ~1,200 grams (kids send multiples)',
-    story: 'Week of Valentine\'s Day. Kids fill out an order form, pay up front, and your class delivers a candy-gram with a handwritten tag to the recipient in 3rd period on Feb 14. Wholesale: candy + tag + ribbon = <strong>$0.75 per gram</strong>. Total people who COULD send: 470, but most kids send multiple (best friends, crushes, teachers). Realistic ceiling: about 1,200 grams sold if priced right.',
+    unitCost: 1,
+    unitCostLabel: '$1 per gram (candy + tag + ribbon + bag)',
+    pool: 470, // 450 students + 20 adults
+    poolLabel: '450 students + 20 adults (some buy multiples)',
+    story: 'Week of Valentine\'s Day. Kids fill out an order form, pay up front, and your class delivers a candy-gram with a handwritten tag to the recipient in 3rd period on Feb 14. Cost per gram: candy + tag + ribbon + bag = <strong>$1 each</strong>. About <strong>470 people on campus</strong>. Some kids buy a few for friends, but most buy 0&ndash;1. Realistically you\'re selling maybe 10&ndash;80 depending on price.',
     priceQuestion: 'How much do you want to charge per candy-gram?',
     defaultPrice: 3,
     demandSamples: [2, 3, 4, 5, 7],
     volumeByPrice: function(p) {
-      if (p <= 2) return 520; // cheap = everyone sends 2-3
-      if (p <= 3) return 360;
-      if (p <= 4) return 220;
-      if (p <= 5) return 130;
-      if (p <= 7) return 60;
-      return 30;
+      if (p <= 2) return 50;  // cheap = more kids buy, some buy 2-3
+      if (p <= 3) return 35;
+      if (p <= 4) return 20;
+      if (p <= 5) return 10;  // real data: ~10 sold at $5
+      if (p <= 7) return 4;
+      return 2;
     },
     volumeExplain: function(p, v) {
       var note = '';
-      if (p <= 2) note = ' Dirt cheap &mdash; kids sent them to the whole friend group.';
-      else if (p <= 3) note = ' Classic price point &mdash; most kids sent 1-2.';
-      else if (p <= 4) note = ' Kids thought twice, still bought for close friends + crush.';
-      else if (p <= 5) note = ' Only the serious buyers &mdash; crush grams and close-friend pairs.';
+      if (p <= 2) note = ' Cheap enough that kids bought a few for the friend group.';
+      else if (p <= 3) note = ' Solid price &mdash; most kids bought one for their crush or best friend.';
+      else if (p <= 4) note = ' Kids thought twice. Only bought for the one person they really wanted to.';
+      else if (p <= 5) note = ' Real data: about 10 sold at $5 this year. Only the serious buyers.';
       else note = ' Too expensive &mdash; kids just handed out their own candy at lunch.';
       return 'About <strong>' + v + ' grams</strong> sold across the week.' + note;
+    }
+  },
+  halloween_grams: {
+    icon: '&#x1F383;',
+    name: 'Halloween-Grams (October)',
+    unit: 'gram',
+    unitCost: 1,
+    unitCostLabel: '$1 per gram (candy + tag + ribbon + bag)',
+    pool: 470,
+    poolLabel: '450 students + 20 adults (some buy multiples)',
+    story: 'Week before Halloween. Kids fill out an order form, pay up front, and your class delivers a spooky candy-gram with a tag to the recipient. Cost per gram: candy + tag + ribbon + bag = <strong>$1 each</strong>. About <strong>470 people on campus</strong>. Some kids buy a few for friends, but most buy 0&ndash;1. Realistically you\'re selling maybe 10&ndash;80 depending on price.',
+    priceQuestion: 'How much do you want to charge per halloween-gram?',
+    defaultPrice: 3,
+    demandSamples: [2, 3, 4, 5, 7],
+    volumeByPrice: function(p) {
+      if (p <= 2) return 50;
+      if (p <= 3) return 35;
+      if (p <= 4) return 20;
+      if (p <= 5) return 10;
+      if (p <= 7) return 4;
+      return 2;
+    },
+    volumeExplain: function(p, v) {
+      var note = '';
+      if (p <= 2) note = ' Cheap enough that kids bought a few for the friend group.';
+      else if (p <= 3) note = ' Solid price &mdash; most kids bought one for a friend or just for fun.';
+      else if (p <= 4) note = ' Kids thought twice. Only bought for the one person they really wanted to.';
+      else if (p <= 5) note = ' About 10 sold at $5. Only the committed buyers.';
+      else note = ' Too expensive &mdash; kids just brought their own Halloween candy.';
+      return 'About <strong>' + v + ' halloween-grams</strong> sold across the week.' + note;
     }
   },
   car_wash: {
@@ -631,27 +663,27 @@ var PRODUCTS = {
 var FUND_STEPS = {
   9: [
     { month:'SEPTEMBER &mdash; 9TH GRADE',
-      prompt:'<h3>&#x1F4CB; Welcome to ASB &mdash; Learn the Paperwork.</h3><p>Before you can fundraise, you need to learn <strong>how the money works</strong>. Every event, every dollar, every receipt &mdash; there\'s a form for it. Fill them out wrong? Your fundraiser gets denied. Fill them out right? You\'re running the show.</p><p>Your class is going to run a <strong>Donut Sale</strong>. But first, the paperwork.</p>',
+      prompt:'<h3>&#x1F4CB; Welcome to ASB &mdash; Learn the Paperwork.</h3><p><strong>Class Fundraising Target this year: $1,500.</strong></p><p>Before you can fundraise, you need to learn <strong>how the money works</strong>. Every event, every dollar, every receipt &mdash; there\'s a form for it. Fill them out wrong? Your fundraiser gets denied. Fill them out right? You\'re running the show.</p><p>Your class is going to run a <strong>Donut Sale</strong> &mdash; one day, one pickup, real money. But first, the paperwork.</p>',
       options:[
         { label:'&#x1F4CB; START THE DONUT SALE PAPERWORK', forms9th:true },
         { label:'&#x274C; Skip the paperwork &mdash; just sell donuts', yield:0, cutscene:{gif:'terry-tate', title:'TERRY TATE: NO FORMS, NO FUNDRAISER', msg:'You can\'t sell ANYTHING without the forms. Fundraising Event Request. Revenue Potential. Expenditure Approval. Cash Count. You skipped all of it. Terry Tate shut the whole thing down before you opened the donut box. GAME OVER.'} }
       ] },
-    { month:'FEBRUARY &mdash; 9TH GRADE',
-      prompt:'<h3>&#x1F36C; Valentine Candy-Grams.</h3><p>You know the forms now. Time to run one on your own. Wholesale: <strong>$0.75 per gram</strong>. You set the price.</p>',
+    { month:'OCTOBER &mdash; 9TH GRADE',
+      prompt:'<h3>&#x1F383; Halloween-Grams.</h3><p>You know the forms now. Time to run one on your own. Wholesale: <strong>$1 per gram</strong> (candy + tag + ribbon + bag). You set the price.</p>',
       options:[
-        { label:'&#x1F36C; RUN THE VALENTINE CANDY-GRAM SALE', product:'candy_grams' },
-        { label:'&#x1F4A4; Skip Valentine\'s week', yield:0, cutscene:{gif:'bobby', title:'SKIPPED VALENTINE\'S?', msg:'You learned all the forms and then didn\'t use them. Bobby had his gram ready. He\'s upset.'} }
+        { label:'&#x1F383; RUN THE HALLOWEEN-GRAM SALE', product:'halloween_grams' },
+        { label:'&#x1F4A4; Skip Halloween week', yield:0, cutscene:{gif:'bobby', title:'SKIPPED HALLOWEEN?', msg:'You learned all the forms and then didn\'t use them. Bobby had his halloween-gram ready. He\'s upset.'} }
       ] }
   ],
   10: [
     { month:'OCTOBER &mdash; 10TH GRADE',
-      prompt:'<h3>&#x1F383; Halloween Haunted House <span style="color:#8b0000;">(REQUIRED)</span>.</h3><p>Your class target this year: <strong>$1,500</strong>. The Haunted House is a <strong>required tradition</strong> at our school &mdash; your class runs it every year, no opt-out. You control the theme, decorations, costumes, ticket price, and whether you feed volunteers.</p><p>Here\'s the deal: <strong>ASB covers all expenses</strong>, but <strong>your class keeps the profit</strong>. Profit = <strong>Revenue &minus; Expenses</strong>. Revenue is how many tickets you sell &times; ticket price. Expenses are costumes, decorations, and volunteer food. The more profit you make, the more your class banks toward future events.</p>',
+      prompt:'<h3>&#x1F383; Halloween Haunted House <span style="color:#8b0000;">(REQUIRED)</span>.</h3><p>Class Fundraising Target this year: <strong>$1,500</strong>. The Haunted House is a <strong>required tradition</strong> at our school &mdash; your class runs it every year, no opt-out. You control the theme, decorations, costumes, ticket price, and whether you feed volunteers.</p><p>Here\'s the deal: <strong>ASB covers all expenses</strong>, but <strong>your class keeps the profit</strong>. Profit = <strong>Revenue &minus; Expenses</strong>. Revenue is how many tickets you sell &times; ticket price. Expenses are costumes, decorations, and volunteer food. The more profit you make, the more your class banks toward future events.</p>',
       options:[
         { label:'&#x1F47B; RUN THE HAUNTED HOUSE &mdash; design it yourself', hauntedHouse:true },
         { label:'&#x274C; Skip the Haunted House', yield:0, cutscene:{gif:'terry-tate', title:'YOU SKIPPED THE HAUNTED HOUSE?', msg:'The Haunted House isn\'t optional. It builds school culture, brings the community together, and shows every other class that your grade actually cares about improving this school. You skipped the one event the whole campus looks forward to. Terry Tate says GAME OVER.'} }
       ] },
     { month:'FEBRUARY &mdash; 10TH GRADE',
-      prompt:'<h3>&#x1F36C; Valentine Candy-Grams.</h3><p>Week-of-Valentine\'s presale. Kids order candy-grams (candy + tag + ribbon), your class delivers on Feb 14. Wholesale: <strong>$0.75 per gram</strong>. You set the price.</p>',
+      prompt:'<h3>&#x1F36C; Valentine Candy-Grams.</h3><p>Week-of-Valentine\'s presale. Kids order candy-grams (candy + tag + ribbon), your class delivers on Feb 14. Wholesale: <strong>$1 per gram</strong>. You set the price.</p>',
       options:[
         { label:'&#x1F36C; RUN THE VALENTINE CANDY-GRAM SALE', product:'candy_grams' },
         { label:'&#x1F4A4; Skip Valentine\'s week', yield:0, cutscene:{gif:'bobby', title:'SKIPPED VALENTINE\'S?', msg:'Valentine\'s is an automatic fundraiser. You skipped it. Bobby Boucher had a crush he was gonna send a gram to. Now he\'s upset.'} }
@@ -673,7 +705,7 @@ var FUND_STEPS = {
         { label:'&#x1F4A4; Skip fall fundraising', yield:0, cutscene:{gif:'terry-tate', title:'TERRY TATE SEES YOU', msg:'Fourteen months to prom. Every skip now = a bigger ask later. Terry is taking notes.'} }
       ] },
     { month:'FEBRUARY &mdash; 11TH GRADE',
-      prompt:'<h3>&#x1F36C; Valentine Candy-Grams.</h3><p>Week-of-Valentine\'s presale. Your class delivers candy-grams on Feb 14. Wholesale: <strong>$0.75 per gram</strong>. You set the price. Demand spikes for cheap grams (kids send multiple).</p>',
+      prompt:'<h3>&#x1F36C; Valentine Candy-Grams.</h3><p>Week-of-Valentine\'s presale. Your class delivers candy-grams on Feb 14. Wholesale: <strong>$1 per gram</strong>. You set the price. Demand spikes for cheap grams (kids send multiple).</p>',
       options:[
         { label:'&#x1F36C; RUN THE VALENTINE CANDY-GRAM SALE', product:'candy_grams' },
         { label:'&#x1F4A4; Skip Valentine\'s week', yield:0, cutscene:{gif:'bobby', title:'SKIPPED VALENTINE\'S?', msg:'Easiest money of the year. You passed. Bobby Boucher had his gram written out. You\'re on the field now.'} }
@@ -688,15 +720,27 @@ var FUND_STEPS = {
       ] }
   ],
   12: [
-    { month:'FALL &mdash; 12TH GRADE',
+    { month:'SEPTEMBER &mdash; 12TH GRADE',
+      prompt:'<h3>&#x1F697; Fall Car Wash (REQUIRED).</h3><p>Senior year starts with a car wash. Every dollar matters now &mdash; prom venue deposits, Disney reservations, and yearbooks are all coming. Donations only, ~$15 average per car. Your class needs to build the war chest.</p>',
+      options:[
+        { label:'&#x1F697; RUN THE FALL CAR WASH', product:'car_wash' },
+        { label:'&#x274C; Skip the car wash', yield:0, cutscene:{gif:'terry-tate', title:'TERRY TATE: YOU SKIPPED THE CAR WASH?', msg:'Prom venue deposits are due in weeks. Disney needs a commitment by November. You skipped the first fundraiser of senior year. Terry is charging.'} }
+      ] },
+    { month:'SEPTEMBER &mdash; 12TH GRADE',
       prompt:'<h3>Fall Senior Auction.</h3><p>Families bid on donated items, dinners with teachers, class bundles. This money helps cover the big-ticket items (venue deposit, Disney reservation) coming up.</p>',
       options:[
         { label:'&#x1F4E3; Fall auction &mdash; organized, pre-promoted', yield:1000 },
         { label:'&#x1F4CB; Fall auction &mdash; basic', yield:600 },
         { label:'&#x274C; Skip fall auction', yield:0, cutscene:{gif:'terry-tate', title:'SKIPPED THE FALL AUCTION?', msg:'Venue deposit and Disney reservation are coming. That money had to come from somewhere. Terry is running up the hallway.'} }
       ] },
+    { month:'OCTOBER &mdash; 12TH GRADE',
+      prompt:'<h3>&#x1F451; HOMECOMING DANCE</h3><p>Your senior class is running Homecoming. Juniors attend too &mdash; the two classes <strong>split the net profit 50/50</strong>. You pick the venue, food, drinks, dessert, and ticket price. Real data from this year: 112 tickets sold at $50, total cost was $2,250, no food provided.</p><p><strong>Warning:</strong> If you charge over $30 per ticket, students expect real food &mdash; not just snacks. No food + expensive tickets = Terry Tate.</p>',
+      options:[
+        { label:'&#x1F451; PLAN HOMECOMING', hocoEvent:true },
+        { label:'&#x274C; Skip Homecoming', yield:0, cutscene:{gif:'terry-tate', title:'YOU SKIPPED HOMECOMING?', msg:'Homecoming is the biggest fall event. Every class looks forward to it. You cancelled it. Terry Tate is running down the hallway. GAME OVER.'} }
+      ] },
     { month:'FEBRUARY &mdash; 12TH GRADE',
-      prompt:'<h3>&#x1F36C; Valentine Candy-Grams.</h3><p>Last product fundraiser before prom-push. Wholesale: <strong>$0.75 per gram</strong>. Price it, sell it, bank the margin toward prom.</p>',
+      prompt:'<h3>&#x1F36C; Valentine Candy-Grams.</h3><p>Last product fundraiser before prom-push. Wholesale: <strong>$1 per gram</strong>. Price it, sell it, bank the margin toward prom.</p>',
       options:[
         { label:'&#x1F36C; RUN THE VALENTINE CANDY-GRAM SALE', product:'candy_grams' },
         { label:'&#x1F4A4; Skip Valentine\'s week', yield:0, cutscene:{gif:'bobby', title:'SKIPPING VALENTINE\'S THIS LATE?', msg:'Prom is two months away and your class chose not to move $700 in margin. Bobby is running.'} }
@@ -706,14 +750,22 @@ var FUND_STEPS = {
   ]
 };
 
-// 12th grade Spring Auction step — injected right before luncheon in the Lab flow
+// 12th grade Spring steps — injected after prom costs, before luncheon
 var SPRING_AUCTION_STEP = {
   month:'SPRING &mdash; 12TH GRADE',
-  prompt:'<h3>Spring Senior Auction.</h3><p>Prom and Disney are already locked at this point. Spring fundraising exists to cover the Senior Luncheon and anything still short.</p>',
+  prompt:'<h3>Spring Senior Auction.</h3><p>Prom and Disney are already locked. Spring fundraising covers the Senior Luncheon and any shortfall.</p>',
   options:[
     { label:'&#x1F4E3; Spring auction &mdash; organized, pre-promoted', yield:1000 },
     { label:'&#x1F4CB; Spring auction &mdash; basic', yield:600 },
     { label:'&#x274C; Skip spring auction', yield:0, cutscene:{gif:'terry-tate', title:'LUNCHEON IS IN 6 WEEKS', msg:'Spring auction skipped. The luncheon still needs to be paid for. Terry Tate has entered the chat.'} }
+  ]
+};
+var SPRING_CARWASH_STEP = {
+  month:'SPRING &mdash; 12TH GRADE',
+  prompt:'<h3>&#x1F697; Spring Car Wash (optional).</h3><p>One more shot to pad the bank before luncheon. No penalty if you skip &mdash; but if you\'re short, this is your safety net.</p>',
+  options:[
+    { label:'&#x1F697; RUN A SPRING CAR WASH', product:'car_wash' },
+    { label:'&#x1F4A4; Skip &mdash; we have enough', yield:0 }
   ]
 };
 
@@ -782,6 +834,8 @@ function runFundStep(idx) {
     if (state.grade === 9)  { runEndParty(finalize9th); return; }
     if (state.grade === 10) { runEndParty(finalize10th); return; }
     if (state.grade === 11) { runEndParty(finalize11th); return; }
+    state.balanceBeforeProm = state.balance; // snapshot: savings after 12th-grade fundraisers, before prom planning
+    state.fundraised12th = state.balance - (state.startBalance || 0); // how much 12th-grade fundraisers added
     show('sLab'); runLab(); return; // 12th → prom lab
   }
   var step = steps[idx];
@@ -802,6 +856,8 @@ function runFundStep(idx) {
         });
       } else if (opt.hauntedHouse) {
         runHauntedHouse(function(){ runFundStep(idx+1); });
+      } else if (opt.hocoEvent) {
+        runHoco(function(){ runFundStep(idx+1); });
       } else if (opt.forms9th) {
         run9thFormsTutorial(function(){ runFundStep(idx+1); });
       } else {
@@ -832,16 +888,20 @@ function runInjectedFundStep(step, onDone) {
       var i = +el.getAttribute('data-i');
       var opt = step.options[i];
       var cleanLabel = opt.label.replace(/&#x[0-9A-F;]+/gi,'').replace(/<[^>]+>/g,'').trim();
-      adjust(opt.yield, step.month + ': ' + cleanLabel);
-      if (opt.cutscene) {
-        renderCutscene(opt.cutscene, opt.yield, onDone);
+      if (opt.product) {
+        runProductMath(PRODUCTS[opt.product], step.month + ': ' + cleanLabel, onDone);
       } else {
-        document.getElementById('fund-content').innerHTML =
-          '<div class="info-box reveal-flash"><h2>&#x1F4B0; RESULT</h2>' +
-          '<p style="font-size:1.3em;">You raised <span class="big-num">' + money(opt.yield) + '</span>.</p>' +
-          '<p style="margin-top:1vh;">New bank balance: <span class="big-num">' + money(state.balance) + '</span></p></div>' +
-          '<button class="btn" id="next-fund">CONTINUE &raquo;</button>';
-        document.getElementById('next-fund').onclick = onDone;
+        adjust(opt.yield, step.month + ': ' + cleanLabel);
+        if (opt.cutscene) {
+          renderCutscene(opt.cutscene, opt.yield, onDone);
+        } else {
+          document.getElementById('fund-content').innerHTML =
+            '<div class="info-box reveal-flash"><h2>&#x1F4B0; RESULT</h2>' +
+            '<p style="font-size:1.3em;">You raised <span class="big-num">' + money(opt.yield) + '</span>.</p>' +
+            '<p style="margin-top:1vh;">New bank balance: <span class="big-num">' + money(state.balance) + '</span></p></div>' +
+            '<button class="btn" id="next-fund">CONTINUE &raquo;</button>';
+          document.getElementById('next-fund').onclick = onDone;
+        }
       }
     };
   });
@@ -860,8 +920,9 @@ function runProductMath(prod, logLabel, onDone) {
   // Supply/demand preview — shows the curve so students SEE how price changes volume
   if (prod.demandSamples && prod.volumeByPrice) {
     html += '<div class="math-panel" style="border-left:4px solid #d4af37;"><h3>SUPPLY &amp; DEMAND &mdash; BEFORE YOU PICK A PRICE</h3>';
-    html += '<p style="color:#555; font-size:0.95em; margin-bottom:1vh;">Realistic demand ceiling: <strong>'+prod.poolLabel+'</strong>. You can\'t sell a million '+prod.unit+'s &mdash; that\'s not how a school works. Here\'s the curve:</p>';
-    html += '<table style="width:100%; margin:1vh 0; border-collapse:collapse;"><thead><tr style="background:#fef6d5;"><th style="padding:0.5vh; border:1px solid #d4af37;">Price per '+prod.unit+'</th><th style="padding:0.5vh; border:1px solid #d4af37;">Expected '+prod.unit+'s sold</th><th style="padding:0.5vh; border:1px solid #d4af37;">% of pool</th></tr></thead><tbody>';
+    html += '<p style="color:#555; font-size:0.95em; margin-bottom:1vh;"><strong>Pool</strong> = the total number of people who <em>could</em> buy: <strong>'+prod.poolLabel+'</strong>. That\'s your ceiling &mdash; you can\'t sell more than there are people willing to buy. Here\'s how price affects demand:</p>';
+    var soldWord = prod.unitSoldLabel || (prod.unit+'s sold');
+    html += '<table style="width:100%; margin:1vh 0; border-collapse:collapse;"><thead><tr style="background:#fef6d5;"><th style="padding:0.5vh; border:1px solid #d4af37;">Price per '+prod.unit+'</th><th style="padding:0.5vh; border:1px solid #d4af37;">Expected '+soldWord+'</th><th style="padding:0.5vh; border:1px solid #d4af37;">% of students who buy</th></tr></thead><tbody>';
     prod.demandSamples.forEach(function(pp){
       var vv = prod.volumeByPrice(pp);
       var pct = prod.pool ? Math.round((vv / prod.pool) * 100) : 0;
@@ -873,7 +934,7 @@ function runProductMath(prod, logLabel, onDone) {
 
   html += '<div class="math-panel"><h3>STEP 1 &mdash; SET YOUR PRICE</h3>';
   html += '<div class="math-row"><label>'+prod.priceQuestion+'</label>';
-  html += '<input type="number" id="pm-price" min="0" step="0.5" placeholder="'+prod.defaultPrice+'"></div>';
+  html += '<input type="number" id="pm-price" min="0" step="0.5" placeholder="$"></div>';
   html += '<p style="margin-top:1vh; color:#555; font-size:0.95em;">Pick any price &mdash; not just the ones in the table above. The curve scales in between. Type a number, then click below.</p></div>';
   html += '<button class="btn" id="pm-price-ok">LOCK IN MY PRICE &raquo;</button>';
 
@@ -1082,7 +1143,7 @@ function triggerBobby(kind) {
   } else if (kind === 'emptylot') {
     html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F3C8; TERRY TATE: THIS IS JUST DETENTION</h2>';
     html += '<img src="'+randomTerryTate()+'" alt="Terry Tate Office Linebacker" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8);" onerror="this.style.display=\'none\'">';
-    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>Your class stood in an empty parking lot eating nothing.</strong></p><p>You banked almost everything and threw no party. 10th graders need a reason to keep showing up to ASB meetings. You gave them concrete and awkward silence.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">That&#39;s not a party. That&#39;s detention. Terry Tate charged on principle.</p></div>';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>Your class stood in an empty parking lot eating nothing.</strong></p><p>You banked almost everything and threw no party. Students need a reason to keep showing up to ASB meetings. You gave them concrete and awkward silence.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">That&#39;s not a party. That&#39;s detention. Terry Tate charged on principle.</p></div>';
   } else if (kind === 'fcmat') {
     html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F6A8; FCMAT VIOLATION &mdash; COMMINGLING</h2>';
     html += '<img src="'+randomTerryTate()+'" alt="Terry Tate" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8);" onerror="this.style.display=\'none\'">';
@@ -1091,6 +1152,10 @@ function triggerBobby(kind) {
     html += '<p>The correct procedure: deposit all cash with the bookkeeper FIRST. Then the advisor uses the school credit card for purchases. Receipt comes back. Check request closes the loop.</p>';
     html += '<p>Cash never goes from the cash box to the store. Period.</p>';
     html += '<p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Terry Tate shut down the entire operation. GAME OVER.</p></div>';
+  } else if (kind === 'hocoNoFood') {
+    html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F3C8; TERRY TATE: WHERE\'S THE FOOD?</h2>';
+    html += '<img src="'+randomTerryTate()+'" alt="Terry Tate" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8);" onerror="this.style.display=\'none\'">';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>You charged over $30 a ticket and gave them NOTHING to eat.</strong></p><p>Students paid good money expecting a real dance. They got a room with music and empty tables. Parents started calling the school. The advisor got pulled into a meeting. Terry Tate got hungry.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">No food at a premium dance? GAME OVER.</p></div>';
   }
   document.getElementById('bobby-body').innerHTML = html;
   // show('sBobby') handles audio (rickroll on, bg muted)
@@ -1143,21 +1208,26 @@ function renderPricingLab() {
   html += '<h3>SET YOUR PRICES</h3>';
   html += '<p style="margin-bottom:1vh;">Break-even Senior Package price if all '+SENIOR_COUNT+' seniors buy: <span class="big-num">'+money(breakEvenPkg)+'</span></p>';
   html += '<p style="margin-bottom:1vh; font-size:0.95em;">You can price it LOWER (more seniors buy, but you owe the gap in fundraising) or HIGHER (fewer seniors buy, but each one covers more).</p>';
-  html += '<div class="math-row"><label><strong>Senior Package Price</strong> ($) &mdash; what you charge each senior</label><input type="number" id="p-pkg" min="0" step="5" placeholder="'+breakEvenPkg+'"></div>';
-  html += '<div class="math-row"><label><strong>Prom-Only Ticket</strong> ($) &mdash; for juniors/sophs buying only prom</label><input type="number" id="p-pro" min="0" step="5" placeholder="120"></div>';
-  html += '<div class="math-row"><label><strong>Grad Nite-Only Ticket</strong> ($) &mdash; seniors who want only Disney</label><input type="number" id="p-gno" min="0" step="5" placeholder="275"></div>';
+  html += '<div class="math-row"><label><strong>Senior Package Price</strong> ($) &mdash; what you charge each senior</label><input type="number" id="p-pkg" min="0" step="5" placeholder="$"></div>';
+  html += '<div class="math-row" style="opacity:0.7;"><label><strong>Prom-Only Ticket</strong> &mdash; individual prom tickets (juniors only)</label><span style="font-size:1.1em; font-weight:bold; padding:0.4vh 0.5vw;">$120 <span style="font-size:0.85em; color:#555;">(fixed price)</span></span></div>';
+  html += '<input type="hidden" id="p-pro" value="120">';
+  html += '<div class="math-row"><label><strong>Grad Nite-Only Ticket</strong> ($) &mdash; seniors who want only Disney</label><input type="number" id="p-gno" min="0" step="5" placeholder="$"></div>';
+  html += '<div style="margin:1.5vh 0; padding:1vh; border:2px dashed #888; border-radius:8px; background:rgba(0,0,0,0.03);">';
+  html += '<p style="font-size:0.95em; color:#555;">&#x1F4A1; <strong>Future option (not available this year):</strong> Sell prom tickets to <strong>10th graders</strong> at <strong>$135</strong>. That could bring in ~15 additional ticket sales and <strong>$2,025 in extra revenue</strong>. Something to think about for next year\'s class.</p>';
+  html += '</div>';
   html += '<h3 style="margin-top:2vh;">HOW MANY DO YOU THINK YOU&#39;LL SELL?</h3>';
-  html += '<p style="font-size:0.95em; color:#555; margin-bottom:1vh;">You have <strong>'+SENIOR_COUNT+' seniors</strong>. Prom-Only is open to juniors/sophs. <strong>Realistically, about 90 attendees fit on the prom buses.</strong></p>';
-  html += '<div class="math-row"><label><strong>Senior Packages sold</strong> (0&ndash;'+SENIOR_COUNT+')</label><input type="number" id="q-pkg" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder="'+SENIOR_COUNT+'"></div>';
-  html += '<div class="math-row"><label><strong>Grad Nite-Only tickets sold</strong> (seniors w/o package)</label><input type="number" id="q-gno" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder="2"></div>';
-  html += '<div class="math-row"><label><strong>Prom-Only tickets sold</strong> (underclassmen &mdash; but remember the 90-seat prom-bus cap)</label><input type="number" id="q-pro" min="0" step="1" placeholder="16"></div>';
+  html += '<p style="font-size:0.95em; color:#555; margin-bottom:0.5vh;">You have <strong>'+SENIOR_COUNT+' seniors</strong>. Prom-Only is open to juniors.</p>';
+  html += '<p style="font-size:0.95em; color:#8b0000; font-weight:bold; margin-bottom:1vh;">&#x26A0; Realistic cap: <strong>80 total prom tickets max.</strong> This year we sold 73. Students always think they\'ll sell more than they do. Plan for 80 or fewer.</p>';
+  html += '<div class="math-row"><label><strong>Senior Packages sold</strong> (0&ndash;'+SENIOR_COUNT+')</label><input type="number" id="q-pkg" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder=""></div>';
+  html += '<div class="math-row"><label><strong>Grad Nite-Only tickets sold</strong> (seniors w/o package)</label><input type="number" id="q-gno" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder=""></div>';
+  html += '<div class="math-row"><label><strong>Prom-Only tickets sold</strong> (juniors at $120 each)</label><input type="number" id="q-pro" min="0" step="1" placeholder=""></div>';
   html += '<p id="q-warn" style="color:#8b0000; font-weight:bold; font-size:0.95em; min-height:1.2em;"></p>';
   html += '<p style="font-size:0.95em; color:#555; margin-top:1vh;">Drop numbers into the boxes. Edit as many times as you want &mdash; the projection below updates live.</p>';
   html += '</div>';
 
   html += '<div class="math-panel" id="proj-panel">';
   html += '<h3>YOUR BUDGET WORKSHEET &mdash; YOU DO THE MATH</h3>';
-  html += '<p style="color:#555; margin-bottom:1vh;">No calculator preview. <strong>You have to compute every line.</strong> The formulas are written out &mdash; type your answer in the box. Green check = right. Red X = try again. You can&#39;t lock it in until every box is correct.</p>';
+  html += '<p style="color:#555; margin-bottom:1vh;">No calculator preview. <strong>You have to compute every line.</strong> The formulas are written out &mdash; type your answer in the box. No hints, no checkmarks. Submit when you think you\'re right. If you\'re wrong, you redo it.</p>';
   html += '<p style="color:#8b0000; font-weight:bold; font-size:0.95em;">Formulas matter. These are the SAME formulas a real ASB treasurer uses.</p>';
   html += '<div id="proj-out"></div></div>';
 
@@ -1165,20 +1235,20 @@ function renderPricingLab() {
 
   document.getElementById('lab-content').innerHTML = html;
 
-  ['p-pkg','p-pro','p-gno','q-pkg','q-gno','q-pro'].forEach(function(id){ document.getElementById(id).addEventListener('input', updateProjection); });
+  ['p-pkg','p-gno','q-pkg','q-gno','q-pro'].forEach(function(id){ document.getElementById(id).addEventListener('input', updateProjection); });
   document.getElementById('lock-btn').onclick = function(){
     var pkg = +document.getElementById('p-pkg').value || 0;
-    var pro = +document.getElementById('p-pro').value || 0;
+    var pro = 120; // Fixed prom-only ticket price
     var gno = +document.getElementById('p-gno').value || 0;
     var qPkg = +document.getElementById('q-pkg').value;
     var qGno = +document.getElementById('q-gno').value;
     var qPro = +document.getElementById('q-pro').value;
-    if (!pkg || !pro || !gno) { alert('Fill in all three prices to continue.'); return; }
+    if (!pkg || !gno) { alert('Fill in the Senior Package price and Grad Nite-Only price.'); return; }
     if (isNaN(qPkg) || isNaN(qGno) || isNaN(qPro)) { alert('Fill in all three quantities (how many you expect to sell). Use 0 if none.'); return; }
     if (qPkg + qGno > SENIOR_COUNT) { alert('Senior Packages + Grad-Nite-Only can\'t exceed '+SENIOR_COUNT+' seniors. Adjust.'); return; }
-    // AIRTIGHT 90-cap: realistic prom attendance limit. Bobby, no bypass.
-    if (qPkg + qPro > 90) { triggerBobby('nobus'); return; }
-    if (!validateWorksheet()) { alert('Finish the budget worksheet first. Every box needs a green check.'); return; }
+    // Realistic 80-ticket cap. Students always think they'll sell more.
+    if (qPkg + qPro > 80) { alert('Total prom tickets (packages + prom-only) can\'t exceed 80. This year we sold 73. Be realistic.'); return; }
+    if (!validateWorksheet()) { return; }
     state.prices = { pkg:pkg, promTicket:pro, gradNiteOnly:gno };
     finalize();
   };
@@ -1197,10 +1267,8 @@ function simulateTakeRate(pkgPrice, hardPerSenior) {
   return 35;
 }
 function simulatePromOnly(promPrice) {
-  if (promPrice <= 100) return 20;
-  if (promPrice <= 130) return 16;
-  if (promPrice <= 160) return 12;
-  return 8;
+  // Prom-only is fixed at $120 — realistic junior demand
+  return 15; // ~15 juniors typically buy prom-only
 }
 function simulateGradOnly(gnoPrice) {
   if (gnoPrice <= 220) return 4;
@@ -1210,7 +1278,7 @@ function simulateGradOnly(gnoPrice) {
 
 function updateProjection() {
   var pkg = +document.getElementById('p-pkg').value || 0;
-  var pro = +document.getElementById('p-pro').value || 0;
+  var pro = 120; // Fixed prom-only ticket price
   var gno = +document.getElementById('p-gno').value || 0;
 
   var qPkgEl = document.getElementById('q-pkg');
@@ -1271,7 +1339,7 @@ function updateProjection() {
   // Only render the worksheet once all 6 driver inputs (3 prices + 3 quantities) have values
   var out = document.getElementById('proj-out');
   if (!out) return;
-  if (!pkg || !pro || !gno || isNaN(qPkg) || isNaN(qGno) || isNaN(qPro)) {
+  if (!pkg || !gno || isNaN(qPkg) || isNaN(qGno) || isNaN(qPro)) {
     out.innerHTML = '<p style="color:#555; font-style:italic; padding:1vh;">Fill in all three PRICES and all three QUANTITIES above. Then the worksheet will unlock and you can compute the budget.</p>';
     return;
   }
@@ -1320,23 +1388,16 @@ function updateProjection() {
   out.innerHTML = html;
 
   // Wire validators
-  var ids = ['w-pkg-rev','w-pro-rev','w-gno-rev','w-total-rev','w-disney','w-yb','w-lun','w-food','w-other','w-total-exp','w-net'];
-  ids.forEach(function(id){
-    var el = document.getElementById(id);
-    if (el) el.addEventListener('input', validateWorksheet);
-  });
-  validateWorksheet();
+  // No live validation — worksheet checked on submit only
 }
 
-// Render a worksheet row where the student has to compute the answer
+// Render a worksheet row where the student has to compute the answer — NO live checkmarks
 function wsRow(id, label, formula, expected, emphasize) {
   var cls = emphasize ? ' style="background:#fffbe6; border-left:4px solid #d4af37; padding:0.5vh 0.5vw;"' : '';
   return '<div class="math-row"'+cls+' data-expected="'+expected+'">' +
     '<label><strong>'+label+'</strong><br><span style="font-size:0.9em; color:#555;">'+formula+'</span></label>' +
-    '<span style="display:flex; align-items:center; gap:0.5vw;">' +
     '<input type="number" id="'+id+'" step="1" placeholder="?" style="width:7vw; min-width:90px; padding:0.4vh 0.5vw; font-size:1.1em; text-align:right;">' +
-    '<span id="'+id+'-chk" style="font-weight:bold; font-size:1.3em; min-width:1.5em;"></span>' +
-    '</span></div>';
+    '</div>';
 }
 
 // Render a fixed-cost line (no math needed — just shown)
@@ -1344,68 +1405,62 @@ function wsFixed(label, formula, value) {
   return '<div class="math-row" style="opacity:0.8;"><label>'+label+'<br><span style="font-size:0.9em; color:#555;">'+formula+'</span></label><span class="val neg">'+money(-value)+'</span></div>';
 }
 
-// Validate the worksheet — green ✓ for correct, red ✗ for wrong. Returns all-correct boolean.
+// Validate the worksheet on submit — no live feedback. Returns true if all correct, false + shows errors if not.
 function validateWorksheet() {
   var p = state.projection;
   if (!p) return false;
   var cells = [
-    { id:'w-pkg-rev',   expected:p.pkgRev },
-    { id:'w-pro-rev',   expected:p.proRev },
-    { id:'w-gno-rev',   expected:p.gnoRev },
-    { id:'w-total-rev', expected:p.totalRev },
-    { id:'w-disney',    expected:p.disneyTix },
-    { id:'w-yb',        expected:p.yearbookExp },
-    { id:'w-lun',       expected:p.luncheonExp },
-    { id:'w-food',      expected:Math.round(p.promFood) },
-    { id:'w-other',     expected:p.otherProm },
-    { id:'w-total-exp', expected:Math.round(p.totalExp) },
-    { id:'w-net',       expected:Math.round(p.net) }
+    { id:'w-pkg-rev',   expected:p.pkgRev,              label:'Senior Package revenue' },
+    { id:'w-pro-rev',   expected:p.proRev,               label:'Prom-Only revenue' },
+    { id:'w-gno-rev',   expected:p.gnoRev,               label:'Grad Nite-Only revenue' },
+    { id:'w-total-rev', expected:p.totalRev,              label:'TOTAL REVENUE' },
+    { id:'w-disney',    expected:p.disneyTix,             label:'Grad Nite tickets' },
+    { id:'w-yb',        expected:p.yearbookExp,           label:'Yearbooks' },
+    { id:'w-lun',       expected:p.luncheonExp,           label:'Senior Luncheon' },
+    { id:'w-food',      expected:Math.round(p.promFood),  label:'Prom food + tip' },
+    { id:'w-other',     expected:p.otherProm,             label:'DJ + Photo + Decor + Tableware' },
+    { id:'w-total-exp', expected:Math.round(p.totalExp),  label:'TOTAL EXPENSES' },
+    { id:'w-net',       expected:Math.round(p.net),       label:'End-of-year balance' }
   ];
-  var allGood = true, filled = 0;
+  var errors = [];
+  var empty = 0;
   cells.forEach(function(c){
     var el = document.getElementById(c.id);
-    var chk = document.getElementById(c.id+'-chk');
-    if (!el || !chk) return;
+    if (!el) return;
     var v = el.value;
-    if (v === '' || v === null) { chk.textContent = ''; chk.style.color=''; allGood = false; return; }
-    filled++;
-    var num = +v;
-    // Tolerance: ±$1 for rounding on prom food (×1.20)
-    if (Math.abs(num - c.expected) <= 1) {
-      chk.textContent = '\u2713'; chk.style.color = '#2a8f2a';
-    } else {
-      chk.textContent = '\u2717'; chk.style.color = '#c00';
-      allGood = false;
+    if (v === '' || v === null) { empty++; return; }
+    if (Math.abs(+v - c.expected) > 1) {
+      errors.push(c.label+': should be '+money(c.expected)+', you put '+money(+v));
     }
   });
-  var summary = document.getElementById('w-summary');
-  if (summary) {
-    if (allGood && filled === cells.length) {
-      summary.textContent = '\u2713 WORKSHEET COMPLETE. You can lock it in.';
-      summary.style.color = '#2a8f2a';
-    } else if (filled === 0) {
-      summary.textContent = '';
-    } else {
-      summary.textContent = 'Filled '+filled+' of '+cells.length+' boxes. Keep going.';
-      summary.style.color = '#8b0000';
-    }
+  if (empty > 0) { alert('Fill in all '+cells.length+' boxes first.'); return false; }
+  if (errors.length > 0) {
+    alert('WRONG. Fix these and resubmit:\n\n' + errors.join('\n'));
+    return false;
   }
-  return allGood && filled === cells.length;
+  return true;
 }
 
 // ============ 9TH GRADE: FORMS TUTORIAL (DONUT SALE) ============
-// Scenario: Class wants to sell donuts for 6 Friday mornings AT LUNCH AND AFTER SCHOOL ONLY.
-// FCMAT rule: California lunch regulations apply — can only sell during lunch and after school.
-// Wholesale: $6/dozen (12 donuts). Sell for $1 each. ~8 dozen/week realistic for 450-student school.
-// Real benchmark: donuts netted $250-$750 depending on community outreach vs. students-only.
-var FORM_DONUT_WHOLESALE = 6;     // $6 per dozen
-var FORM_DONUT_SELL_EACH = 1;     // $1 per donut
-var FORM_DONUT_DOZENS = 8;        // 8 dozen per week (realistic for 450 students, lunch only)
-var FORM_DONUT_WEEKS = 6;         // 6 Fridays
-var FORM_DONUT_TOTAL_DOZENS = FORM_DONUT_DOZENS * FORM_DONUT_WEEKS;  // 48 dozen
-var FORM_DONUT_TOTAL_COST = FORM_DONUT_TOTAL_DOZENS * FORM_DONUT_WHOLESALE;  // $288
-var FORM_DONUT_TOTAL_REVENUE = FORM_DONUT_TOTAL_DOZENS * 12 * FORM_DONUT_SELL_EACH;  // $576
-var FORM_DONUT_PROFIT = FORM_DONUT_TOTAL_REVENUE - FORM_DONUT_TOTAL_COST;  // $288
+// Scenario: Class wants to sell donuts — ONE day sale, single pickup.
+// Wholesale: $12/dozen (cheaper bakery, 35-min drive). Sell for $2 each.
+// 8 dozen = 96 donuts. One pickup, one day. Realistic for a 450-student school.
+// FCMAT rule: can only sell food during lunch and after school, but can collect money during school.
+// $100 minimum profit rule: if projected profit < $100, advisor won't approve (not worth their time/gas).
+var FORM_DONUT_WHOLESALE = 12;    // $12 per dozen (cheaper bakery, 35-min drive)
+var FORM_DONUT_SELL_EACH = 2;     // $2 per donut
+var FORM_DONUT_DOZENS = 8;        // 8 dozen (one pickup, one day)
+var FORM_DONUT_WEEKS = 1;         // 1 day sale (not weekly)
+var FORM_DONUT_TOTAL_DOZENS = FORM_DONUT_DOZENS;  // 8 dozen total (single day)
+var FORM_DONUT_TOTAL_COST = FORM_DONUT_TOTAL_DOZENS * FORM_DONUT_WHOLESALE;  // $96
+var FORM_DONUT_TOTAL_REVENUE = FORM_DONUT_TOTAL_DOZENS * 12 * FORM_DONUT_SELL_EACH;  // $192
+var FORM_DONUT_PROFIT = FORM_DONUT_TOTAL_REVENUE - FORM_DONUT_TOTAL_COST;  // $96
+
+function isValidClassName(val) {
+  // Accept: "class of 2029", "class of 29", "Class of '29", etc. Case insensitive.
+  var v = val.toLowerCase().replace(/['']/g, '');
+  return /class\s+of\s+\d{2,4}/.test(v);
+}
 
 function run9thFormsTutorial(onDone) {
   state.forms = { step:0 };
@@ -1416,19 +1471,22 @@ function run9thFormsTutorial(onDone) {
 function form9_Step1_Request(onDone) {
   var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F4CB;</div>';
   html += '<div class="expert-bubble"><h3>FORM 1: REQUEST FOR APPROVAL &mdash; FUNDRAISING EVENT</h3>';
-  html += '<p>Before you sell a single donut, you need <strong>approval</strong>. This form goes to the ASB advisor, then the principal, then the bookkeeper. Everyone signs off.</p>';
-  html += '<p><strong>RULE: Must be submitted at least 2 weeks before the event.</strong> Miss the deadline = no fundraiser.</p>';
-  html += '<div class="quote">"No form, no fundraiser. No exceptions."</div></div></div>';
+  html += '<p>Before you sell a single donut, you need <strong>approval</strong>. This form goes to the ASB Executive team first (President, VP, Treasurer, Secretary), then the advisor signs, and finally the principal signs.</p>';
+  html += '<p><strong>IMPORTANT: If the principal does NOT sign it, it gets denied.</strong> It isn\'t approved just because ASB voted yes. The principal has final say.</p>';
+  html += '<p><strong>RULE: Paperwork must be submitted at least 2 weeks before the event.</strong> Miss the deadline = no fundraiser. Figure out your dates.</p>';
+  html += '<p style="margin-top:1vh;"><strong>FCMAT FOOD RULE:</strong> You can only sell food <strong>during lunch and after school</strong>. Not before school, not during class. However, you CAN collect money (take orders) during school hours.</p>';
+  html += '<div class="quote">"No form, no fundraiser. No exceptions. Every form needs three signatures: student, advisor, and principal."</div></div></div>';
 
   html += '<div class="math-panel"><h3>FILL OUT THE FUNDRAISING REQUEST</h3>';
-  html += '<p style="color:#555; margin-bottom:1vh;">Your donut sale will run <strong>6 Fridays at lunch</strong>, starting <strong>October 18</strong>. Today is <strong>October 1</strong>.</p>';
-  html += '<p style="color:#8b0000; font-size:0.9em; margin-bottom:1vh;"><strong>FCMAT RULE:</strong> Under California lunch regulations, student fundraisers can only sell food <strong>during lunch and after school</strong>. Not before school, not during class. This limits how many donuts you can realistically move.</p>';
-  html += '<div class="math-row"><label>Name of Club</label><input type="text" id="f1-club" placeholder="e.g. Class of 2029"></div>';
+  html += '<p style="color:#555; margin-bottom:1vh;">Your class wants to run a <strong>donut sale</strong>. Today is <strong>October 1</strong>. You need to pick a date and get this submitted in time.</p>';
+  html += '<div class="math-row"><label>Name of Club</label><input type="text" id="f1-club" placeholder="e.g. class of 29"></div>';
   html += '<div class="math-row"><label>Proposed Event</label><input type="text" id="f1-event" placeholder="e.g. Donut Sale"></div>';
-  html += '<div class="math-row"><label>Proposed Start Date (mm/dd)</label><input type="text" id="f1-date" placeholder="e.g. 10/18"></div>';
-  html += '<div class="math-row"><label>Date Submitting This Form (mm/dd)</label><input type="text" id="f1-submit" placeholder="e.g. 10/01"></div>';
+  html += '<div class="math-row"><label>Proposed Event Date (mm/dd)</label><input type="text" id="f1-date" placeholder="mm/dd"></div>';
+  html += '<div class="math-row"><label>Date Submitting This Form (mm/dd)</label><input type="text" id="f1-submit" placeholder="mm/dd"></div>';
   html += '<div class="math-row"><label>Description of fundraiser</label><input type="text" id="f1-desc" placeholder="Describe what you\'re doing"></div>';
-  html += '<div class="math-row"><label>Location</label><input type="text" id="f1-loc" placeholder="e.g. Front gate before school"></div>';
+  html += '<div class="math-row"><label>When will you sell? (time of day)</label><input type="text" id="f1-when" placeholder="e.g. lunch, after school"></div>';
+  html += '<div class="math-row"><label>Location</label><input type="text" id="f1-loc" placeholder="Where on campus?"></div>';
+  html += '<div class="math-row"><label>Student Signature</label><input type="text" id="f1-sig" placeholder="Type your name"></div>';
   html += '</div>';
   html += '<button class="btn" id="f1-ok">SUBMIT FORM &raquo;</button>';
 
@@ -1439,16 +1497,25 @@ function form9_Step1_Request(onDone) {
     var date = document.getElementById('f1-date').value.trim();
     var submit = document.getElementById('f1-submit').value.trim();
     var desc = document.getElementById('f1-desc').value.trim();
+    var when = document.getElementById('f1-when').value.trim();
     var loc = document.getElementById('f1-loc').value.trim();
+    var sig = document.getElementById('f1-sig').value.trim();
 
-    // Check for blank fields — Terry sends it back
-    if (!club || !event || !date || !submit || !desc || !loc) {
+    // Check for blank fields
+    if (!club || !event || !date || !submit || !desc || !when || !loc || !sig) {
       showFormError('You left fields blank. Terry Tate is sending this back.', 'Every box needs to be filled out. The advisor won\'t even look at it if it\'s incomplete. Try again.',
         function(){ form9_Step1_Request(onDone); });
       return;
     }
 
-    // Check 2-week rule — parse dates loosely
+    // Validate class name
+    if (!isValidClassName(club)) {
+      showFormError('Club name doesn\'t look right.', 'It should be something like "class of 29" or "Class of 2029". Try again.',
+        function(){ form9_Step1_Request(onDone); });
+      return;
+    }
+
+    // Check 2-week rule
     var eventMonth = parseInt(date.split('/')[0]) || 0;
     var eventDay = parseInt(date.split('/')[1]) || 0;
     var subMonth = parseInt(submit.split('/')[0]) || 0;
@@ -1461,9 +1528,9 @@ function form9_Step1_Request(onDone) {
       return;
     }
 
-    // Passed — continue
+    // Passed
     showFormSuccess('Fundraising Request: APPROVED',
-      'The advisor signed it. The principal signed it. The bookkeeper recorded it. Your donut sale is officially on the calendar.',
+      '<strong>It was turned in, voted on by the ASB Executive team (ASB President, VP, Treasurer, and Secretary), signed by the advisor, and finally, signed by the principal.</strong><br><br>Your donut sale is officially on the calendar.<br><br><div style="background:#fff8dc; border:2px solid #d4af37; border-radius:8px; padding:1vh 1.5vw; margin-top:1vh;"><strong>&#x1F4A1; Remember:</strong> Every ASB form needs <strong>three signatures</strong>: student, advisor, and principal. If ANY of those are missing &mdash; especially the principal &mdash; it\'s not approved. The principal has final say, even if ASB voted yes.</div>',
       function(){ form9_Step2_Revenue(onDone); });
   };
 }
@@ -1472,15 +1539,19 @@ function form9_Step1_Request(onDone) {
 function form9_Step2_Revenue(onDone) {
   var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F4CB;</div>';
   html += '<div class="expert-bubble"><h3>FORM 2: SALES ANALYSIS &mdash; REVENUE POTENTIAL</h3>';
-  html += '<p>Now you forecast. How much will you make? This form proves to the advisor that the fundraiser is worth doing.</p>';
-  html += '<p>Your plan: buy <strong>'+FORM_DONUT_DOZENS+' dozen donuts per week</strong> at <strong>$'+FORM_DONUT_WHOLESALE+'/dozen</strong> wholesale. Sell at <strong>$'+FORM_DONUT_SELL_EACH+' each</strong> during lunch only. Run it for <strong>'+FORM_DONUT_WEEKS+' Fridays</strong>. ('+FORM_DONUT_DOZENS+' dozen/week is realistic for a 450-student campus at lunch.)</p>';
-  html += '<div class="quote">"Revenue Potential = units sold &times; selling price. If this number doesn\'t make sense, the whole fundraiser gets questioned."</div></div></div>';
+  html += '<p>This form proves to the advisor that the fundraiser is <strong>worth doing</strong>.</p>';
+  html += '<p>Just because you WANT to sell donuts doesn\'t mean it\'s worth the advisor\'s time. Think about it: the advisor (or another adult) has to <strong>drive 35 minutes each way</strong> to pick up your donuts. That\'s gas, time, and effort. And they\'re not just supporting YOUR class &mdash; they support <strong>6 total grades</strong> and have other duties.</p>';
+  html += '<p style="margin-top:1vh;"><strong>&#x1F6A8; THE $100 RULE:</strong> If a fundraiser isn\'t projected to make at least <strong>$100 profit</strong>, it\'s not worth the time. The advisor will deny it. Come up with something else.</p>';
+  html += '<p style="margin-top:1vh;">Your plan: buy <strong>'+FORM_DONUT_DOZENS+' dozen donuts</strong> at <strong>$'+FORM_DONUT_WHOLESALE+'/dozen</strong> wholesale (cheaper bakery, 35-min drive). Sell at <strong>$'+FORM_DONUT_SELL_EACH+' each</strong> during lunch. One day, one pickup.</p>';
+  html += '<div class="quote">"Revenue Potential = units sold &times; selling price. If the projected profit doesn\'t clear $100, I\'m not driving 35 minutes to pick up your donuts."</div></div></div>';
 
   html += '<div class="math-panel"><h3>COMPUTE YOUR REVENUE POTENTIAL</h3>';
-  html += '<div class="math-row"><label>Total dozens purchased (10/week &times; 4 weeks)</label><input type="number" id="f2-dozens" placeholder="?"></div>';
+  html += '<div class="math-row"><label>Total dozens purchased</label><input type="number" id="f2-dozens" placeholder="?"></div>';
   html += '<div class="math-row"><label>Total individual donuts (dozens &times; 12)</label><input type="number" id="f2-units" placeholder="?"></div>';
   html += '<div class="math-row"><label>Unit selling price ($)</label><input type="number" id="f2-price" step="0.01" placeholder="?"></div>';
   html += '<div class="math-row"><label>Revenue potential (units &times; price) ($)</label><input type="number" id="f2-rev" step="1" placeholder="?"></div>';
+  html += '<div class="math-row"><label>Total cost (dozens &times; wholesale price) ($)</label><input type="number" id="f2-cost" step="1" placeholder="?"></div>';
+  html += '<div class="math-row"><label><strong>Projected profit (revenue &minus; cost) ($)</strong></label><input type="number" id="f2-profit" step="1" placeholder="?"></div>';
   html += '</div>';
   html += '<button class="btn" id="f2-ok">SUBMIT FORM &raquo;</button>';
 
@@ -1490,13 +1561,15 @@ function form9_Step2_Revenue(onDone) {
     var units = +document.getElementById('f2-units').value;
     var price = +document.getElementById('f2-price').value;
     var rev = +document.getElementById('f2-rev').value;
+    var cost = +document.getElementById('f2-cost').value;
+    var profit = +document.getElementById('f2-profit').value;
 
-    if (!dozens || !units || !price || !rev) {
+    if (!dozens || !units || !price || !rev || !cost || !profit) {
       showFormError('Blank fields.', 'Every line on this form needs a number. Terry is sending it back.', function(){ form9_Step2_Revenue(onDone); });
       return;
     }
     if (dozens !== FORM_DONUT_TOTAL_DOZENS) {
-      showFormError('Total dozens is wrong.', '10 dozen per week &times; 4 weeks = '+FORM_DONUT_TOTAL_DOZENS+'. Fix it and resubmit.', function(){ form9_Step2_Revenue(onDone); });
+      showFormError('Total dozens is wrong.', 'You\'re buying '+FORM_DONUT_TOTAL_DOZENS+' dozen (one pickup, one day). Fix it and resubmit.', function(){ form9_Step2_Revenue(onDone); });
       return;
     }
     if (units !== FORM_DONUT_TOTAL_DOZENS * 12) {
@@ -1511,10 +1584,25 @@ function form9_Step2_Revenue(onDone) {
       showFormError('Revenue potential doesn\'t match.', units+' donuts &times; $'+price+' = $'+(units*price)+'. Redo the math.', function(){ form9_Step2_Revenue(onDone); });
       return;
     }
+    if (Math.abs(cost - FORM_DONUT_TOTAL_COST) > 1) {
+      showFormError('Cost doesn\'t match.', dozens+' dozen &times; $'+FORM_DONUT_WHOLESALE+' = $'+(dozens*FORM_DONUT_WHOLESALE)+'. Check the wholesale price.', function(){ form9_Step2_Revenue(onDone); });
+      return;
+    }
+    if (Math.abs(profit - FORM_DONUT_PROFIT) > 1) {
+      showFormError('Projected profit is wrong.', '$'+FORM_DONUT_TOTAL_REVENUE+' revenue &minus; $'+FORM_DONUT_TOTAL_COST+' cost = $'+FORM_DONUT_PROFIT+'. Revenue minus cost.', function(){ form9_Step2_Revenue(onDone); });
+      return;
+    }
 
-    showFormSuccess('Revenue Potential: VERIFIED',
-      'Your forecast: '+units+' donuts at $'+price+' each = <strong>'+money(FORM_DONUT_TOTAL_REVENUE)+'</strong> potential revenue. Attached to your fundraiser request.',
-      function(){ form9_Step3_Expenditure(onDone); });
+    // Check $100 minimum
+    if (FORM_DONUT_PROFIT < 100) {
+      showFormSuccess('Revenue Potential: VERIFIED &mdash; but advisor flags it',
+        'Your forecast: '+units+' donuts at $'+price+' each = <strong>'+money(FORM_DONUT_TOTAL_REVENUE)+'</strong> revenue, <strong>'+money(FORM_DONUT_TOTAL_COST)+'</strong> cost, <strong>'+money(FORM_DONUT_PROFIT)+'</strong> profit.<br><br><div style="background:#fff8dc; border:2px solid #d4af37; border-radius:8px; padding:1vh 1.5vw;"><strong>&#x26A0; ADVISOR NOTE:</strong> Projected profit of '+money(FORM_DONUT_PROFIT)+' is under the $100 threshold. The advisor is hesitant &mdash; 35-min drive for '+money(FORM_DONUT_PROFIT)+'? They\'ll allow it THIS time since it\'s your first fundraiser and a learning experience. But next time, if it doesn\'t clear $100, find a better fundraiser.</div>',
+        function(){ form9_Step3_Expenditure(onDone); });
+    } else {
+      showFormSuccess('Revenue Potential: VERIFIED',
+        'Your forecast: '+units+' donuts at $'+price+' each = <strong>'+money(FORM_DONUT_TOTAL_REVENUE)+'</strong> revenue, <strong>'+money(FORM_DONUT_TOTAL_COST)+'</strong> cost, projected profit: <strong>'+money(FORM_DONUT_PROFIT)+'</strong>. Clears the $100 minimum. Attached to your fundraiser request.',
+        function(){ form9_Step3_Expenditure(onDone); });
+    }
   };
 }
 
@@ -1523,7 +1611,7 @@ function form9_Step3_Expenditure(onDone) {
   var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F4CB;</div>';
   html += '<div class="expert-bubble"><h3>FORM 3: EXPENDITURE APPROVAL</h3>';
   html += '<p>Your advisor is buying the donuts with the <strong>school credit card</strong>. But they can\'t just go spend ASB money without pre-approval. This form is the green light.</p>';
-  html += '<p>The advisor will buy <strong>'+FORM_DONUT_TOTAL_DOZENS+' dozen</strong> over 4 weeks at <strong>$'+FORM_DONUT_WHOLESALE+'/dozen</strong> wholesale.</p>';
+  html += '<p>The advisor will buy <strong>'+FORM_DONUT_TOTAL_DOZENS+' dozen</strong> at <strong>$'+FORM_DONUT_WHOLESALE+'/dozen</strong> wholesale. One trip, 35-minute drive.</p>';
   html += '<div class="quote">"This is a pre-approval form. The advisor needs it BEFORE buying anything. No form = no purchase = no donuts."</div></div></div>';
 
   html += '<div class="math-panel"><h3>FILL OUT THE EXPENDITURE APPROVAL</h3>';
@@ -1531,7 +1619,8 @@ function form9_Step3_Expenditure(onDone) {
   html += '<div class="math-row"><label>Quantity (total dozens)</label><input type="number" id="f3-qty" placeholder="?"></div>';
   html += '<div class="math-row"><label>Unit price (per dozen, $)</label><input type="number" id="f3-unit" step="0.01" placeholder="?"></div>';
   html += '<div class="math-row"><label>Total amount ($)</label><input type="number" id="f3-total" step="1" placeholder="?"></div>';
-  html += '<div class="math-row"><label>Club to be charged</label><input type="text" id="f3-club" placeholder="e.g. Class of 2029"></div>';
+  html += '<div class="math-row"><label>Club to be charged</label><input type="text" id="f3-club" placeholder="e.g. class of 29"></div>';
+  html += '<div class="math-row"><label>Student Signature</label><input type="text" id="f3-sig" placeholder="Type your name"></div>';
   html += '</div>';
   html += '<button class="btn" id="f3-ok">SUBMIT FORM &raquo;</button>';
 
@@ -1542,13 +1631,18 @@ function form9_Step3_Expenditure(onDone) {
     var unit = +document.getElementById('f3-unit').value;
     var total = +document.getElementById('f3-total').value;
     var club = document.getElementById('f3-club').value.trim();
+    var sig = document.getElementById('f3-sig').value.trim();
 
-    if (!desc || !qty || !unit || !total || !club) {
+    if (!desc || !qty || !unit || !total || !club || !sig) {
       showFormError('Missing fields.', 'Every line matters. The bookkeeper will reject this.', function(){ form9_Step3_Expenditure(onDone); });
       return;
     }
+    if (!isValidClassName(club)) {
+      showFormError('Club name doesn\'t look right.', 'Should be something like "class of 29" or "Class of 2029".', function(){ form9_Step3_Expenditure(onDone); });
+      return;
+    }
     if (qty !== FORM_DONUT_TOTAL_DOZENS) {
-      showFormError('Wrong quantity.', 'You\'re buying '+FORM_DONUT_TOTAL_DOZENS+' dozen total (10/week &times; 4 weeks).', function(){ form9_Step3_Expenditure(onDone); });
+      showFormError('Wrong quantity.', 'You\'re buying '+FORM_DONUT_TOTAL_DOZENS+' dozen total (one pickup).', function(){ form9_Step3_Expenditure(onDone); });
       return;
     }
     if (Math.abs(unit - FORM_DONUT_WHOLESALE) > 0.01) {
@@ -1561,7 +1655,7 @@ function form9_Step3_Expenditure(onDone) {
     }
 
     showFormSuccess('Expenditure Approval: APPROVED',
-      'The advisor now has permission to spend <strong>'+money(FORM_DONUT_TOTAL_COST)+'</strong> on donuts using the school credit card. They\'ll bring the receipt back.',
+      '<strong>It was voted on and signed by the ASB Executive team, signed by the advisor, and signed by the principal.</strong><br><br>The advisor now has permission to spend <strong>'+money(FORM_DONUT_TOTAL_COST)+'</strong> on donuts using the school credit card. They\'ll make the 35-minute drive, pick them up, and bring the receipt back.<br><br><div style="background:#fff8dc; border:2px solid #d4af37; border-radius:8px; padding:1vh 1.5vw; margin-top:1vh;"><strong>&#x1F4A1; Remember:</strong> Student signature, advisor signature, principal signature. Every. Single. Form.</div>',
       function(){ form9_Step4_TheTrap(onDone); });
   };
 }
@@ -1570,8 +1664,8 @@ function form9_Step3_Expenditure(onDone) {
 function form9_Step4_TheTrap(onDone) {
   var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F36A;</div>';
   html += '<div class="expert-bubble"><h3>THE SALE HAPPENED!</h3>';
-  html += '<p>Your first two Fridays went great. You sold donuts, collected <strong>$240 in cash</strong> so far. The advisor needs to buy donuts for next Friday.</p>';
-  html += '<p>A student suggests: <em>"We\'ve got $240 in cash right here. Let\'s just take it to the donut shop and buy next week\'s supply. It\'s faster!"</em></p></div></div>';
+  html += '<p>Your donut sale went great. You sold almost everything. Now you have a cashbox full of money. A student has an idea...</p>';
+  html += '<p>A student suggests: <em>"We\'ve got cash right here from the sale. Let\'s just use it to buy supplies for the next fundraiser. It\'s faster!"</em></p></div></div>';
 
   html += '<div class="pick-grid">';
   html += '<div class="pick-card" data-id="correct" style="border-color:#1e5a2e;"><div class="ic">&#x2705;</div><div class="vname">NO &mdash; Follow procedure</div><div class="vnote">Deposit the cash with the bookkeeper first. Advisor uses credit card for purchases. Bring receipt back.</div></div>';
@@ -1594,20 +1688,20 @@ function form9_Step4_TheTrap(onDone) {
 
 // STEP 5 — Cash Count form
 function form9_Step5_CashCount(onDone) {
-  // Simulate: collected $480 total over 4 weeks. Denominations:
-  // 80 x $5 bills = $400, 16 x $5 = $80 (total $480)
-  // Actually let's do realistic small bills: selling $1 donuts
-  // 380 x $1 = $380, 20 x $5 = $100 = $480
   var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F4CB;</div>';
   html += '<div class="expert-bubble"><h3>FORM 4: CASH COUNT</h3>';
-  html += '<p>All 4 Fridays are done. You collected <strong>$'+FORM_DONUT_TOTAL_REVENUE+'</strong> total. Now <strong>two students</strong> count every bill and coin, fill out the cash count form, and take it to the bookkeeper for deposit.</p>';
+  html += '<p>Your donut sale is done. You collected <strong>$'+FORM_DONUT_TOTAL_REVENUE+'</strong> total. Now <strong>two students</strong> count every bill and coin, fill out the cash count form, and take it to the bookkeeper for deposit.</p>';
+  html += '<p><strong>This form is critical.</strong> If the count is wrong, the bookkeeper sends it back. If money is missing, that\'s a problem for everyone involved.</p>';
   html += '<div class="quote">"Two students count. Not one. Two. If the count is wrong, both of you redo it."</div></div></div>';
 
   html += '<div class="math-panel"><h3>COUNT THE CASH</h3>';
-  html += '<p style="color:#555; margin-bottom:1vh;">Here\'s what\'s in the cash box: <strong>456 one-dollar bills</strong> and <strong>24 five-dollar bills</strong>.</p>';
-  html += '<div class="math-row"><label>Dollar bills: 456 &times; $1.00 = ?</label><input type="number" id="f5-ones" step="1" placeholder="$"></div>';
-  html += '<div class="math-row"><label>Five-dollar bills: 24 &times; $5.00 = ?</label><input type="number" id="f5-fives" step="1" placeholder="$"></div>';
+  html += '<p style="color:#555; margin-bottom:1vh;">Here\'s what\'s in the cash box from today\'s sale: <strong>142 one-dollar bills</strong> and <strong>10 five-dollar bills</strong>.</p>';
+  html += '<p style="color:#555; margin-bottom:1vh; font-size:0.9em;"><em>The real cash count form has rows for every denomination &mdash; pennies through $100 bills, plus coins, checks, and a supporting docs checklist. In real life, you fill out ALL of it.</em></p>';
+  html += '<div class="math-row"><label>Dollar bills: 142 &times; $1.00 = ?</label><input type="number" id="f5-ones" step="1" placeholder="$"></div>';
+  html += '<div class="math-row"><label>Five-dollar bills: 10 &times; $5.00 = ?</label><input type="number" id="f5-fives" step="1" placeholder="$"></div>';
   html += '<div class="math-row"><label><strong>GRAND TOTAL ($)</strong></label><input type="number" id="f5-total" step="1" placeholder="$"></div>';
+  html += '<div class="math-row"><label>Counter 1 name (student)</label><input type="text" id="f5-counter1" placeholder="Your name"></div>';
+  html += '<div class="math-row"><label>Counter 2 name (student)</label><input type="text" id="f5-counter2" placeholder="Second student\'s name"></div>';
   html += '</div>';
   html += '<button class="btn" id="f5-ok">SUBMIT CASH COUNT &raquo;</button>';
 
@@ -1616,26 +1710,32 @@ function form9_Step5_CashCount(onDone) {
     var ones = +document.getElementById('f5-ones').value;
     var fives = +document.getElementById('f5-fives').value;
     var total = +document.getElementById('f5-total').value;
+    var c1 = document.getElementById('f5-counter1').value.trim();
+    var c2 = document.getElementById('f5-counter2').value.trim();
 
-    if (!ones || !fives || !total) {
+    if (!ones || !fives || !total || !c1 || !c2) {
       showFormError('Blank fields.', 'Count every denomination. Both students sign off.', function(){ form9_Step5_CashCount(onDone); });
       return;
     }
-    if (ones !== 456) {
-      showFormError('Dollar bills count is wrong.', '456 bills &times; $1 = $456. Recount.', function(){ form9_Step5_CashCount(onDone); });
+    if (c1.toLowerCase() === c2.toLowerCase()) {
+      showFormError('Same name twice.', 'Two DIFFERENT students count. Not the same person twice.', function(){ form9_Step5_CashCount(onDone); });
       return;
     }
-    if (fives !== 120) {
-      showFormError('Five-dollar bills count is wrong.', '24 bills &times; $5 = $120. Recount.', function(){ form9_Step5_CashCount(onDone); });
+    if (ones !== 142) {
+      showFormError('Dollar bills count is wrong.', '142 bills &times; $1 = $142. Recount.', function(){ form9_Step5_CashCount(onDone); });
       return;
     }
-    if (total !== 576) {
-      showFormError('Grand total doesn\'t match.', '$456 + $120 = $576. Add it up.', function(){ form9_Step5_CashCount(onDone); });
+    if (fives !== 50) {
+      showFormError('Five-dollar bills count is wrong.', '10 bills &times; $5 = $50. Recount.', function(){ form9_Step5_CashCount(onDone); });
+      return;
+    }
+    if (total !== FORM_DONUT_TOTAL_REVENUE) {
+      showFormError('Grand total doesn\'t match.', '$142 + $50 = $'+FORM_DONUT_TOTAL_REVENUE+'. Add it up.', function(){ form9_Step5_CashCount(onDone); });
       return;
     }
 
     showFormSuccess('Cash Count: VERIFIED &mdash; deposited with bookkeeper',
-      'Both students signed. $480 deposited. The money is now officially in your class account.',
+      'Both students signed. <strong>$'+FORM_DONUT_TOTAL_REVENUE+' deposited</strong>. The money is now officially in your class account.',
       function(){ form9_Step6_Receipt(onDone); });
   };
 }
@@ -1649,6 +1749,7 @@ function form9_Step6_Receipt(onDone) {
   html += '<div class="quote">"No receipt = no reimbursement. The advisor fronted the money. If you lose the receipt, they\'re out $'+FORM_DONUT_TOTAL_COST+' of their own money. Don\'t do that."</div></div></div>';
 
   html += '<div class="math-panel"><h3>CLOSE OUT THE DONUT SALE</h3>';
+  html += '<p style="color:#555; margin-bottom:1vh;"><strong>Reminder:</strong> You deposited <strong>$'+FORM_DONUT_TOTAL_REVENUE+'</strong> from the cash count. The receipt from the advisor says <strong>$'+FORM_DONUT_TOTAL_COST+'</strong>.</p>';
   html += '<div class="math-row"><label>Total revenue collected ($)</label><input type="number" id="f6-rev" step="1" placeholder="$"></div>';
   html += '<div class="math-row"><label>Total expenses (from receipt) ($)</label><input type="number" id="f6-exp" step="1" placeholder="$"></div>';
   html += '<div class="math-row"><label><strong>NET PROFIT (revenue &minus; expenses) ($)</strong></label><input type="number" id="f6-profit" step="1" placeholder="$"></div>';
@@ -1667,8 +1768,12 @@ function form9_Step6_Receipt(onDone) {
       showFormError('Missing numbers.', 'Fill in every line.', function(){ form9_Step6_Receipt(onDone); });
       return;
     }
-    if (receipt === 'no' || receipt === '') {
-      showFormError('WHERE IS THE RECEIPT?', 'The advisor spent $'+FORM_DONUT_TOTAL_COST+' of their own money (via school card). No receipt = no reimbursement = your advisor is out $'+FORM_DONUT_TOTAL_COST+'. Go find that receipt.', function(){ form9_Step6_Receipt(onDone); });
+    if (receipt === '') {
+      showFormError('Select whether the receipt is attached.', 'This is important. Pick one.', function(){ form9_Step6_Receipt(onDone); });
+      return;
+    }
+    if (receipt === 'no') {
+      showFormError('WHERE IS THE RECEIPT?', 'The advisor spent $'+FORM_DONUT_TOTAL_COST+' on the school credit card. No receipt = no reimbursement = your advisor is personally out $'+FORM_DONUT_TOTAL_COST+'. <strong>In real life, losing the receipt means the advisor eats the cost.</strong> Don\'t do that to your advisor. Go find that receipt.', function(){ form9_Step6_Receipt(onDone); });
       return;
     }
     if (Math.abs(rev - FORM_DONUT_TOTAL_REVENUE) > 1) {
@@ -1795,7 +1900,7 @@ function hhStep1(onDone) {
   html += '<div class="quote">"Price it however you want. You\'ll find out what happens."</div></div></div>';
 
   html += '<div class="math-panel"><h3>YOUR TICKET PRICE</h3>';
-  html += '<div class="math-row"><label>Price per ticket ($1 &ndash; $10)</label><input type="number" id="hh-price" min="1" max="10" step="0.5" placeholder="5"></div></div>';
+  html += '<div class="math-row"><label>Price per ticket ($1 &ndash; $10)</label><input type="number" id="hh-price" min="1" max="10" step="0.5" placeholder="$"></div></div>';
   html += '<button class="btn" id="hh-p1-ok">LOCK TICKET PRICE &raquo;</button>';
 
   document.getElementById('fund-content').innerHTML = html;
@@ -1906,7 +2011,7 @@ function hhStep6_Food(onDone) {
   });
 }
 
-// RESULTS — compute profit and show breakdown, then continue
+// RESULTS — make the student DO THE MATH, then reveal
 function hhResults(onDone) {
   var h = state.haunted;
   var baseTickets = hauntedTicketVolume(h.price);
@@ -1920,7 +2025,6 @@ function hhResults(onDone) {
   var pizzaCost = 120;
   var totalExp = costumeCost + decorCost + propsCost + pizzaCost;
   var rawProfit = revenue - totalExp;
-  // ASB covers losses on the Haunted House — class can't lose money, but keeps any profit
   var profit = Math.max(0, rawProfit);
 
   var themeName = HAUNTED_THEMES.find(function(t){return t.id===h.theme;}).name;
@@ -1940,58 +2044,364 @@ function hhResults(onDone) {
     flavor += '<p style="color:#8b0000; font-weight:bold; margin-top:1vh;">'+money(h.price)+' for a school haunted house? Terry Tate laughed out loud. He bought a gallon of ice cream and a bag of candy instead. So did literally everyone else. Zero tickets sold. Your volunteers stood in costumes in an empty hallway.</p>';
   }
 
-  var html = '<div class="info-box reveal-flash"><h2>&#x1F383; HAUNTED HOUSE RESULTS</h2>';
-  html += '<p>Theme: <strong>'+themeName+'</strong>. One night. Let\'s count the damage.</p>';
+  var html = '<div class="info-box"><h2>&#x1F383; HAUNTED HOUSE RESULTS &mdash; DO THE MATH</h2>';
+  html += '<p>Theme: <strong>'+themeName+'</strong>. One night. Here\'s what happened:</p>';
   html += flavor;
+  html += '<p style="margin-top:1vh;">Now <strong>you</strong> figure out the profit. The formulas are written out &mdash; type your answer in each box.</p></div>';
+
+  html += '<div class="math-panel"><h3>REVENUE</h3>';
+  html += '<p style="color:#555; margin-bottom:1vh;">Tickets sold: <strong>'+tickets+'</strong>. Ticket price: <strong>'+money(h.price)+'</strong>.</p>';
+  html += '<div class="math-row"><label><strong>Revenue</strong><br><span style="font-size:0.9em; color:#555;">'+tickets+' tickets &times; '+money(h.price)+' = ?</span></label>';
+  html += '<input type="number" id="hh-rev" step="1" placeholder="?" style="width:7vw; min-width:90px; padding:0.4vh 0.5vw; font-size:1.1em; text-align:right;"></div>';
+
+  html += '<h3 style="margin-top:2vh;">EXPENSES</h3>';
+  html += '<p style="color:#555; margin-bottom:1vh;">Add up everything you spent:</p>';
+  html += '<div class="math-row" style="opacity:0.8;"><label>Costumes</label><span class="val neg">&minus;'+money(costumeCost)+'</span></div>';
+  html += '<div class="math-row" style="opacity:0.8;"><label>Decorations</label><span class="val neg">&minus;'+money(decorCost)+'</span></div>';
+  if (propsCost > 0) html += '<div class="math-row" style="opacity:0.8;"><label>Props &amp; effects</label><span class="val neg">&minus;'+money(propsCost)+'</span></div>';
+  html += '<div class="math-row" style="opacity:0.8;"><label>Volunteer pizza</label><span class="val neg">&minus;'+money(pizzaCost)+'</span></div>';
+  html += '<div class="math-row"><label><strong>Total Expenses</strong><br><span style="font-size:0.9em; color:#555;">$'+costumeCost+' + $'+decorCost+(propsCost>0?' + $'+propsCost:'')+' + $'+pizzaCost+' = ?</span></label>';
+  html += '<input type="number" id="hh-exp" step="1" placeholder="?" style="width:7vw; min-width:90px; padding:0.4vh 0.5vw; font-size:1.1em; text-align:right;"></div>';
+
+  html += '<h3 style="margin-top:2vh;">PROFIT</h3>';
+  html += '<div class="math-row" style="background:#fffbe6; border-left:4px solid #d4af37; padding:0.5vh 0.5vw;"><label><strong>Profit</strong><br><span style="font-size:0.9em; color:#555;">Revenue &minus; Total Expenses = ?</span></label>';
+  html += '<input type="number" id="hh-profit" step="1" placeholder="?" style="width:7vw; min-width:90px; padding:0.4vh 0.5vw; font-size:1.1em; text-align:right;"></div>';
+  html += '</div>';
+
+  html += '<button class="btn" id="hh-done">SUBMIT MY ANSWERS &raquo;</button>';
+
+  document.getElementById('fund-content').innerHTML = html;
+
+  // No live validation — check on submit, fail & redo if wrong
+  document.getElementById('hh-done').onclick = function(){
+    var revGuess = +document.getElementById('hh-rev').value;
+    var expGuess = +document.getElementById('hh-exp').value;
+    var profitGuess = +document.getElementById('hh-profit').value;
+    if (!revGuess && revGuess !== 0 || !expGuess && expGuess !== 0 || !profitGuess && profitGuess !== 0) {
+      alert('Fill in all three boxes.'); return;
+    }
+    var errors = [];
+    if (Math.abs(revGuess - revenue) > 1) errors.push('Revenue: '+tickets+' &times; '+money(h.price)+' = '+money(revenue)+'. You put '+money(revGuess)+'.');
+    if (Math.abs(expGuess - totalExp) > 1) errors.push('Total Expenses: $'+costumeCost+' + $'+decorCost+(propsCost>0?' + $'+propsCost:'')+' + $'+pizzaCost+' = '+money(totalExp)+'. You put '+money(expGuess)+'.');
+    if (Math.abs(profitGuess - rawProfit) > 1) errors.push('Profit: '+money(revenue)+' &minus; '+money(totalExp)+' = '+money(rawProfit)+'. You put '+money(profitGuess)+'.');
+    if (errors.length > 0) {
+      showFormError('WRONG. Redo the math.', errors.join('<br>'), function(){ hhResults(onDone); });
+      return;
+    }
+    hhResultsReveal(themeName, tickets, h.price, revenue, costumeCost, decorCost, propsCost, pizzaCost, totalExp, rawProfit, profit, onDone);
+  };
+}
+
+// After student does the math correctly — show summary + teaching moment
+function hhResultsReveal(themeName, tickets, price, revenue, costumeCost, decorCost, propsCost, pizzaCost, totalExp, rawProfit, profit, onDone) {
+  var html = '<div class="info-box reveal-flash"><h2 style="color:'+(rawProfit>=0?'#1e5a2e':'#8b0000')+';">&#x1F383; '+themeName+' &mdash; '+(rawProfit>=0?'PROFIT':'LOSS')+'</h2>';
   html += '<table style="margin:1vh auto; width:90%;">';
   html += '<tr><th>Line</th><th>Math</th><th>Amount</th></tr>';
-  html += '<tr><td>Tickets sold</td><td>'+tickets+' @ '+money(h.price)+'</td><td><strong>'+money(revenue)+'</strong></td></tr>';
+  html += '<tr><td>Tickets sold</td><td>'+tickets+' &times; '+money(price)+'</td><td><strong>'+money(revenue)+'</strong></td></tr>';
   html += '<tr><td>Costumes</td><td>flat</td><td>&minus;'+money(costumeCost)+'</td></tr>';
   html += '<tr><td>Decorations</td><td>flat</td><td>&minus;'+money(decorCost)+'</td></tr>';
   if (propsCost > 0) html += '<tr><td>Props &amp; effects</td><td>flat</td><td>&minus;'+money(propsCost)+'</td></tr>';
   html += '<tr><td>Volunteer pizza</td><td>flat</td><td>&minus;'+money(pizzaCost)+'</td></tr>';
-  html += '<tr><td>Net</td><td>Revenue &minus; Cost</td><td><strong style="color:'+(rawProfit>=0?'#1e5a2e':'#8b0000')+';">'+money(rawProfit)+'</strong></td></tr>';
+  html += '<tr><td><strong>PROFIT</strong></td><td>Revenue &minus; Expenses</td><td><strong style="color:'+(rawProfit>=0?'#1e5a2e':'#8b0000')+';">'+money(rawProfit)+'</strong></td></tr>';
   if (rawProfit < 0) {
-    html += '<tr><td><strong>ASB COVERS LOSS</strong></td><td>General fund absorbs it</td><td><strong style="color:#555;">'+money(-rawProfit)+'</strong></td></tr>';
-    html += '<tr><td><strong>YOUR CLASS KEEPS</strong></td><td></td><td><strong style="color:#8b0000;">$0.00</strong></td></tr>';
+    html += '<tr><td><strong>ASB COVERS LOSS</strong></td><td>General fund absorbs it</td><td style="color:#555;">'+money(-rawProfit)+'</td></tr>';
+    html += '<tr><td><strong>YOUR CLASS KEEPS</strong></td><td></td><td><strong style="color:#8b0000;">$0</strong></td></tr>';
   } else {
     html += '<tr><td><strong>YOUR CLASS KEEPS</strong></td><td>All profit is yours</td><td><strong style="color:#1e5a2e;">'+money(profit)+'</strong></td></tr>';
   }
   html += '</table>';
-  // ============ TEACHING MOMENT ============
+
+  // Teaching moment
   html += '<div style="background:#fff8dc; border:2px solid #d4af37; border-radius:8px; padding:1.2vh 1.5vw; margin:1.5vh auto; max-width:640px;">';
   html += '<h3 style="margin:0 0 0.8vh 0; color:#5a3a0a;">&#x1F4A1; HOW THIS WORKS</h3>';
   html += '<p style="margin:0.3vh 0;">The Haunted House is a <strong>school event</strong>. ASB covers the expenses no matter what &mdash; your class can\'t lose money on it.</p>';
   html += '<p style="margin:0.3vh 0;">But any <strong>profit is yours to keep</strong>. That\'s the deal.</p>';
   if (rawProfit < 0) {
     html += '<p style="margin:0.3vh 0; color:#8b0000;">You didn\'t break even. ASB absorbed <strong>'+money(-rawProfit)+'</strong> in losses. Your class walks away with nothing from this event.</p>';
-  } else if (tickets >= Math.ceil(totalExp/h.price)) {
-    html += '<p style="margin:0.3vh 0; color:#1e5a2e;">You cleared break-even (<strong>'+Math.ceil(totalExp/h.price)+' tickets</strong> to cover '+money(totalExp)+' in costs). Every ticket past that was pure profit for your class.</p>';
+  } else if (tickets >= Math.ceil(totalExp/price)) {
+    html += '<p style="margin:0.3vh 0; color:#1e5a2e;">You cleared break-even (<strong>'+Math.ceil(totalExp/price)+' tickets</strong> to cover '+money(totalExp)+' in costs). Every ticket past that was pure profit for your class.</p>';
   }
   html += '<p style="margin:0.6vh 0 0 0; font-size:0.92em; color:#5a3a0a;"><em>Break-even = fixed costs &divide; ticket price. Know that number before committing to an event.</em></p>';
   html += '</div>';
   html += '<p style="margin-top:1vh;">This goes into your class bank: <span class="big-num" style="color:'+(profit>0?'#1e5a2e':'#8b0000')+';">'+money(profit)+'</span></p></div>';
-  html += '<button class="btn" id="hh-done">CONTINUE &raquo;</button>';
+  html += '<button class="btn" id="hh-done2">CONTINUE &raquo;</button>';
 
   document.getElementById('fund-content').innerHTML = html;
   adjust(profit, 'Haunted House (net)');
-  document.getElementById('hh-done').onclick = onDone;
+  document.getElementById('hh-done2').onclick = onDone;
+}
+
+// ========== HOMECOMING DANCE (12th grade) ==========
+var HOCO_VENUES = [
+  { id:'gym',       name:'School Gym',  cost:0,   ic:'&#x1F3C0;', desc:'Free. On campus. Easy setup.' },
+  { id:'clubhouse', name:'Clubhouse',   cost:750, ic:'&#x1F3E0;', desc:'$750 rental. Nicer vibe. ($500 if you cater.)' }
+];
+var HOCO_FOOD = [
+  { id:'burgers',  name:'Burgers',                cost:12,   perPerson:true, ic:'&#x1F354;', desc:'$12/person. Classic.' },
+  { id:'italian',  name:'Italian',                cost:15,   perPerson:true, ic:'&#x1F35D;', desc:'$15/person. Pasta, salad, bread.' },
+  { id:'chicken',  name:'Chicken',                cost:14,   perPerson:true, ic:'&#x1F357;', desc:'$14/person. Grilled chicken plates.' },
+  { id:'chinese',  name:'Chinese Catering',       cost:1400, perPerson:false, ic:'&#x1F961;', desc:'$1,400 flat. Lots of food for everyone.' },
+  { id:'none',     name:'No Food',                cost:0,    perPerson:false, ic:'&#x274C;',  desc:'Snacks only. Risky if tickets are over $30.' }
+];
+var HOCO_DRINKS = [
+  { id:'full',      name:'Full Drinks Setup',  cost:500, ic:'&#x1F379;', desc:'$500. Punch, sodas, water, cups, ice.' },
+  { id:'lemonade',  name:'Lemonade',           cost:250, ic:'&#x1F34B;', desc:'$250. Lemonade + cups.' },
+  { id:'water',     name:'Water Only',         cost:0,   ic:'&#x1F4A7;', desc:'Free. Just water.' }
+];
+var HOCO_DESSERT = [
+  { id:'cake',     name:'Cake',     costPer:5, ic:'&#x1F382;', desc:'$5/person. Sheet cakes.' },
+  { id:'cookies',  name:'Cookies',  costPer:1, ic:'&#x1F36A;', desc:'$1/person. Cookies.' },
+  { id:'none',     name:'No Dessert', costPer:0, ic:'&#x274C;', desc:'Skip dessert.' }
+];
+var HOCO_DECOR = [
+  { id:'full',    name:'Full Decor (tablecloths, centerpieces, balloon arch)', cost:400, ic:'&#x2728;', desc:'$400. Tablecloths, centerpieces, balloon arch, lighting.' },
+  { id:'basic',   name:'Basic Decor (tablecloths + streamers)', cost:150, ic:'&#x1F388;', desc:'$150. Tablecloths and streamers.' },
+  { id:'minimal', name:'Tablecloths Only', cost:50, ic:'&#x1F3F3;', desc:'$50. Just tablecloths on the tables.' }
+];
+
+function hocoAttendance(ticketPrice) {
+  // Real data: 112 tickets at $50. Pool is ~150 (seniors + juniors).
+  if (ticketPrice <= 20) return 140;
+  if (ticketPrice <= 30) return 130;
+  if (ticketPrice <= 40) return 120;
+  if (ticketPrice <= 50) return 112;
+  if (ticketPrice <= 60) return 90;
+  if (ticketPrice <= 70) return 70;
+  if (ticketPrice <= 80) return 50;
+  return 30;
+}
+
+var _hocoOnDone = null;
+function runHoco(onDone) {
+  _hocoOnDone = onDone;
+  show('sLab');
+  state.hoco = { venue:null, food:null, drinks:null, dessert:null, decor:null, ticketPrice:null };
+  hocoStep1_Venue();
+}
+
+function hocoStep1_Venue() {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F451;</div>';
+  html += '<div class="expert-bubble"><h3>HOMECOMING &mdash; PICK YOUR VENUE</h3>';
+  html += '<p>Seniors + juniors. ~150 potential attendees. Where are you hosting?</p></div></div>';
+  html += '<div class="pick-grid">';
+  HOCO_VENUES.forEach(function(v){
+    html += '<div class="pick-card" data-id="'+v.id+'"><div class="ic">'+v.ic+'</div><div class="vname">'+v.name+'</div><div class="vprice">'+money(v.cost)+'</div><div class="vnote">'+v.desc+'</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('lab-content').innerHTML = html;
+  document.querySelectorAll('#lab-content .pick-card').forEach(function(el){
+    el.onclick = function(){ state.hoco.venue = el.getAttribute('data-id'); hocoStep2_Food(); };
+  });
+}
+
+function hocoStep2_Food() {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F451;</div>';
+  html += '<div class="expert-bubble"><h3>FOOD</h3>';
+  html += '<p>Pick what you\'re serving. Per-person costs depend on attendance (set by ticket price later). Chinese catering is a flat $1,400 regardless of attendance.</p>';
+  html += '<p style="color:#8b0000;"><strong>Warning:</strong> If you charge over $30/ticket and serve no food, Terry Tate will be angry.</p></div></div>';
+  html += '<div class="pick-grid">';
+  HOCO_FOOD.forEach(function(f){
+    var priceText = f.perPerson ? money(f.cost)+'/person' : (f.cost > 0 ? money(f.cost)+' flat' : '$0');
+    html += '<div class="pick-card" data-id="'+f.id+'"><div class="ic">'+f.ic+'</div><div class="vname">'+f.name+'</div><div class="vprice">'+priceText+'</div><div class="vnote">'+f.desc+'</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('lab-content').innerHTML = html;
+  document.querySelectorAll('#lab-content .pick-card').forEach(function(el){
+    el.onclick = function(){ state.hoco.food = el.getAttribute('data-id'); hocoStep3_Drinks(); };
+  });
+}
+
+function hocoStep3_Drinks() {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F451;</div>';
+  html += '<div class="expert-bubble"><h3>DRINKS</h3>';
+  html += '<p>What are people drinking?</p></div></div>';
+  html += '<div class="pick-grid">';
+  HOCO_DRINKS.forEach(function(d){
+    html += '<div class="pick-card" data-id="'+d.id+'"><div class="ic">'+d.ic+'</div><div class="vname">'+d.name+'</div><div class="vprice">'+money(d.cost)+'</div><div class="vnote">'+d.desc+'</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('lab-content').innerHTML = html;
+  document.querySelectorAll('#lab-content .pick-card').forEach(function(el){
+    el.onclick = function(){ state.hoco.drinks = el.getAttribute('data-id'); hocoStep4_Dessert(); };
+  });
+}
+
+function hocoStep4_Dessert() {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F451;</div>';
+  html += '<div class="expert-bubble"><h3>DESSERT</h3>';
+  html += '<p>Pick one or skip.</p></div></div>';
+  html += '<div class="pick-grid">';
+  HOCO_DESSERT.forEach(function(d){
+    var priceText = d.costPer > 0 ? money(d.costPer)+'/person' : '$0';
+    html += '<div class="pick-card" data-id="'+d.id+'"><div class="ic">'+d.ic+'</div><div class="vname">'+d.name+'</div><div class="vprice">'+priceText+'</div><div class="vnote">'+d.desc+'</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('lab-content').innerHTML = html;
+  document.querySelectorAll('#lab-content .pick-card').forEach(function(el){
+    el.onclick = function(){ state.hoco.dessert = el.getAttribute('data-id'); hocoStep5_Decor(); };
+  });
+}
+
+function hocoStep5_Decor() {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F451;</div>';
+  html += '<div class="expert-bubble"><h3>DECORATIONS</h3>';
+  html += '<p>How much effort are you putting into the look?</p></div></div>';
+  html += '<div class="pick-grid">';
+  HOCO_DECOR.forEach(function(d){
+    html += '<div class="pick-card" data-id="'+d.id+'"><div class="ic">'+d.ic+'</div><div class="vname">'+d.name+'</div><div class="vprice">'+money(d.cost)+'</div><div class="vnote">'+d.desc+'</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('lab-content').innerHTML = html;
+  document.querySelectorAll('#lab-content .pick-card').forEach(function(el){
+    el.onclick = function(){ state.hoco.decor = el.getAttribute('data-id'); hocoStep6_Ticket(); };
+  });
+}
+
+function hocoStep6_Ticket() {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F451;</div>';
+  html += '<div class="expert-bubble"><h3>SET YOUR TICKET PRICE</h3>';
+  html += '<p>This year, tickets were <strong>$50</strong> and we sold <strong>112</strong>. Higher price = fewer buyers. Lower price = more attendance but less revenue per person.</p>';
+  html += '<p>Seniors + juniors: about <strong>150 potential attendees</strong>.</p></div></div>';
+  html += '<div class="math-panel"><h3>TICKET PRICE</h3>';
+  html += '<div class="math-row"><label>Ticket price ($)</label>';
+  html += '<input type="number" id="hoco-price" min="5" max="100" step="5" placeholder="" style="width:8vw; min-width:100px; padding:0.4vh 0.5vw; font-size:1.1em; text-align:right;">';
+  html += '</div></div>';
+  html += '<button class="btn" id="hoco-go">SET PRICE &amp; SEE RESULTS &raquo;</button>';
+  document.getElementById('lab-content').innerHTML = html;
+  document.getElementById('hoco-go').onclick = function(){
+    var price = parseInt(document.getElementById('hoco-price').value);
+    if (!price || price < 5) { alert('Enter a ticket price ($5 minimum).'); return; }
+    // Forecast check — no advisor approves a dance projected to lose money
+    var h = state.hoco;
+    var att = hocoAttendance(price);
+    var fVenue = HOCO_VENUES.find(function(x){return x.id===h.venue;}).cost;
+    if (h.venue === 'clubhouse' && h.food === 'chinese') fVenue = 500;
+    var fFood = HOCO_FOOD.find(function(x){return x.id===h.food;});
+    var fFoodCost = fFood.perPerson ? fFood.cost * att : fFood.cost;
+    var fDrinks = HOCO_DRINKS.find(function(x){return x.id===h.drinks;}).cost;
+    var fDessert = HOCO_DESSERT.find(function(x){return x.id===h.dessert;}).costPer * att;
+    var fDecor = HOCO_DECOR.find(function(x){return x.id===h.decor;}).cost;
+    var fTotal = fVenue + fFoodCost + fDrinks + fDessert + fDecor;
+    var fRevenue = price * att;
+    if (fRevenue <= fTotal) {
+      showFormError('FORECAST SHOWS A LOSS.', 'At $'+price+'/ticket you\'d sell ~'+att+' tickets for $'+fRevenue+' revenue, but expenses are $'+fTotal+'. No advisor will approve an event projected to lose money. Go back and change your venue, food, or ticket price.', function(){ hocoStep1_Venue(); });
+      return;
+    }
+    state.hoco.ticketPrice = price;
+    hocoResults();
+  };
+}
+
+function hocoResults() {
+  var h = state.hoco;
+  var venue = HOCO_VENUES.find(function(x){return x.id===h.venue;});
+  var food = HOCO_FOOD.find(function(x){return x.id===h.food;});
+  var drinks = HOCO_DRINKS.find(function(x){return x.id===h.drinks;});
+  var dessert = HOCO_DESSERT.find(function(x){return x.id===h.dessert;});
+  var decor = HOCO_DECOR.find(function(x){return x.id===h.decor;});
+
+  var attendance = hocoAttendance(h.ticketPrice);
+  var revenue = h.ticketPrice * attendance;
+
+  // Venue cost — clubhouse is $500 if catering Chinese, $750 otherwise
+  var venueCost = venue.cost;
+  if (h.venue === 'clubhouse' && h.food === 'chinese') venueCost = 500;
+
+  // Food cost
+  var foodCost = food.perPerson ? food.cost * attendance : food.cost;
+
+  // Drinks cost (flat)
+  var drinksCost = drinks.cost;
+
+  // Dessert cost (per person)
+  var dessertCost = dessert.costPer * attendance;
+
+  // Decor cost (flat)
+  var decorCost = decor.cost;
+
+  var totalCost = venueCost + foodCost + drinksCost + dessertCost + decorCost;
+  var netProfit = revenue - totalCost;
+  var seniorShare = Math.floor(netProfit / 2); // 50/50 split with juniors
+
+  // Terry Tate check: over $30 ticket and no food
+  if (h.ticketPrice > 30 && h.food === 'none') {
+    triggerBobby('hocoNoFood');
+    return;
+  }
+
+  // If they lost money, Bobby charges but game continues (not game-over)
+  if (netProfit < 0) {
+    var html = '<div style="text-align:center; padding:2vh 0;">';
+    html += '<h2 class="title-mono" style="color:#ff3333; margin:2vh 0;">&#x1F3C8; BOBBY BOUCHER: HOMECOMING LOST MONEY</h2>';
+    html += '<img src="'+BOBBY_TACKLE_GIF+'" alt="Bobby Boucher tackle" style="max-width:min(400px,70vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8); margin-bottom:1vh;" onerror="this.style.display=\'none\'">';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>You spent more on Homecoming than you made from tickets.</strong></p>';
+    html += '<p>Revenue: <strong>'+money(revenue)+'</strong> &minus; Expenses: <strong>'+money(totalCost)+'</strong> = <strong style="color:#8b0000;">'+money(netProfit)+'</strong></p>';
+    html += '<p>Your class share of the loss: <strong style="color:#8b0000;">'+money(seniorShare)+'</strong>. That comes out of your bank.</p>';
+    html += '<p>Bobby is NOT happy. But the year goes on.</p></div></div>';
+    html += '<button class="btn" id="hoco-done" style="margin-top:2vh;">&#x1F622; TAKE THE L AND CONTINUE &raquo;</button>';
+    document.getElementById('lab-content').innerHTML = html;
+    adjust(seniorShare, 'Homecoming Dance LOSS (senior share of 50/50 split)');
+    document.getElementById('hoco-done').onclick = function(){ if (_hocoOnDone) _hocoOnDone(); };
+    return;
+  }
+
+  // SUCCESS
+  var html = '<div class="info-box reveal-flash"><h2 style="color:#1e5a2e;">&#x1F451; HOMECOMING RESULTS</h2>';
+  html += '<p><strong>'+attendance+' tickets sold</strong> at <strong>'+money(h.ticketPrice)+'</strong> each.</p>';
+  html += '<table style="margin:1vh auto; width:90%;">';
+  html += '<tr><th>Line Item</th><th>Amount</th></tr>';
+  html += '<tr><td colspan="2" style="font-weight:bold; background:#e8f5e9;">REVENUE</td></tr>';
+  html += '<tr><td>Tickets: '+attendance+' &times; '+money(h.ticketPrice)+'</td><td>'+money(revenue)+'</td></tr>';
+  html += '<tr><td colspan="2" style="font-weight:bold; background:#ffebee;">EXPENSES</td></tr>';
+  var venueLabel = venue.name;
+  if (h.venue === 'clubhouse' && h.food === 'chinese') venueLabel += ' (discounted for catering)';
+  html += '<tr><td>Venue: '+venueLabel+'</td><td>&minus;'+money(venueCost)+'</td></tr>';
+  html += '<tr><td>Food: '+food.name+(food.perPerson ? ' ('+money(food.cost)+' &times; '+attendance+')' : '')+'</td><td>&minus;'+money(foodCost)+'</td></tr>';
+  html += '<tr><td>Drinks: '+drinks.name+'</td><td>&minus;'+money(drinksCost)+'</td></tr>';
+  html += '<tr><td>Dessert: '+dessert.name+(dessert.costPer > 0 ? ' ('+money(dessert.costPer)+' &times; '+attendance+')' : '')+'</td><td>&minus;'+money(dessertCost)+'</td></tr>';
+  html += '<tr><td>Decor: '+decor.name+'</td><td>&minus;'+money(decorCost)+'</td></tr>';
+  html += '<tr style="border-top:2px solid #333;"><td><strong>TOTAL COST</strong></td><td><strong>&minus;'+money(totalCost)+'</strong></td></tr>';
+  html += '<tr style="border-top:2px solid #333; background:#e8f5e9;"><td><strong>NET PROFIT</strong></td><td><strong style="color:#1e5a2e;">'+money(netProfit)+'</strong></td></tr>';
+  html += '<tr><td><strong>YOUR CLASS SHARE (50%)</strong></td><td><strong style="color:#1e5a2e;">'+money(seniorShare)+'</strong></td></tr>';
+  html += '<tr><td>Junior class share (50%)</td><td>'+money(netProfit - seniorShare)+'</td></tr>';
+  html += '</table>';
+
+  if (seniorShare > 0) {
+    html += '<div class="quote">"Homecoming brought in <strong>'+money(seniorShare)+'</strong> for your senior class bank. Every dollar gets you closer to prom."</div>';
+  } else if (seniorShare < 0) {
+    html += '<div class="quote" style="border-color:#8b0000;">"Homecoming <strong>lost money</strong>. Your class owes <strong>'+money(Math.abs(seniorShare))+'</strong> from the bank. That\'s money that was supposed to go toward prom. Ouch."</div>';
+  } else {
+    html += '<div class="quote" style="border-color:#8b0000;">"You broke even. No profit for the class. Not great, not terrible &mdash; but prom is still coming."</div>';
+  }
+  html += '</div>';
+  html += '<button class="btn" id="hoco-done">CONTINUE &raquo;</button>';
+
+  document.getElementById('lab-content').innerHTML = html;
+
+  // Add senior share to bank (positive or negative)
+  if (seniorShare !== 0) {
+    adjust(seniorShare, 'Homecoming Dance (senior share of 50/50 split)');
+  }
+
+  document.getElementById('hoco-done').onclick = function(){
+    if (_hocoOnDone) _hocoOnDone();
+  };
 }
 
 // ============ 10TH GRADE: END-OF-YEAR PARTY ============
 var PARTY_LOCATIONS = [
-  { id:'pool',   name:'Community Pool',  cost:400, ic:'&#x1F3CA;', desc:'Lifeguard + rental.' },
-  { id:'park',   name:'Park Pavilion',   cost:150, ic:'&#x1F332;', desc:'Pavilion reservation.' },
-  { id:'school', name:'School Gym',      cost:0,   ic:'&#x1F3EB;', desc:'Free, but it\'s the gym you already see every day.' }
+  { id:'pool',   name:'Community Pool',  cost:0, ic:'&#x1F3CA;', desc:'Free. Lifeguard on duty.' },
+  { id:'park',   name:'Park Pavilion',   cost:0, ic:'&#x1F332;', desc:'Free. Open space, bring your own setup.' },
+  { id:'field',  name:'Baseball Field',  cost:0, ic:'&#x26BE;',  desc:'Free. On campus. Easy cleanup.' }
 ];
 var PARTY_FOOD = [
   { id:'truck',   name:'Food Truck',           cost:900, ic:'&#x1F69A;', desc:'Can they actually cook 70 meals in 2 hours? Pricey.' },
-  { id:'pizza',   name:'Pizza',                cost:280, ic:'&#x1F355;', desc:'Always works.' },
+  { id:'pizza',   name:'Pizza',                cost:280, ic:'&#x1F355;', desc:'$2/slice &times; 2 slices/person &times; ~70 students. Pepperoni + cheese. Always works.' },
   { id:'school',  name:'School Cafeteria Food',cost:140, ic:'&#x1F35D;', desc:'Cheap. Nobody is excited.' },
   { id:'hotdogs', name:'Hot Dogs (grill)',     cost:160, ic:'&#x1F32D;', desc:'Buns + dogs + grill stuff.' }
 ];
 var PARTY_SIDE = [
-  { id:'chips',   name:'Chips',      cost:60, ic:'&#x1F35F;', desc:'Family size bags.' },
+  { id:'chips',   name:'Chips',      cost:35, ic:'&#x1F35F;', desc:'$0.50 snack-size bags &times; ~70 students.' },
   { id:'nochips', name:'No chips',   cost:0,  ic:'&#x274C;',   desc:'Skip the sides.' }
 ];
 var PARTY_DESSERT = [
@@ -2021,32 +2431,24 @@ function epStep1_Budget() {
   html += '<div class="expert-bubble"><h3>&#x1F389; END-OF-YEAR PARTY &mdash; DO THE MATH</h3>';
   html += '<p>You raised <strong class="big-num">'+money(raised)+'</strong> this year. Nice.</p>';
   html += '<p>You <strong>bank 80%</strong> for future years. You can spend <strong>20%</strong> on a class party.</p>';
-  html += '<p>On top of that, the ASB general fund kicks in <strong>an extra $500</strong> for sophomore class parties.</p>';
+  html += '<p>On top of that, the ASB general fund kicks in <strong>an extra $500</strong> for class parties.</p>';
   html += '<div class="quote">"Your party budget = 20% of what you raised + $500. Figure out what that number is. I\'m not typing it for you."</div></div></div>';
 
   html += '<div class="math-panel"><h3>COMPUTE YOUR PARTY BUDGET</h3>';
   html += '<p style="color:#555; margin-bottom:1vh;">Formula: <strong>('+money(raised)+' &times; 0.20) + $500 = ?</strong></p>';
   html += '<div class="math-row"><label>Your party budget ($)</label>';
-  html += '<span style="display:flex; align-items:center; gap:0.5vw;">';
   html += '<input type="number" id="ep-budget" step="1" placeholder="?" style="width:8vw; min-width:100px; padding:0.4vh 0.5vw; font-size:1.1em; text-align:right;">';
-  html += '<span id="ep-budget-chk" style="font-weight:bold; font-size:1.3em; min-width:1.5em;"></span>';
-  html += '</span></div>';
+  html += '</div>';
   html += '<p style="font-size:0.9em; color:#555; margin-top:1vh;">Tip: 20% is the same as dividing by 5.</p></div>';
-  html += '<button class="btn" id="ep-b-ok">LOCK IN BUDGET &raquo;</button>';
+  html += '<button class="btn" id="ep-b-ok">SUBMIT BUDGET &raquo;</button>';
 
   document.getElementById('lab-content').innerHTML = html;
   var input = document.getElementById('ep-budget');
-  var chk = document.getElementById('ep-budget-chk');
-  input.addEventListener('input', function(){
-    var v = +input.value;
-    if (input.value === '') { chk.textContent=''; return; }
-    if (Math.abs(v - expected) <= 1) { chk.textContent='\u2713'; chk.style.color='#2a8f2a'; }
-    else { chk.textContent='\u2717'; chk.style.color='#c00'; }
-  });
   document.getElementById('ep-b-ok').onclick = function(){
     var v = +input.value;
+    if (!v && v !== 0) { alert('Enter a number.'); return; }
     if (Math.abs(v - expected) > 1) {
-      alert('Not quite. Compute 20% of '+money(raised)+', then add $500. Try again.');
+      showFormError('WRONG.', '('+money(raised)+' &times; 0.20) + $500 = '+money(expected)+'. You put '+money(v)+'. Redo it.', function(){ epStep1_Budget(); });
       return;
     }
     state.party.budget = expected;
@@ -2074,7 +2476,8 @@ function epStep2_Location() {
 function epStep3_Food() {
   var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F483;&#x1F57A;</div>';
   html += '<div class="expert-bubble"><h3>FOOD &mdash; PICK ONE</h3>';
-  html += '<p>~70 sophomores showing up. Pick what they eat.</p></div></div>';
+  var gradeLabel = state.grade===9 ? 'freshmen' : state.grade===10 ? 'sophomores' : 'juniors';
+  html += '<p>~70 '+gradeLabel+' showing up. Pick what they eat.</p></div></div>';
   html += '<div class="pick-grid">';
   PARTY_FOOD.forEach(function(f){
     var note = f.desc;
@@ -2306,7 +2709,16 @@ function runPostPromSequence() {
     });
     return;
   }
-  // Step 2: Senior Luncheon
+  // Step 2: Optional Spring Car Wash
+  if (!state.didSpringCarwash) {
+    state.didSpringCarwash = true;
+    show('sFund');
+    runInjectedFundStep(SPRING_CARWASH_STEP, function(){
+      runPostPromSequence(); // come back after car wash
+    });
+    return;
+  }
+  // Step 3: Senior Luncheon
   runSeniorLuncheonFinale();
 }
 
@@ -2408,11 +2820,256 @@ function showFinalEndScreen() {
   h += '<div class="row"><span>ENDING BALANCE</span><span class="'+(bal>=0?'pos':'neg')+'">'+money(bal)+'</span></div>';
   tally.innerHTML = h;
 
+  // REALITY CHECK — interactive pricing lab with student's REAL ASB account balance
+  var realityHtml = '<div style="margin-top:3vh; padding:2vh 1.5vw; border:4px solid #d4af37; border-radius:10px; background:rgba(212,175,55,0.08);">';
+  realityHtml += '<h3 style="font-family:\'Bangers\'; color:#d4af37; letter-spacing:2px; text-align:center;">REALITY CHECK</h3>';
+  realityHtml += '<p style="text-align:center; color:#555;">You played the game with simulated money. Now enter your class\'s <strong>real-life ASB account balance</strong> &mdash; what you actually have right now, entering 12th grade.</p>';
+  realityHtml += '<div style="text-align:center; margin:1.5vh 0;">';
+  realityHtml += '<label style="font-weight:bold; font-size:1.1em;">Your class\'s REAL ASB account balance: $</label>';
+  realityHtml += '<input type="number" id="real-savings" min="0" step="1" placeholder="" style="width:8vw; min-width:120px; padding:0.5vh 0.5vw; font-size:1.2em; text-align:right; border:3px solid #d4af37; border-radius:6px;">';
+  realityHtml += '</div>';
+  realityHtml += '<button class="btn" id="real-go" style="display:block; margin:1vh auto;">SEE MY REAL NUMBERS &raquo;</button>';
+  realityHtml += '<div id="real-results"></div>';
+  realityHtml += '</div>';
+  tally.innerHTML += realityHtml;
+
+  document.getElementById('real-go').onclick = function(){
+    var realBalance = +document.getElementById('real-savings').value;
+    if (isNaN(realBalance) || realBalance < 0) { alert('Enter your real ASB account balance (a positive number).'); return; }
+    runRealityCheck(realBalance);
+  };
+
   renderEndNav();
   show('sEnd');
 }
 
-function restart() { startGrade(state.grade); }
+function runRealityCheck(realBalance) {
+  var c = state.calc;
+  if (!c) return;
+
+  var fundraised12 = state.fundraised12th || 0;
+  var realBeforeProm = realBalance + fundraised12;
+  var gameBeforeProm = state.balanceBeforeProm || 0;
+  var diff = realBeforeProm - gameBeforeProm;
+  var ahead = diff >= 0;
+
+  // ---- GAME vs REALITY comparison (static, shown once) ----
+  var html = '<div style="margin-top:1.5vh;">';
+  html += '<h3 style="font-family:\'Bangers\'; text-align:center; color:#d4af37; letter-spacing:2px; margin-bottom:1vh;">GAME vs. REALITY</h3>';
+  html += '<table style="width:100%; margin:1vh 0; border-collapse:collapse;">';
+  html += '<tr style="background:#f5f5f5;"><td style="padding:6px 8px;"><strong>Your real ASB balance (entering 12th)</strong></td><td style="padding:6px 8px; text-align:right;"><strong>'+money(realBalance)+'</strong></td></tr>';
+  html += '<tr><td style="padding:6px 8px;">+ 12th grade fundraiser earnings (same as game)</td><td style="padding:6px 8px; text-align:right;">+'+money(fundraised12)+'</td></tr>';
+  html += '<tr style="border-top:2px solid #333; background:#e8f5e9;"><td style="padding:6px 8px;"><strong>Real balance before prom planning</strong></td><td style="padding:6px 8px; text-align:right;"><strong>'+money(realBeforeProm)+'</strong></td></tr>';
+  html += '<tr style="background:#f0f0f0;"><td style="padding:6px 8px;">Game balance at same point</td><td style="padding:6px 8px; text-align:right;">'+money(gameBeforeProm)+'</td></tr>';
+  html += '<tr style="border-top:2px solid #333; background:'+(ahead?'#e8f5e9':'#ffebee')+';"><td style="padding:6px 8px;"><strong>Your class is '+(ahead?'AHEAD':'BEHIND')+' the game by:</strong></td><td style="padding:6px 8px; text-align:right;"><strong style="color:'+(ahead?'#1e5a2e':'#8b0000')+';">'+money(Math.abs(diff))+'</strong></td></tr>';
+  html += '</table>';
+  if (ahead) {
+    html += '<p style="color:#1e5a2e; font-weight:bold; text-align:center; margin:1vh 0;">Your real class has MORE saved than the game predicted. Nice work.</p>';
+  } else {
+    html += '<p style="color:#8b0000; font-weight:bold; text-align:center; margin:1vh 0;">Your real class has LESS saved than the game predicted. You need to fundraise harder or make cheaper prom choices.</p>';
+  }
+
+  // ---- MINI PRICING LAB (interactive) ----
+  html += '<h3 style="font-family:\'Bangers\'; text-align:center; color:#d4af37; letter-spacing:2px; margin:2vh 0 1vh;">REAL-LIFE PRICING LAB</h3>';
+  html += '<p style="text-align:center; color:#555; margin-bottom:1vh;">Same venue, food, DJ, and other choices you made in the game. Now set ticket prices and quantities with your <strong>real</strong> savings and see if the math works.</p>';
+
+  // Inputs
+  html += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:1vh 2vw; max-width:600px; margin:0 auto 1.5vh;">';
+  html += '<div><label style="font-weight:bold;">Senior Package price ($)</label><br><input type="number" id="rc-pkg-price" min="0" step="1" value="'+(state.projection?state.projection.pkg:'')+'" style="width:100%; padding:0.4vh 0.5vw; font-size:1.1em; border:2px solid #d4af37; border-radius:5px;"></div>';
+  html += '<div><label style="font-weight:bold;">Prom-Only price</label><br><input type="text" value="$120 (fixed)" disabled style="width:100%; padding:0.4vh 0.5vw; font-size:1.1em; border:2px solid #ccc; border-radius:5px; background:#eee; color:#555;"></div>';
+  html += '<div><label style="font-weight:bold;">Grad Nite-Only price ($)</label><br><input type="number" id="rc-gno-price" min="0" step="1" value="'+(state.projection?state.projection.gno:'')+'" style="width:100%; padding:0.4vh 0.5vw; font-size:1.1em; border:2px solid #d4af37; border-radius:5px;"></div>';
+  html += '<div></div>'; // empty cell
+  html += '<div><label style="font-weight:bold;">Senior Packages sold (max '+SENIOR_COUNT+')</label><br><input type="number" id="rc-pkg-qty" min="0" max="'+SENIOR_COUNT+'" step="1" value="'+(state.projection?state.projection.pkgBuyers:'')+'" style="width:100%; padding:0.4vh 0.5vw; font-size:1.1em; border:2px solid #d4af37; border-radius:5px;"></div>';
+  html += '<div><label style="font-weight:bold;">Grad Nite-Only sold</label><br><input type="number" id="rc-gno-qty" min="0" max="'+SENIOR_COUNT+'" step="1" value="'+(state.projection?state.projection.gradOnlyBuyers:'')+'" style="width:100%; padding:0.4vh 0.5vw; font-size:1.1em; border:2px solid #d4af37; border-radius:5px;"></div>';
+  html += '<div><label style="font-weight:bold;">Prom-Only sold (juniors, cap total prom at 80)</label><br><input type="number" id="rc-pro-qty" min="0" step="1" value="'+(state.projection?state.projection.promOnlyBuyers:'')+'" style="width:100%; padding:0.4vh 0.5vw; font-size:1.1em; border:2px solid #d4af37; border-radius:5px;"></div>';
+  html += '</div>';
+
+  // Live projection area
+  html += '<div id="rc-projection" style="margin-top:1vh;"></div>';
+
+  // Status / error message area
+  html += '<div id="rc-status" style="margin-top:1vh;"></div>';
+
+  // Lock-in button
+  html += '<div style="text-align:center; margin-top:1.5vh;"><button class="btn" id="rc-lockin" style="font-size:1.15em; padding:1.2vh 3vw;">LOCK IN</button></div>';
+
+  // Victory area (hidden until success)
+  html += '<div id="rc-victory" style="display:none;"></div>';
+
+  html += '</div>';
+
+  document.getElementById('real-results').innerHTML = html;
+
+  // Store real balance for projection recalc
+  state._rcRealBeforeProm = realBeforeProm;
+
+  // Attach live update listeners
+  var ids = ['rc-pkg-price','rc-gno-price','rc-pkg-qty','rc-gno-qty','rc-pro-qty'];
+  ids.forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) { el.addEventListener('input', rcUpdateProjection); }
+  });
+
+  // Initial projection render
+  rcUpdateProjection();
+
+  // Lock-in handler
+  document.getElementById('rc-lockin').onclick = rcLockIn;
+}
+
+// ---- Reality Check: live projection recalculation ----
+function rcUpdateProjection() {
+  var c = state.calc;
+  if (!c) return;
+
+  var realBeforeProm = state._rcRealBeforeProm || 0;
+
+  var pkg = +(document.getElementById('rc-pkg-price').value) || 0;
+  var pro = 120; // fixed
+  var gno = +(document.getElementById('rc-gno-price').value) || 0;
+  var qPkg = +(document.getElementById('rc-pkg-qty').value) || 0;
+  var qGno = +(document.getElementById('rc-gno-qty').value) || 0;
+  var qPro = +(document.getElementById('rc-pro-qty').value) || 0;
+
+  // Clamp
+  qPkg = Math.max(0, Math.min(SENIOR_COUNT, qPkg));
+  qGno = Math.max(0, Math.min(SENIOR_COUNT - qPkg, qGno));
+  var promAttendees = qPkg + qPro;
+  if (promAttendees > 80) { qPro = Math.max(0, 80 - qPkg); promAttendees = qPkg + qPro; }
+
+  // Revenue
+  var pkgRev = qPkg * pkg;
+  var proRev = qPro * pro;
+  var gnoRev = qGno * gno;
+  var totalRev = pkgRev + proRev + gnoRev;
+
+  // Attendance
+  var gradNiteAttendees = qPkg + qGno;
+  promAttendees = qPkg + qPro;
+
+  // Expenses (same choices from game)
+  var disneyTix = gradNiteAttendees * c.gradNite;
+  var disneyBus = GRADNITE_BUS;
+  var yearbookExp = qPkg * YEARBOOK_COST;
+  var luncheonExp = qPkg * c.luncheon;
+  var promFood = promAttendees * c.food * 1.20;
+  var venueCost = c.venue.rent;
+  var busCost = c.venue.bus;
+  var otherProm = c.dj + c.photo + c.decor + c.tableware;
+  var lockedExp = disneyTix + disneyBus + yearbookExp + promFood + venueCost + busCost + otherProm;
+  var totalExp = lockedExp + luncheonExp;
+
+  var totalCash = realBeforeProm + totalRev;
+  var endingBalance = totalCash - totalExp;
+
+  // Save for lock-in check
+  state._rcLastCalc = {
+    totalRev:totalRev, lockedExp:lockedExp, luncheonExp:luncheonExp, totalExp:totalExp,
+    totalCash:totalCash, endingBalance:endingBalance,
+    disneyTix:disneyTix, disneyBus:disneyBus, yearbookExp:yearbookExp, promFood:promFood,
+    venueCost:venueCost, busCost:busCost, otherProm:otherProm,
+    gradNiteAttendees:gradNiteAttendees, promAttendees:promAttendees, qPkg:qPkg, qGno:qGno, qPro:qPro,
+    pkg:pkg, gno:gno
+  };
+
+  // Render projection table
+  var h = '<table style="width:100%; border-collapse:collapse; margin:0 auto; max-width:650px;">';
+  h += '<tr style="background:#e8f5e9;"><td style="padding:4px 8px;">Real balance before prom</td><td style="padding:4px 8px; text-align:right;">'+money(realBeforeProm)+'</td></tr>';
+
+  h += '<tr><td colspan="2" style="padding:6px 4px 2px; font-weight:bold; color:#1e5a2e;">TICKET REVENUE</td></tr>';
+  h += '<tr><td style="padding:3px 8px;">Senior Packages ('+qPkg+' x $'+pkg+')</td><td style="padding:3px 8px; text-align:right;">+'+money(pkgRev)+'</td></tr>';
+  h += '<tr><td style="padding:3px 8px;">Prom-Only ('+qPro+' x $'+pro+')</td><td style="padding:3px 8px; text-align:right;">+'+money(proRev)+'</td></tr>';
+  h += '<tr><td style="padding:3px 8px;">Grad Nite-Only ('+qGno+' x $'+gno+')</td><td style="padding:3px 8px; text-align:right;">+'+money(gnoRev)+'</td></tr>';
+  h += '<tr style="border-top:1px solid #999;"><td style="padding:4px 8px;"><strong>Total Revenue</strong></td><td style="padding:4px 8px; text-align:right;"><strong>+'+money(totalRev)+'</strong></td></tr>';
+
+  h += '<tr style="border-top:2px solid #333;"><td style="padding:4px 8px;"><strong>Total Cash Available</strong></td><td style="padding:4px 8px; text-align:right;"><strong>'+money(totalCash)+'</strong></td></tr>';
+
+  h += '<tr><td colspan="2" style="padding:6px 4px 2px; font-weight:bold; color:#8b0000;">EXPENSES (your game choices)</td></tr>';
+  h += '<tr><td style="padding:3px 8px;">Grad Nite tickets ('+gradNiteAttendees+' x $'+c.gradNite+')</td><td style="padding:3px 8px; text-align:right;">&minus;'+money(disneyTix)+'</td></tr>';
+  h += '<tr><td style="padding:3px 8px;">Disney bus</td><td style="padding:3px 8px; text-align:right;">&minus;'+money(disneyBus)+'</td></tr>';
+  h += '<tr><td style="padding:3px 8px;">Yearbooks ('+qPkg+' x $'+YEARBOOK_COST+')</td><td style="padding:3px 8px; text-align:right;">&minus;'+money(yearbookExp)+'</td></tr>';
+  h += '<tr><td style="padding:3px 8px;">Prom food + tip ('+promAttendees+' ppl)</td><td style="padding:3px 8px; text-align:right;">&minus;'+money(promFood)+'</td></tr>';
+  h += '<tr><td style="padding:3px 8px;">Venue: '+c.venue.name+'</td><td style="padding:3px 8px; text-align:right;">&minus;'+money(venueCost)+'</td></tr>';
+  if (busCost > 0) h += '<tr><td style="padding:3px 8px;">Prom bus</td><td style="padding:3px 8px; text-align:right;">&minus;'+money(busCost)+'</td></tr>';
+  h += '<tr><td style="padding:3px 8px;">DJ + Photo + Decor + Tableware</td><td style="padding:3px 8px; text-align:right;">&minus;'+money(otherProm)+'</td></tr>';
+  h += '<tr style="border-top:1px dashed #999;"><td style="padding:3px 8px;">Senior Luncheon ('+qPkg+' x $'+c.luncheon+')</td><td style="padding:3px 8px; text-align:right;">&minus;'+money(luncheonExp)+'</td></tr>';
+  h += '<tr style="border-top:2px solid #333;"><td style="padding:4px 8px;"><strong>Total Expenses</strong></td><td style="padding:4px 8px; text-align:right;"><strong>&minus;'+money(totalExp)+'</strong></td></tr>';
+
+  var balColor = endingBalance >= 0 ? '#1e5a2e' : '#8b0000';
+  var balBg = endingBalance >= 0 ? '#e8f5e9' : '#ffebee';
+  h += '<tr style="border-top:3px solid #333; background:'+balBg+';"><td style="padding:8px;"><strong>ENDING BALANCE</strong></td><td style="padding:8px; text-align:right;"><strong style="color:'+balColor+'; font-size:1.2em;">'+money(endingBalance)+'</strong></td></tr>';
+  h += '</table>';
+
+  // FCMAT indicator
+  var fcmatOk = totalCash >= lockedExp;
+  h += '<div style="margin-top:0.8vh; padding:0.6vh 1vw; border-radius:6px; text-align:center; font-weight:bold; font-size:0.95em; ';
+  if (fcmatOk) {
+    h += 'background:rgba(30,90,46,0.12); color:#1e5a2e; border:2px solid #1e5a2e;">FCMAT: PASSES (savings + revenue '+money(totalCash)+' covers locked expenses '+money(lockedExp)+')</div>';
+  } else {
+    h += 'background:rgba(139,0,0,0.12); color:#8b0000; border:2px solid #8b0000;">FCMAT: FAILS (savings + revenue '+money(totalCash)+' does NOT cover locked expenses '+money(lockedExp)+')</div>';
+  }
+
+  document.getElementById('rc-projection').innerHTML = h;
+}
+
+// ---- Reality Check: lock-in validation ----
+function rcLockIn() {
+  var calc = state._rcLastCalc;
+  if (!calc) return;
+
+  var realBeforeProm = state._rcRealBeforeProm || 0;
+  var statusEl = document.getElementById('rc-status');
+
+  // FCMAT check: savings + ticket revenue must cover locked expenses (excl. luncheon)
+  if (calc.totalCash < calc.lockedExp) {
+    statusEl.innerHTML = '<div style="padding:1.2vh 1.5vw; border:3px solid #8b0000; border-radius:8px; background:rgba(139,0,0,0.1); margin-top:1vh;">' +
+      '<p style="font-weight:bold; color:#8b0000; font-size:1.05em;">Your budget doesn\'t work yet.</p>' +
+      '<p style="color:#8b0000;">FCMAT requires savings + ticket revenue to cover all locked expenses before contracts get signed. You\'re short by <strong>'+money(calc.lockedExp - calc.totalCash)+'</strong>.</p>' +
+      '<p style="color:#555; margin-top:0.5vh;">Change your prices or sell more tickets, then try again.</p></div>';
+    return;
+  }
+
+  // Negative ending balance check
+  if (calc.endingBalance < 0) {
+    statusEl.innerHTML = '<div style="padding:1.2vh 1.5vw; border:3px solid #8b0000; border-radius:8px; background:rgba(139,0,0,0.1); margin-top:1vh;">' +
+      '<p style="font-weight:bold; color:#8b0000; font-size:1.05em;">You\'d end the year negative.</p>' +
+      '<p style="color:#8b0000;">Your ending balance would be <strong>'+money(calc.endingBalance)+'</strong>. Adjust your prices until the math works.</p></div>';
+    return;
+  }
+
+  // SUCCESS — hide inputs, show victory
+  statusEl.innerHTML = '';
+  document.getElementById('rc-lockin').style.display = 'none';
+
+  // Hide the input grid
+  var inputs = document.querySelectorAll('#real-results input, #real-results label');
+  for (var i = 0; i < inputs.length; i++) {
+    var p = inputs[i].closest('div[style*="grid"]');
+    if (p) p.style.display = 'none';
+  }
+
+  // Hide the paragraph above inputs
+  var paras = document.querySelectorAll('#real-results > div > p');
+  for (var j = 0; j < paras.length; j++) {
+    if (paras[j].textContent.indexOf('Same venue') > -1) paras[j].style.display = 'none';
+  }
+
+  var victoryEl = document.getElementById('rc-victory');
+  victoryEl.style.display = 'block';
+  victoryEl.innerHTML = '<div style="margin-top:2vh; padding:3vh 2vw; border:5px solid #1e5a2e; border-radius:12px; background:rgba(30,90,46,0.12); text-align:center;">' +
+    '<h2 style="font-family:\'Bangers\'; color:#1e5a2e; font-size:clamp(1.6rem,3.5vw,2.5rem); letter-spacing:3px; margin-bottom:1vh;">THE MATH WORKS.</h2>' +
+    '<p style="font-size:1.2em; color:#333; margin-bottom:1vh;">With your <strong>real</strong> class savings and these ticket prices, you end the year with <strong style="color:#1e5a2e; font-size:1.15em;">'+money(calc.endingBalance)+'</strong> remaining.</p>' +
+    '<p style="font-size:1.1em; color:#333;">Prom. Grad Nite. Yearbooks. Senior Luncheon. <strong>All covered.</strong></p>' +
+    '<p style="margin-top:1.5vh; font-size:1em; color:#555;">Senior Package: <strong>$'+calc.pkg+'</strong> &nbsp;|&nbsp; Prom-Only: <strong>$120</strong> &nbsp;|&nbsp; Grad Nite-Only: <strong>$'+calc.gno+'</strong></p>' +
+    '<p style="font-size:0.95em; color:#555;">Packages sold: '+calc.qPkg+' &nbsp;|&nbsp; Prom-Only: '+calc.qPro+' &nbsp;|&nbsp; Grad Nite-Only: '+calc.qGno+'</p>' +
+    '<div style="margin-top:2vh; font-family:\'Bangers\'; color:#d4af37; font-size:clamp(1.3rem,2.8vw,2rem); letter-spacing:2px;">YOUR CLASS IS READY FOR SENIOR YEAR.</div>' +
+    '</div>';
+
+  // Play victory sound
+  playSfx('sfx-win', 0.8);
+}
+
+function restart() { startGrade(state.grade, state.startBalance); }
 
 // Build end-of-grade navigation: continue to next year (if positive balance + not 12th), replay, or start fresh
 function renderEndNav() {
