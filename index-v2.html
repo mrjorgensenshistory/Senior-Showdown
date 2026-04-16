@@ -1379,40 +1379,56 @@ var HAUNTED_DECOR = [
 ];
 // Ticket demand curve (max $10, pool 450 students)
 function hauntedTicketVolume(price) {
+  // $5 is the sweet spot — anything above tanks fast, $10 = nobody shows
+  if (price <= 2)  return 200;
   if (price <= 3)  return 180;
+  if (price <= 4)  return 160;
   if (price <= 5)  return 140;
-  if (price <= 7)  return 100;
-  if (price <= 9)  return 70;
-  if (price <= 10) return 55;
-  return 0; // shouldn't happen — capped at $10
+  if (price <= 6)  return 60;   // steep dropoff past $5
+  if (price <= 7)  return 30;
+  if (price <= 8)  return 12;
+  if (price <= 9)  return 4;
+  return 0; // $10+ = literally nobody comes
 }
-var HAUNTED_TICKET_SAMPLES = [3, 5, 7, 9, 10];
+var HAUNTED_TICKET_SAMPLES = [2, 3, 5, 6, 7, 8, 10];
 
 function runHauntedHouse(onDone) {
   state.haunted = { price:null, theme:null, costumes:null, decor:null, pizza:null };
   hhStep1(onDone);
 }
 
-// STEP 1 — Ticket price FIXED at $5 per student (school standard)
+// STEP 1 — Ticket price picker with supply/demand preview (demand cliff past $5)
 function hhStep1(onDone) {
-  var fixedPrice = 5;
-  var expectedTickets = hauntedTicketVolume(fixedPrice);
-  state.haunted.price = fixedPrice;
-
   var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F383;</div>';
-  html += '<div class="expert-bubble"><h3>STEP 1 &mdash; TICKET PRICE</h3>';
-  html += '<p>Ticket price is <strong>$5 per student</strong> &mdash; school standard. It has to be affordable for every kid on campus. This is not negotiable.</p>';
-  html += '<div class="quote">"$5 is the sweet spot. Enough to cover costs, cheap enough that most of the school shows up. At this price, expect about <strong>'+expectedTickets+' tickets sold</strong> (out of 450 students)."</div></div></div>';
+  html += '<div class="expert-bubble"><h3>STEP 1 &mdash; SET TICKET PRICE</h3>';
+  html += '<p>Your Haunted House runs one night, school-wide. You set the ticket price (max $10). But look at the demand table carefully &mdash; these are real kids with real allowances.</p>';
+  html += '<div class="quote">"$5 is the sweet spot for our school. Go higher and attendance falls off a cliff. At $10, literally nobody shows up."</div></div></div>';
 
-  html += '<div class="math-panel" style="border-left:4px solid #d4af37;"><h3>THE MATH AT $5</h3>';
-  html += '<p>Expected tickets: <strong>'+expectedTickets+'</strong> &mdash; that\'s <strong>'+Math.round((expectedTickets/450)*100)+'%</strong> of the student body.</p>';
-  html += '<p>Expected ticket revenue: '+expectedTickets+' &times; $5 = <strong>'+money(expectedTickets * fixedPrice)+'</strong></p>';
-  html += '<p style="color:#555; font-size:0.92em; margin-top:1vh;">Your job now: keep setup costs low enough that this revenue turns into real profit.</p></div>';
+  // Supply/demand preview
+  html += '<div class="math-panel" style="border-left:4px solid #d4af37;"><h3>SUPPLY &amp; DEMAND &mdash; HAUNTED HOUSE TICKETS</h3>';
+  html += '<p style="color:#555; font-size:0.95em; margin-bottom:1vh;">Pool: <strong>450 students</strong>. Demand drops fast past $5 &mdash; these are middle/high schoolers, not adults.</p>';
+  html += '<table style="width:100%; margin:1vh 0; border-collapse:collapse;"><thead><tr style="background:#fef6d5;"><th style="padding:0.5vh; border:1px solid #d4af37;">Ticket price</th><th style="padding:0.5vh; border:1px solid #d4af37;">Expected tickets sold</th><th style="padding:0.5vh; border:1px solid #d4af37;">Gross revenue</th></tr></thead><tbody>';
+  HAUNTED_TICKET_SAMPLES.forEach(function(pp){
+    var vv = hauntedTicketVolume(pp);
+    var rev = vv * pp;
+    var style = vv === 0 ? ' color:#8b0000; font-weight:bold;' : '';
+    html += '<tr><td style="padding:0.4vh; border:1px solid #ddd; text-align:center;">'+money(pp)+'</td><td style="padding:0.4vh; border:1px solid #ddd; text-align:center;'+style+'">'+vv+(vv===0?' &#x1F480;':'')+'</td><td style="padding:0.4vh; border:1px solid #ddd; text-align:center;">'+money(rev)+'</td></tr>';
+  });
+  html += '</tbody></table>';
+  html += '<p style="font-size:0.9em; color:#8b0000; margin-top:0.5vh;"><strong>Notice:</strong> $5 &times; 140 tickets = $700. $7 &times; 30 tickets = $210. Higher price ≠ more money.</p></div>';
 
-  html += '<button class="btn" id="hh-p1-ok">GOT IT &mdash; PICK A THEME &raquo;</button>';
+  html += '<div class="math-panel"><h3>YOUR TICKET PRICE</h3>';
+  html += '<div class="math-row"><label>Price per ticket ($1 &ndash; $10)</label><input type="number" id="hh-price" min="1" max="10" step="0.5" placeholder="5"></div></div>';
+  html += '<button class="btn" id="hh-p1-ok">LOCK TICKET PRICE &raquo;</button>';
 
   document.getElementById('fund-content').innerHTML = html;
-  document.getElementById('hh-p1-ok').onclick = function(){ hhStep2(onDone); };
+  document.getElementById('hh-p1-ok').onclick = function(){
+    var p = +document.getElementById('hh-price').value;
+    if (!p || p <= 0) { alert('Enter a ticket price between $1 and $10.'); return; }
+    if (p > 10) { alert('Max ticket price is $10.'); return; }
+    state.haunted.price = p;
+    hhStep2(onDone);
+  };
 }
 
 // STEP 2 — Theme picker
