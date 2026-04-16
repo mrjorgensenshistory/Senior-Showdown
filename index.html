@@ -516,6 +516,33 @@ var PRODUCTS = {
       return 'At <strong>' + money(p) + '/cup</strong>, about <strong>' + v + ' cups</strong> sold during the game.';
     }
   },
+  candy_grams: {
+    icon: '&#x1F36C;',
+    name: 'Valentine Candy-Grams (February)',
+    unit: 'gram',
+    unitCost: 0.75,
+    unitCostLabel: '$0.75 per gram (candy + tag + ribbon, bulk)',
+    story: 'Week of Valentine\'s Day. Kids order candy-grams (candy + tag + ribbon) and your class delivers them Feb 14. Wholesale: <strong>$0.75 per gram</strong>. Nearly everyone sends multiple (friends, crushes, teachers). Price it smart.',
+    priceQuestion: 'How much do you want to charge per candy-gram?',
+    defaultPrice: 3,
+    volumeByPrice: function(p) {
+      if (p <= 2) return 520;
+      if (p <= 3) return 360;
+      if (p <= 4) return 220;
+      if (p <= 5) return 130;
+      if (p <= 7) return 60;
+      return 30;
+    },
+    volumeExplain: function(p, v) {
+      var note = '';
+      if (p <= 2) note = ' Dirt cheap &mdash; kids sent them to the whole friend group.';
+      else if (p <= 3) note = ' Classic price &mdash; most kids sent 1-2.';
+      else if (p <= 4) note = ' Kids thought twice, still bought for close friends + crush.';
+      else if (p <= 5) note = ' Only the serious buyers &mdash; crush grams and close-friend pairs.';
+      else note = ' Too expensive &mdash; kids just handed out their own candy at lunch.';
+      return 'About <strong>' + v + ' grams</strong> sold across the week.' + note;
+    }
+  },
   car_wash: {
     icon: '&#x1F697;',
     name: 'Car Wash (one Saturday, ~3 hours)',
@@ -559,12 +586,11 @@ var FUND_STEPS = {
         { label:'&#x2615; HOT CHOCOLATE STAND &mdash; one football game', product:'hot_cocoa' },
         { label:'&#x1F4A4; Skip fall fundraising', yield:0, cutscene:{gif:'terry-tate', title:'TERRY TATE HEARD ABOUT THAT', msg:'While other classes stack money, you just skipped. Terry does not approve of coasting.'} }
       ] },
-    { month:'DECEMBER &mdash; 10TH GRADE',
-      prompt:'<h3>Winter Concessions.</h3><p>Staff splits profit by hours worked. Real payout depends on class turnout.</p>',
+    { month:'FEBRUARY &mdash; 10TH GRADE',
+      prompt:'<h3>&#x1F36C; Valentine Candy-Grams.</h3><p>Week-of-Valentine\'s presale. Wholesale: <strong>$0.75 per gram</strong>. You set the price.</p>',
       options:[
-        { label:'&#x1F525; All officers sign up for EVERY home game', yield:1200 },
-        { label:'&#x1F91D; Officers split &mdash; half the shifts', yield:600 },
-        { label:'&#x1F4F4; Skip &mdash; we&#39;re busy', yield:50, cutscene:{gif:'bobby', title:'WATER. BOY.', msg:'Everyone was "too busy." Other classes worked the whole season. You made $50 in vending machine change.'} }
+        { label:'&#x1F36C; RUN THE VALENTINE CANDY-GRAM SALE', product:'candy_grams' },
+        { label:'&#x1F4A4; Skip Valentine\'s week', yield:0, cutscene:{gif:'bobby', title:'SKIPPED VALENTINE\'S?', msg:'Easiest fundraiser of the year. You passed. Bobby Boucher had his gram ready to go. He\'s upset.'} }
       ] }
   ],
   11: [
@@ -576,12 +602,11 @@ var FUND_STEPS = {
         { label:'&#x2615; HOT CHOCOLATE STAND &mdash; one football game', product:'hot_cocoa' },
         { label:'&#x1F4A4; Skip fall fundraising', yield:0, cutscene:{gif:'terry-tate', title:'TERRY TATE SEES YOU', msg:'Fourteen months to prom. Every skip now = panic later. Terry is taking notes.'} }
       ] },
-    { month:'NOVEMBER &mdash; 11TH GRADE',
-      prompt:'<h3>Concessions Season.</h3><p>Basketball home games. Last year&#39;s winning class pulled around $1,300.</p>',
+    { month:'FEBRUARY &mdash; 11TH GRADE',
+      prompt:'<h3>&#x1F36C; Valentine Candy-Grams.</h3><p>Week-of-Valentine\'s presale. Wholesale: <strong>$0.75 per gram</strong>. Price it, sell it, bank the margin.</p>',
       options:[
-        { label:'&#x1F525; Every home game', yield:1200 },
-        { label:'&#x1F4C5; Half the shifts', yield:600 },
-        { label:'&#x1F4F4; Skip', yield:50, cutscene:{gif:'bobby', title:'THE OTHER CLASSES BANKED $1,300', msg:'You banked $50 in change. Bobby Boucher is disappointed in the entire operation.'} }
+        { label:'&#x1F36C; RUN THE VALENTINE CANDY-GRAM SALE', product:'candy_grams' },
+        { label:'&#x1F4A4; Skip Valentine\'s week', yield:0, cutscene:{gif:'bobby', title:'SKIPPED VALENTINE\'S?', msg:'You passed on the easiest margin of the year. Bobby Boucher had his gram ready. You\'re on the field.'} }
       ] },
     { month:'MARCH &mdash; 11TH GRADE',
       prompt:'<h3>Spring push.</h3><p>Last fundraiser before you cross into senior year.</p>',
@@ -600,12 +625,11 @@ var FUND_STEPS = {
         { label:'&#x1F4CB; Fall auction &mdash; basic', yield:600 },
         { label:'&#x274C; Skip fall auction', yield:0, cutscene:{gif:'terry-tate', title:'SKIPPED THE FALL AUCTION?', msg:'Venue deposit and Disney reservation are coming. That money had to come from somewhere. Terry is running up the hallway.'} }
       ] },
-    { month:'WINTER &mdash; 12TH GRADE',
-      prompt:'<h3>Winter Concessions.</h3><p>Basketball season. Pays by hours worked.</p>',
+    { month:'FEBRUARY &mdash; 12TH GRADE',
+      prompt:'<h3>&#x1F36C; Valentine Candy-Grams.</h3><p>Last product fundraiser before prom-push. Wholesale: <strong>$0.75 per gram</strong>. Price it, sell it, bank the margin toward prom.</p>',
       options:[
-        { label:'&#x1F525; Every home game', yield:1200 },
-        { label:'&#x1F91D; Half the shifts', yield:600 },
-        { label:'&#x1F4F4; Skip', yield:50, cutscene:{gif:'bobby', title:'SKIPPING CONCESSIONS MID-PANIC', msg:'Prom is three months away and the class chose to not show up. Bobby is on the field.'} }
+        { label:'&#x1F36C; RUN THE VALENTINE CANDY-GRAM SALE', product:'candy_grams' },
+        { label:'&#x1F4A4; Skip Valentine\'s week', yield:0, cutscene:{gif:'bobby', title:'SKIPPING VALENTINE\'S THIS LATE?', msg:'Prom is two months away and your class chose not to move $700 in margin. Bobby is running.'} }
       ] }
     // Spring Senior Auction is injected later — runs BEFORE the Luncheon lab step,
     // because by spring the big stuff (venue, Disney, prom vendors) is already locked.
