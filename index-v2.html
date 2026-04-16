@@ -829,6 +829,7 @@ function setGradeMusic(grade) {
 }
 
 function runFundStep(idx) {
+  show('sFund');
   var steps = FUND_STEPS[state.grade];
   if (idx >= steps.length) {
     if (state.grade === 9)  { runEndParty(finalize9th); return; }
