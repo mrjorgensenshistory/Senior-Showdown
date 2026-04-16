@@ -249,7 +249,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
         <span class="icon">&#x1F4CB;</span>
         <div class="card-title">9TH GRADE</div>
         <div class="card-desc">Class of &#39;29. Learn the paperwork. Every ASB form, every procedure, from scratch.</div>
-        <div class="card-bal">Starting: $0</div>
+        <div class="card-bal">Starting: $100.55</div>
       </a>
       <a class="card" onclick="startGrade(10)">
         <span class="icon">&#x1F9D1;&#x200D;&#x1F393;</span>
@@ -261,13 +261,13 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
         <span class="icon">&#x1F4DA;</span>
         <div class="card-title">11TH GRADE</div>
         <div class="card-desc">Class of &#39;27. 14 months until prom. Your upcoming adventure.</div>
-        <div class="card-bal">Starting: $900</div>
+        <div class="card-bal">Starting: $804</div>
       </a>
       <a class="card" onclick="startGrade(12)">
         <span class="icon">&#x1F514;</span>
         <div class="card-title">12TH GRADE</div>
-        <div class="card-desc">Class of &#39;26. Five months until prom. Mostly pricing decisions now.</div>
-        <div class="card-bal">Starting: $821</div>
+        <div class="card-desc">Class of &#39;26. Five months until prom. Pricing + Senior Luncheon finale.</div>
+        <div class="card-bal">Starting: $821.10</div>
       </a>
     </div>
     <div style="margin-top:3vh;">
@@ -412,8 +412,8 @@ var TABLEWARE_OPTIONS = [
 // ============ STATE ============
 var state = {};
 function freshState(grade, carryover) {
-  // Default starting balances per grade (used when starting fresh, not carrying over)
-  var defaults = { 9:0, 10:358, 11:900, 12:821 };
+  // Default starting balances per grade (real balances when Michael took over — used when starting fresh, not carrying over)
+  var defaults = { 9:100.55, 10:358, 11:804, 12:821.10 };
   var startBal = (typeof carryover === 'number') ? carryover : (defaults[grade] || 0);
   return {
     grade: grade, balance: startBal, startBalance: startBal,
@@ -988,8 +988,8 @@ var LAB_STEPS = [
     quote:'"No forks, no food."' },
   { key:'luncheon',  title:'SENIOR LUNCHEON  (covered by spring fundraising)',
     list:LUNCHEONS.map(function(l){return {id:l.id,name:l.name,ic:l.ic,cost:l.pp,desc:l.desc+' $'+l.pp+'/senior.'};}),
-    expert:'Senior Luncheon is near graduation. By the time you&#39;re picking this, Disney and prom are already locked &mdash; spring fundraisers exist specifically to cover the luncheon. Catered is easy. Potluck is cheap but your class has to actually organize Aunt Carol&#39;s famous tuna casserole.',
-    quote:'"Potluck saves money. Also costs weekends."' }
+    expert:'Senior Luncheon is near graduation. By the time you&#39;re picking this, Disney and prom are already locked &mdash; spring fundraisers exist specifically to cover the luncheon. Catered is easy. Potluck is cheap but your class has to actually organize it. <strong>If you&#39;re short at the end, you can always drop luncheon to potluck ($4/senior) to save money.</strong>',
+    quote:'"Forecast big. Fall back to potluck if the math doesn&#39;t work."' }
 ];
 
 var labIdx = 0;
@@ -1117,7 +1117,6 @@ function renderPricingLab() {
   var decor = DECOR_OPTIONS.find(function(x){return x.id===state.decor;}).cost;
   var tableware = TABLEWARE_OPTIONS.find(function(x){return x.id===state.tableware;}).cost;
 
-  // SENIOR PACKAGE = Prom (dinner + venue share) + Grad Nite + Yearbook + Luncheon
   // Per-senior variable cost: grad nite + disney bus share + yearbook + luncheon + prom dinner + 20% tip
   var promDinnerWithTip = food * 1.20;
   var hardPerSenior = gradNite + (GRADNITE_BUS / SENIOR_COUNT) + YEARBOOK_COST + luncheon + promDinnerWithTip;
@@ -1130,7 +1129,7 @@ function renderPricingLab() {
   html += '<li><strong>Grad Nite</strong> ticket: <strong>'+money(gradNite)+'</strong></li>';
   html += '<li>Disney bus share ($1,200 &divide; 66): <strong>'+money(GRADNITE_BUS/SENIOR_COUNT)+'</strong></li>';
   html += '<li><strong>Yearbook</strong>: <strong>'+money(YEARBOOK_COST)+'</strong></li>';
-  html += '<li><strong>Luncheon</strong>: <strong>'+money(luncheon)+'</strong></li>';
+  html += '<li><strong>Luncheon</strong>: <strong>'+money(luncheon)+'</strong>'+(luncheon===LUNCHEON_CATERED ? ' (catered &mdash; can drop to $'+LUNCHEON_POTLUCK+' potluck if short)' : ' (potluck)')+'</li>';
   html += '</ul>';
   html += '<p>Per-senior VARIABLE cost (stuff they directly consume): <span class="big-num" style="color:#8b0000;">'+money(hardPerSenior)+'</span></p>';
 
@@ -2220,19 +2219,136 @@ function finalize11th() {
 function finalize() {
   var p = state.projection;
   var c = state.calc;
-  // Apply everything to the actual bank now
+
+  // Check if they end negative BEFORE applying costs
+  if (p.net < 0) {
+    // Can switching luncheon from catered to potluck save them?
+    if (c.luncheon === LUNCHEON_CATERED) {
+      var luncheonSavings = (LUNCHEON_CATERED - LUNCHEON_POTLUCK) * p.pkgBuyers;
+      var netWithPotluck = p.net + luncheonSavings;
+
+      if (netWithPotluck >= 0) {
+        // Potluck saves them — offer the fallback option
+        showLuncheonFallback(luncheonSavings, netWithPotluck);
+        return;
+      }
+    }
+    // Either already potluck, or even potluck can't save them — show game over
+    showLuncheonGameOver();
+    return;
+  }
+
+  // They're in the black — apply costs and show results
+  applyFinalCosts();
+}
+
+// ============ SENIOR LUNCHEON FALLBACK ============
+// Offer to downgrade luncheon from catered ($20) to potluck ($4) when worksheet ends negative
+function showLuncheonFallback(savings, netWithPotluck) {
+  var p = state.projection;
+  var c = state.calc;
+  var cateredTotal = LUNCHEON_CATERED * p.pkgBuyers;
+  var potluckTotal = LUNCHEON_POTLUCK * p.pkgBuyers;
+
+  show('sLab');
+  var el = document.getElementById('lab-content');
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F37D;&#xFE0F;</div>';
+  html += '<div class="expert-bubble"><h3>SENIOR LUNCHEON &mdash; BUDGET CHECK</h3>';
+  html += '<p>Your worksheet shows you ending <strong style="color:#8b0000;">'+money(Math.abs(p.net))+' in the red</strong>. That&#39;s a problem &mdash; you can&#39;t sign contracts you can&#39;t cover.</p>';
+  html += '<p style="margin-top:1vh;">But there&#39;s one variable cost you can still change: the <strong>Senior Luncheon</strong>.</p>';
+  html += '<p>You forecasted a <strong>catered luncheon</strong> at $'+LUNCHEON_CATERED+'/senior ('+money(cateredTotal)+' total). If you switch to a <strong>potluck</strong> at $'+LUNCHEON_POTLUCK+'/senior ('+money(potluckTotal)+' total), you save <strong>'+money(savings)+'</strong>.</p>';
+  html += '<p style="margin-top:1vh;">That puts your final balance at <strong style="color:#1e5a2e;">'+money(netWithPotluck)+'</strong> &mdash; you survive.</p>';
+  html += '<div class="quote">"You forecasted a big luncheon, but the budget says potluck. It&#39;s still a luncheon. Families bring the food. It gets the job done."</div>';
+  html += '</div></div>';
+
+  html += '<div class="pick-grid">';
+  html += '<div class="pick-card" data-id="potluck" style="border-color:#1e5a2e;">';
+  html += '<div class="ic">&#x1F35E;</div>';
+  html += '<div class="name">SWITCH TO POTLUCK</div>';
+  html += '<div class="price">Save '+money(savings)+'</div>';
+  html += '<div class="desc">$'+LUNCHEON_POTLUCK+'/senior. Families bring food. You cover plates, drinks, supplies. Final balance: <strong style="color:#1e5a2e;">'+money(netWithPotluck)+'</strong></div>';
+  html += '</div>';
+
+  html += '<div class="pick-card" data-id="keep" style="border-color:#8b0000;">';
+  html += '<div class="ic">&#x274C;</div>';
+  html += '<div class="name">KEEP CATERED</div>';
+  html += '<div class="price">'+money(Math.abs(p.net))+' in the red</div>';
+  html += '<div class="desc">You end negative. Go back and try again &mdash; fundraise more or cut other costs.</div>';
+  html += '</div>';
+  html += '</div>';
+
+  el.innerHTML = html;
+  document.querySelectorAll('#lab-content .pick-card').forEach(function(card){
+    card.onclick = function(){
+      var id = card.getAttribute('data-id');
+      if (id === 'potluck') {
+        // Swap luncheon to potluck in the calc and projection
+        state.calc.luncheon = LUNCHEON_POTLUCK;
+        state.luncheon = 'pot';
+        var oldLunExp = state.projection.luncheonExp;
+        var newLunExp = LUNCHEON_POTLUCK * state.projection.pkgBuyers;
+        var diff = oldLunExp - newLunExp;
+        state.projection.luncheonExp = newLunExp;
+        state.projection.totalExp -= diff;
+        state.projection.net += diff;
+        applyFinalCosts();
+      } else {
+        // Keep catered = they need to replay
+        showLuncheonGameOver();
+      }
+    };
+  });
+}
+
+// Game over — even potluck can't save them, or they chose to keep catered despite deficit
+function showLuncheonGameOver() {
+  var p = state.projection;
+  var c = state.calc;
+  var potluckSavings = 0;
+  var netWithPotluck = p.net;
+  if (c.luncheon === LUNCHEON_CATERED) {
+    potluckSavings = (LUNCHEON_CATERED - LUNCHEON_POTLUCK) * p.pkgBuyers;
+    netWithPotluck = p.net + potluckSavings;
+  }
+
+  show('sLab');
+  var el = document.getElementById('lab-content');
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F37D;&#xFE0F;</div>';
+  html += '<div class="expert-bubble"><h3>GAME OVER &mdash; CAN&#39;T COVER THE COSTS</h3>';
+  html += '<p>Your worksheet shows you ending <strong style="color:#8b0000;">'+money(Math.abs(p.net))+' in the red</strong>.</p>';
+  if (c.luncheon === LUNCHEON_CATERED && potluckSavings > 0) {
+    html += '<p>Even if you dropped the luncheon to a potluck ($'+LUNCHEON_POTLUCK+'/senior), you&#39;d still be <strong style="color:#8b0000;">'+money(Math.abs(netWithPotluck))+' in the red</strong>.</p>';
+  } else if (c.luncheon === LUNCHEON_POTLUCK) {
+    html += '<p>You already chose the cheapest luncheon option (potluck at $'+LUNCHEON_POTLUCK+'/senior). There&#39;s nothing left to cut.</p>';
+  }
+  html += '<p style="margin-top:1vh;">The Senior Luncheon is the <strong>one</strong> variable cost &mdash; everything else (venue, Disney, DJ, food) is locked. And even at minimum, you can&#39;t make the math work.</p>';
+  html += '<p style="margin-top:1vh; color:#8b0000; font-weight:bold;">You overspent on prom, under-fundraised, or both. Go back and try again.</p>';
+  html += '<div class="quote">"Every dollar you spent on prom decorations was a dollar that couldn&#39;t go to the luncheon. Budget smarter next time."</div>';
+  html += '</div></div>';
+
+  html += '<button class="btn" onclick="restart()">&#x1F504; REPLAY 12TH GRADE</button>';
+  html += '<button class="btn" onclick="show(\'sHub\')">&#x1F3E0; BACK TO START</button>';
+  el.innerHTML = html;
+}
+
+// Apply all final costs to the ledger and show the end screen
+function applyFinalCosts() {
+  var p = state.projection;
+  var c = state.calc;
+
   adjust(p.totalRev, 'Ticket revenue (pkg + prom-only + grad-only)');
   adjust(-p.disneyTix, 'Disney Grad Nite tickets');
   adjust(-p.disneyBus, 'Disney bus');
   adjust(-p.yearbookExp, 'Yearbooks');
-  adjust(-p.luncheonExp, 'Senior Luncheon');
+  adjust(-p.luncheonExp, 'Senior Luncheon'+(c.luncheon===LUNCHEON_POTLUCK ? ' (potluck)' : ' (catered)'));
   adjust(-p.promFood, 'Prom food + 20% tip');
   adjust(-p.venueCost, 'Prom venue: ' + c.venue.name);
   if (p.busCost>0) adjust(-p.busCost, 'Prom bus');
   adjust(-p.otherProm, 'DJ + Photo + Decor + Tableware');
 
   var bal = state.balance;
-  var tier = bal >= 2000 ? 'platinum' : bal >= 0 ? 'ok' : bal >= -2000 ? 'pinched' : 'deep';
+  // Senior Luncheon is the FINALE — if they're in the black, they made it
+  var tier = bal >= 2000 ? 'platinum' : bal >= 0 ? 'ok' : 'fail';
 
   var bg = document.getElementById('end-bg');
   var stamp = document.getElementById('end-stamp');
@@ -2245,34 +2361,21 @@ function finalize() {
     stamp.innerHTML = '<div class="stamp gold">&#x1F3C6; SURPLUS</div>';
     title.textContent = 'YOU FINISHED IN THE BLACK.';
     box.innerHTML = '<p>You ended the year with '+money(bal)+' left over. Class gifts, after-prom breakfast, or carry-forward to help next year&#39;s class &mdash; your call.</p>' +
-      '<p>The math worked out.</p>' + rickrollReward('Nice job! Save your energy for senior year. To help you do that\u2026');
+      '<p>Prom. Grad Nite. Yearbooks. Senior Luncheon. All paid for. The math worked out.</p>' + rickrollReward('Congratulations, graduate. Here\u2019s your reward:');
   } else if (tier==='ok') {
     bg.className='screen-bg bg-ok';
     stamp.innerHTML = '<div class="stamp good">&#x2705; ON BUDGET</div>';
     title.textContent = 'YOU HIT THE TARGET.';
-    box.innerHTML = '<p>You covered every line. Prom, Grad Nite, luncheon, yearbooks &mdash; all paid for. This is what a healthy senior budget looks like.</p>' +
-      rickrollReward('Nice work. Here\u2019s your reward:');
-  } else if (tier==='pinched') {
+    box.innerHTML = '<p>You covered every line. Prom, Grad Nite, yearbooks, Senior Luncheon &mdash; all paid for. This is what a healthy senior budget looks like.</p>' +
+      rickrollReward('Nice work, graduate. Here\u2019s your reward:');
+  } else {
+    // Should not normally reach here (finalize checks before applying), but safety net
     bg.className='screen-bg bg-bad';
     stamp.innerHTML = '<div class="stamp">&#x26D4; FCMAT VIOLATION</div>';
     title.textContent = 'THIS ISN\u2019T ALLOWED.';
-    box.innerHTML = '<p style="font-weight:bold; color:#8b0000; font-size:1.15em;">Your plan ends '+money(Math.abs(bal))+' in the red. California school ASB rules (FCMAT) do not allow this.</p>' +
-      '<p style="margin-top:1vh;"><strong>The cash-on-hand rule:</strong> at the moment you sign a contract &mdash; prom venue, Disney, DJ, anything &mdash; your bank balance PLUS already-collected ticket sales and fundraising has to cover the expense.</p>' +
-      '<p style="margin-top:1vh;">Projected or expected future ticket sales don&#39;t count. It&#39;s not money yet. Signing a contract you can&#39;t cover right now is basically an IOU, and <strong>your advisor legally cannot approve it</strong>.</p>' +
-      '<p style="margin-top:1vh;">This is why fundraising has to happen <strong>before</strong> you sign anything. Revenue + savings = costs, at time of signing.</p>' +
-      bobbyHelmetTeachingMoment() +
-      '<p style="margin-top:1vh;">Try again &mdash; fundraise more in the fall/winter, or pick cheaper options, until your plan clears the cash-on-hand check.</p>' +
-      rickrollReward('Also, while you fix your plan\u2026 enjoy this:');
-  } else {
-    bg.className='screen-bg bg-bad';
-    stamp.innerHTML = '<div class="stamp">&#x26D4; FCMAT VIOLATION</div>';
-    title.textContent = 'SIGNIFICANT SHORTFALL \u2014 NOT ALLOWED.';
-    box.innerHTML = '<p style="font-weight:bold; color:#8b0000; font-size:1.15em;">Your plan ends '+money(Math.abs(bal))+' in the red. That is a massive FCMAT cash-on-hand violation.</p>' +
-      '<p style="margin-top:1vh;"><strong>Why this matters:</strong> at the time you sign contracts for venue, Disney, or any vendor, the money has to already be in the bank &mdash; savings + fundraising actually completed + tickets actually sold. Not "we plan to raise it later."</p>' +
-      '<p style="margin-top:1vh;">Your ASB advisor literally cannot sign a purchase order or approve a contract if the money isn&#39;t there. This is California state law for student body funds.</p>' +
-      bobbyHelmetTeachingMoment() +
-      '<p style="margin-top:1vh;">Run it again. Either raise a lot more in the fall/winter, or scale down the plan (cheaper venue, one-park Grad Nite, potluck luncheon) until Revenue + Savings &#x2265; Costs <strong>before</strong> any contract gets signed.</p>' +
-      rickrollReward('And while you regroup\u2026 enjoy this:');
+    box.innerHTML = '<p style="font-weight:bold; color:#8b0000; font-size:1.15em;">Your plan ends '+money(Math.abs(bal))+' in the red.</p>' +
+      '<p style="margin-top:1vh;">Try again &mdash; fundraise more, price smarter, or pick cheaper options.</p>' +
+      rickrollReward('While you regroup\u2026');
   }
 
   var h = '<div style="font-family:\'Bangers\'; font-size:1.3em; color:#d4af37; letter-spacing:2px; text-align:center; margin-bottom:1vh;">FINAL LEDGER</div>';
