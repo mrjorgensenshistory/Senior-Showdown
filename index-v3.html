@@ -1404,7 +1404,7 @@ function wsRow(id, label, formula, expected, emphasize) {
 
 // Render a fixed-cost line (no math needed — just shown)
 function wsFixed(label, formula, value) {
-  return '<div class="math-row" style="opacity:0.8;"><label>'+label+'<br><span style="font-size:0.9em; color:#555;">'+formula+'</span></label><span class="val neg">'+money(-value)+'</span></div>';
+  return '<div class="math-row" style="opacity:0.8;"><label>'+label+'<br><span style="font-size:0.9em; color:#555;">'+formula+'</span></label><span class="val" style="color:#8b0000; font-weight:bold;">'+money(value)+'</span></div>';
 }
 
 // Validate the worksheet on submit — no live feedback. Returns true if all correct, false + shows errors if not.
