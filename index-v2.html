@@ -1506,7 +1506,9 @@ function hhResults(onDone) {
   var decorCost = HAUNTED_DECOR.find(function(d){return d.id===h.decor;}).cost;
   var pizzaCost = 120;
   var totalExp = costumeCost + decorCost + pizzaCost;
-  var profit = revenue - totalExp;
+  var rawProfit = revenue - totalExp;
+  // ASB covers losses on the Haunted House — class can't lose money, but keeps any profit
+  var profit = Math.max(0, rawProfit);
 
   var themeName = HAUNTED_THEMES.find(function(t){return t.id===h.theme;}).name;
 
@@ -1534,21 +1536,27 @@ function hhResults(onDone) {
   html += '<tr><td>Costumes</td><td>flat</td><td>&minus;'+money(costumeCost)+'</td></tr>';
   html += '<tr><td>Decorations</td><td>flat</td><td>&minus;'+money(decorCost)+'</td></tr>';
   html += '<tr><td>Volunteer pizza</td><td>flat</td><td>&minus;'+money(pizzaCost)+'</td></tr>';
-  html += '<tr><td><strong>PROFIT</strong></td><td>Revenue &minus; Cost</td><td><strong style="color:'+(profit>=0?'#1e5a2e':'#8b0000')+';">'+money(profit)+'</strong></td></tr>';
-  html += '</table>';
-  // ============ TEACHING MOMENT — break-even (no "what you could have made") ============
-  html += '<div style="background:#fff8dc; border:2px solid #d4af37; border-radius:8px; padding:1.2vh 1.5vw; margin:1.5vh auto; max-width:640px;">';
-  html += '<h3 style="margin:0 0 0.8vh 0; color:#5a3a0a;">&#x1F4A1; THE LESSON: BREAK-EVEN</h3>';
-  html += '<p style="margin:0.3vh 0;">Your fixed setup cost was <strong>'+money(totalExp)+'</strong> (costumes + decor + pizza). That money is spent no matter what.</p>';
-  html += '<p style="margin:0.3vh 0;">Break-even = '+money(totalExp)+' &divide; '+money(h.price)+' = <strong>'+Math.ceil(totalExp/h.price)+' tickets</strong>. That\'s how many you needed to sell just to cover costs.</p>';
-  if (tickets >= Math.ceil(totalExp/h.price)) {
-    html += '<p style="margin:0.3vh 0; color:#1e5a2e;">You sold <strong>'+tickets+'</strong>. You cleared break-even. Every ticket past '+Math.ceil(totalExp/h.price)+' was pure profit.</p>';
+  html += '<tr><td>Net</td><td>Revenue &minus; Cost</td><td><strong style="color:'+(rawProfit>=0?'#1e5a2e':'#8b0000')+';">'+money(rawProfit)+'</strong></td></tr>';
+  if (rawProfit < 0) {
+    html += '<tr><td><strong>ASB COVERS LOSS</strong></td><td>General fund absorbs it</td><td><strong style="color:#555;">'+money(-rawProfit)+'</strong></td></tr>';
+    html += '<tr><td><strong>YOUR CLASS KEEPS</strong></td><td></td><td><strong style="color:#8b0000;">$0.00</strong></td></tr>';
   } else {
-    html += '<p style="margin:0.3vh 0; color:#8b0000;">You sold <strong>'+tickets+'</strong>. You needed '+Math.ceil(totalExp/h.price)+'. You didn\'t break even.</p>';
+    html += '<tr><td><strong>YOUR CLASS KEEPS</strong></td><td>All profit is yours</td><td><strong style="color:#1e5a2e;">'+money(profit)+'</strong></td></tr>';
   }
-  html += '<p style="margin:0.6vh 0 0 0; font-size:0.92em; color:#5a3a0a;"><em>Real event planners compute break-even BEFORE the event. Know your number before you commit.</em></p>';
+  html += '</table>';
+  // ============ TEACHING MOMENT ============
+  html += '<div style="background:#fff8dc; border:2px solid #d4af37; border-radius:8px; padding:1.2vh 1.5vw; margin:1.5vh auto; max-width:640px;">';
+  html += '<h3 style="margin:0 0 0.8vh 0; color:#5a3a0a;">&#x1F4A1; HOW THIS WORKS</h3>';
+  html += '<p style="margin:0.3vh 0;">The Haunted House is a <strong>school event</strong>. ASB covers the expenses no matter what &mdash; your class can\'t lose money on it.</p>';
+  html += '<p style="margin:0.3vh 0;">But any <strong>profit is yours to keep</strong>. That\'s the deal.</p>';
+  if (rawProfit < 0) {
+    html += '<p style="margin:0.3vh 0; color:#8b0000;">You didn\'t break even. ASB absorbed <strong>'+money(-rawProfit)+'</strong> in losses. Your class walks away with nothing from this event.</p>';
+  } else if (tickets >= Math.ceil(totalExp/h.price)) {
+    html += '<p style="margin:0.3vh 0; color:#1e5a2e;">You cleared break-even (<strong>'+Math.ceil(totalExp/h.price)+' tickets</strong> to cover '+money(totalExp)+' in costs). Every ticket past that was pure profit for your class.</p>';
+  }
+  html += '<p style="margin:0.6vh 0 0 0; font-size:0.92em; color:#5a3a0a;"><em>Break-even = fixed costs &divide; ticket price. Know that number before committing to an event.</em></p>';
   html += '</div>';
-  html += '<p style="margin-top:1vh;">This goes into your class bank.</p></div>';
+  html += '<p style="margin-top:1vh;">This goes into your class bank: <span class="big-num" style="color:'+(profit>0?'#1e5a2e':'#8b0000')+';">'+money(profit)+'</span></p></div>';
   html += '<button class="btn" id="hh-done">CONTINUE &raquo;</button>';
 
   document.getElementById('fund-content').innerHTML = html;
