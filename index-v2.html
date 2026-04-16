@@ -624,7 +624,7 @@ var PRODUCTS = {
 var FUND_STEPS = {
   10: [
     { month:'OCTOBER &mdash; 10TH GRADE',
-      prompt:'<h3>&#x1F383; Halloween Haunted House <span style="color:#8b0000;">(REQUIRED)</span>.</h3><p>Your class target this year: <strong>$1,500</strong>. The Haunted House is a <strong>required tradition</strong> at our school &mdash; your class runs it every year, no opt-out. You control the theme, decorations, costumes, and whether you feed volunteers. <strong>Ticket price is fixed at $5 per student</strong> (admin rule &mdash; has to be affordable for every kid).</p>',
+      prompt:'<h3>&#x1F383; Halloween Haunted House <span style="color:#8b0000;">(REQUIRED)</span>.</h3><p>Your class target this year: <strong>$1,500</strong>. The Haunted House is a <strong>required tradition</strong> at our school &mdash; your class runs it every year, no opt-out. You control the theme, decorations, costumes, ticket price, and whether you feed volunteers.</p><p>Here\'s the deal: <strong>ASB covers all expenses</strong>, but <strong>your class keeps the profit</strong>. Profit = <strong>Revenue &minus; Expenses</strong>. Revenue is how many tickets you sell &times; ticket price. Expenses are costumes, decorations, and volunteer food. The more profit you make, the more your class banks toward future events.</p>',
       options:[
         { label:'&#x1F47B; RUN THE HAUNTED HOUSE &mdash; design it yourself', hauntedHouse:true },
         { label:'&#x274C; Skip the Haunted House', yield:0, cutscene:{gif:'terry-tate', title:'YOU SKIPPED THE HAUNTED HOUSE?', msg:'The Haunted House isn\'t optional. It builds school culture, brings the community together, and shows every other class that your grade actually cares about improving this school. You skipped the one event the whole campus looks forward to. Terry Tate says GAME OVER.'} }
@@ -1402,7 +1402,8 @@ function hhStep1(onDone) {
   var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F383;</div>';
   html += '<div class="expert-bubble"><h3>STEP 1 &mdash; SET TICKET PRICE</h3>';
   html += '<p>Your Haunted House runs one night, school-wide. You set the ticket price (max $10). Remember &mdash; your customers are <strong>students</strong>, not adults. They have limited money.</p>';
-  html += '<p>There are <strong>450 students</strong> on campus. How many actually show up depends on what you charge.</p>';
+  html += '<p>There are <strong>450 students</strong> on campus. How many show up depends on what you charge.</p>';
+  html += '<p><strong>Profit = Revenue &minus; Expenses.</strong> ASB covers expenses either way, but your class keeps the profit. More tickets sold = more revenue = more profit for your class.</p>';
   html += '<div class="quote">"Price it however you want. You\'ll find out what happens."</div></div></div>';
 
   html += '<div class="math-panel"><h3>YOUR TICKET PRICE</h3>';
