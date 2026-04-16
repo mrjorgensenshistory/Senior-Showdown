@@ -1510,8 +1510,24 @@ function hhResults(onDone) {
 
   var themeName = HAUNTED_THEMES.find(function(t){return t.id===h.theme;}).name;
 
+  // Flavor text based on how well they priced
+  var flavor = '';
+  if (h.price <= 5) {
+    flavor = '<p style="color:#1e5a2e; font-weight:bold; margin-top:1vh;">Solid turnout. The price was right &mdash; kids showed up.</p>';
+  } else if (h.price <= 7) {
+    flavor = '<img src="'+randomTerryTate()+'" alt="Terry Tate" style="max-width:min(300px,60vw); border:4px solid #d4af37; border-radius:8px; margin:1vh auto; display:block;" onerror="this.style.display=\'none\'">';
+    flavor += '<p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Terry Tate walked up to the ticket booth, looked at the price, and said "I could buy a whole tub of ice cream for that." He left. So did most of the school.</p>';
+  } else if (h.price <= 9) {
+    flavor = '<img src="'+randomTerryTate()+'" alt="Terry Tate" style="max-width:min(300px,60vw); border:4px solid #d4af37; border-radius:8px; margin:1vh auto; display:block;" onerror="this.style.display=\'none\'">';
+    flavor += '<p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Terry Tate said '+money(h.price)+' for a haunted house? He could get a whole pizza for that. Or ice cream for the week. Your haunted house had more volunteers than guests. Awkward.</p>';
+  } else {
+    flavor = '<img src="'+randomTerryTate()+'" alt="Terry Tate" style="max-width:min(300px,60vw); border:4px solid #d4af37; border-radius:8px; margin:1vh auto; display:block;" onerror="this.style.display=\'none\'">';
+    flavor += '<p style="color:#8b0000; font-weight:bold; margin-top:1vh;">'+money(h.price)+' for a school haunted house? Terry Tate laughed out loud. He bought a gallon of ice cream and a bag of candy instead. So did literally everyone else. Zero tickets sold. Your volunteers stood in costumes in an empty hallway.</p>';
+  }
+
   var html = '<div class="info-box reveal-flash"><h2>&#x1F383; HAUNTED HOUSE RESULTS</h2>';
   html += '<p>Theme: <strong>'+themeName+'</strong>. One night. Let\'s count the damage.</p>';
+  html += flavor;
   html += '<table style="margin:1vh auto; width:90%;">';
   html += '<tr><th>Line</th><th>Math</th><th>Amount</th></tr>';
   html += '<tr><td>Tickets sold</td><td>'+tickets+' @ '+money(h.price)+'</td><td><strong>'+money(revenue)+'</strong></td></tr>';
@@ -1520,14 +1536,17 @@ function hhResults(onDone) {
   html += '<tr><td>Volunteer pizza</td><td>flat</td><td>&minus;'+money(pizzaCost)+'</td></tr>';
   html += '<tr><td><strong>PROFIT</strong></td><td>Revenue &minus; Cost</td><td><strong style="color:'+(profit>=0?'#1e5a2e':'#8b0000')+';">'+money(profit)+'</strong></td></tr>';
   html += '</table>';
-  // ============ MARGIN / FORECASTING MOMENT ============
+  // ============ TEACHING MOMENT — break-even (no "what you could have made") ============
   html += '<div style="background:#fff8dc; border:2px solid #d4af37; border-radius:8px; padding:1.2vh 1.5vw; margin:1.5vh auto; max-width:640px;">';
-  html += '<h3 style="margin:0 0 0.8vh 0; color:#5a3a0a;">&#x1F4A1; FORECASTING: MARGIN PER TICKET</h3>';
-  html += '<p style="margin:0.3vh 0;">Haunted House has NO cost per ticket &mdash; you just need to cover the <strong>'+money(totalExp)+' fixed setup</strong>.</p>';
-  html += '<p style="margin:0.3vh 0;">So every ticket you sell past <strong>break-even</strong> is pure margin.</p>';
-  html += '<p style="margin:0.3vh 0;">Break-even tickets = '+money(totalExp)+' &divide; '+money(h.price)+' = <strong>'+Math.ceil(totalExp/h.price)+' tickets</strong></p>';
-  html += '<p style="margin:0.3vh 0;">You sold '+tickets+'. Extra beyond break-even = '+Math.max(0, tickets - Math.ceil(totalExp/h.price))+' tickets &times; '+money(h.price)+' = <strong>roughly your profit</strong>.</p>';
-  html += '<p style="margin:0.6vh 0 0 0; font-size:0.92em; color:#5a3a0a;"><em>This is how real event planners decide whether to run it: compute break-even first, then forecast how many you can realistically sell past it.</em></p>';
+  html += '<h3 style="margin:0 0 0.8vh 0; color:#5a3a0a;">&#x1F4A1; THE LESSON: BREAK-EVEN</h3>';
+  html += '<p style="margin:0.3vh 0;">Your fixed setup cost was <strong>'+money(totalExp)+'</strong> (costumes + decor + pizza). That money is spent no matter what.</p>';
+  html += '<p style="margin:0.3vh 0;">Break-even = '+money(totalExp)+' &divide; '+money(h.price)+' = <strong>'+Math.ceil(totalExp/h.price)+' tickets</strong>. That\'s how many you needed to sell just to cover costs.</p>';
+  if (tickets >= Math.ceil(totalExp/h.price)) {
+    html += '<p style="margin:0.3vh 0; color:#1e5a2e;">You sold <strong>'+tickets+'</strong>. You cleared break-even. Every ticket past '+Math.ceil(totalExp/h.price)+' was pure profit.</p>';
+  } else {
+    html += '<p style="margin:0.3vh 0; color:#8b0000;">You sold <strong>'+tickets+'</strong>. You needed '+Math.ceil(totalExp/h.price)+'. You didn\'t break even.</p>';
+  }
+  html += '<p style="margin:0.6vh 0 0 0; font-size:0.92em; color:#5a3a0a;"><em>Real event planners compute break-even BEFORE the event. Know your number before you commit.</em></p>';
   html += '</div>';
   html += '<p style="margin-top:1vh;">This goes into your class bank.</p></div>';
   html += '<button class="btn" id="hh-done">CONTINUE &raquo;</button>';
