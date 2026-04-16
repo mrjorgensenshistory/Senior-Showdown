@@ -2324,7 +2324,6 @@ function hocoResults() {
 
   var totalCost = venueCost + foodCost + drinksCost + dessertCost + decorCost;
   var netProfit = revenue - totalCost;
-  var seniorShare = Math.floor(netProfit / 2); // 50/50 split with juniors
 
   // Note: Terry Tate (no food + $30+ ticket) is caught in hocoStep6_Ticket before we get here
 
@@ -2335,11 +2334,11 @@ function hocoResults() {
     html += '<img src="'+BOBBY_TACKLE_GIF+'" alt="Bobby Boucher tackle" style="max-width:min(400px,70vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8); margin-bottom:1vh;" onerror="this.style.display=\'none\'">';
     html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>You spent more on Homecoming than you made from tickets.</strong></p>';
     html += '<p>Revenue: <strong>'+money(revenue)+'</strong> &minus; Expenses: <strong>'+money(totalCost)+'</strong> = <strong style="color:#8b0000;">'+money(netProfit)+'</strong></p>';
-    html += '<p>Your class share of the loss: <strong style="color:#8b0000;">'+money(seniorShare)+'</strong>. That comes out of your bank.</p>';
+    html += '<p>That full loss comes out of your senior class bank: <strong style="color:#8b0000;">'+money(netProfit)+'</strong></p>';
     html += '<p>Bobby is NOT happy. But the year goes on.</p></div></div>';
     html += '<button class="btn" id="hoco-done" style="margin-top:2vh;">&#x1F622; TAKE THE L AND CONTINUE &raquo;</button>';
     document.getElementById('lab-content').innerHTML = html;
-    adjust(seniorShare, 'Homecoming Dance LOSS (senior share of 50/50 split)');
+    adjust(netProfit, 'Homecoming Dance LOSS');
     document.getElementById('hoco-done').onclick = function(){ if (_hocoOnDone) _hocoOnDone(); };
     return;
   }
@@ -2361,14 +2360,10 @@ function hocoResults() {
   html += '<tr><td>Decor: '+decor.name+'</td><td>&minus;'+money(decorCost)+'</td></tr>';
   html += '<tr style="border-top:2px solid #333;"><td><strong>TOTAL COST</strong></td><td><strong>&minus;'+money(totalCost)+'</strong></td></tr>';
   html += '<tr style="border-top:2px solid #333; background:#e8f5e9;"><td><strong>NET PROFIT</strong></td><td><strong style="color:#1e5a2e;">'+money(netProfit)+'</strong></td></tr>';
-  html += '<tr><td><strong>YOUR CLASS SHARE (50%)</strong></td><td><strong style="color:#1e5a2e;">'+money(seniorShare)+'</strong></td></tr>';
-  html += '<tr><td>Junior class share (50%)</td><td>'+money(netProfit - seniorShare)+'</td></tr>';
   html += '</table>';
 
-  if (seniorShare > 0) {
-    html += '<div class="quote">"Homecoming brought in <strong>'+money(seniorShare)+'</strong> for your senior class bank. Every dollar gets you closer to prom."</div>';
-  } else if (seniorShare < 0) {
-    html += '<div class="quote" style="border-color:#8b0000;">"Homecoming <strong>lost money</strong>. Your class owes <strong>'+money(Math.abs(seniorShare))+'</strong> from the bank. That\'s money that was supposed to go toward prom. Ouch."</div>';
+  if (netProfit > 0) {
+    html += '<div class="quote">"Homecoming brought in <strong>'+money(netProfit)+'</strong> for your senior class bank. Every dollar gets you closer to prom."</div>';
   } else {
     html += '<div class="quote" style="border-color:#8b0000;">"You broke even. No profit for the class. Not great, not terrible &mdash; but prom is still coming."</div>';
   }
@@ -2377,9 +2372,9 @@ function hocoResults() {
 
   document.getElementById('lab-content').innerHTML = html;
 
-  // Add senior share to bank (positive or negative)
-  if (seniorShare !== 0) {
-    adjust(seniorShare, 'Homecoming Dance (senior share of 50/50 split)');
+  // Full net goes to senior class bank
+  if (netProfit !== 0) {
+    adjust(netProfit, 'Homecoming Dance net profit');
   }
 
   document.getElementById('hoco-done').onclick = function(){
