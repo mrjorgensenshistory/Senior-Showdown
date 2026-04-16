@@ -1819,14 +1819,14 @@ function form9_Step6_Receipt(onDone) {
 // Add to triggerBobby if not already there
 
 // Helper: show form error with Terry Tate mindgames GIF, then retry
-function showFormError(title, msg, retryFn) {
+function showFormError(title, msg, retryFn, targetId) {
   var html = '<div class="info-box" style="border-color:#8b0000;">';
   html += '<img src="memes/terry-tate-mindgames.gif" alt="Terry Tate reviewing" style="max-width:min(300px,60vw); border:4px solid #d4af37; border-radius:8px; margin:1vh auto; display:block;" onerror="this.style.display=\'none\'">';
   html += '<h2 style="color:#8b0000;">&#x274C; '+title+'</h2>';
   html += '<p>'+msg+'</p>';
   html += '</div>';
   html += '<button class="btn" id="form-retry">&#x1F504; FIX IT AND RESUBMIT &raquo;</button>';
-  document.getElementById('fund-content').innerHTML = html;
+  document.getElementById(targetId || 'fund-content').innerHTML = html;
   document.getElementById('form-retry').onclick = retryFn;
 }
 
@@ -2272,8 +2272,10 @@ function hocoStep6_Ticket() {
   document.getElementById('hoco-go').onclick = function(){
     var price = parseInt(document.getElementById('hoco-price').value);
     if (!price || price < 5) { alert('Enter a ticket price ($5 minimum).'); return; }
-    // Forecast check — no advisor approves a dance projected to lose money
     var h = state.hoco;
+    // Terry Tate: no food + premium ticket = game over (check BEFORE forecast)
+    if (price > 30 && h.food === 'none') { h.ticketPrice = price; triggerBobby('hocoNoFood'); return; }
+    // Forecast check — no advisor approves a dance projected to lose money
     var att = hocoAttendance(price);
     var fVenue = HOCO_VENUES.find(function(x){return x.id===h.venue;}).cost;
     if (h.venue === 'clubhouse' && h.food === 'chinese') fVenue = 500;
@@ -2285,7 +2287,7 @@ function hocoStep6_Ticket() {
     var fTotal = fVenue + fFoodCost + fDrinks + fDessert + fDecor;
     var fRevenue = price * att;
     if (fRevenue <= fTotal) {
-      showFormError('FORECAST SHOWS A LOSS.', 'At $'+price+'/ticket you\'d sell ~'+att+' tickets for $'+fRevenue+' revenue, but expenses are $'+fTotal+'. No advisor will approve an event projected to lose money. Go back and change your venue, food, or ticket price.', function(){ hocoStep1_Venue(); });
+      showFormError('FORECAST SHOWS A LOSS.', 'At $'+price+'/ticket you\'d sell ~'+att+' tickets for $'+fRevenue+' revenue, but expenses are $'+fTotal+'. No advisor will approve an event projected to lose money. Go back and change your venue, food, or ticket price.', function(){ hocoStep1_Venue(); }, 'lab-content');
       return;
     }
     state.hoco.ticketPrice = price;
@@ -2324,11 +2326,7 @@ function hocoResults() {
   var netProfit = revenue - totalCost;
   var seniorShare = Math.floor(netProfit / 2); // 50/50 split with juniors
 
-  // Terry Tate check: over $30 ticket and no food
-  if (h.ticketPrice > 30 && h.food === 'none') {
-    triggerBobby('hocoNoFood');
-    return;
-  }
+  // Note: Terry Tate (no food + $30+ ticket) is caught in hocoStep6_Ticket before we get here
 
   // If they lost money, Bobby charges but game continues (not game-over)
   if (netProfit < 0) {
@@ -2449,7 +2447,7 @@ function epStep1_Budget() {
     var v = +input.value;
     if (!v && v !== 0) { alert('Enter a number.'); return; }
     if (Math.abs(v - expected) > 1) {
-      showFormError('WRONG.', '('+money(raised)+' &times; 0.20) + $500 = '+money(expected)+'. You put '+money(v)+'. Redo it.', function(){ epStep1_Budget(); });
+      showFormError('WRONG.', '('+money(raised)+' &times; 0.20) + $500 = '+money(expected)+'. You put '+money(v)+'. Redo it.', function(){ epStep1_Budget(); }, 'lab-content');
       return;
     }
     state.party.budget = expected;
