@@ -245,10 +245,16 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
     <h2 class="title-mono title-big">CHOOSE YOUR CLASS</h2>
     <div class="subtitle" style="color:#0a1a0f;">Different grades start with different balances and time horizons.</div>
     <div class="cards">
+      <a class="card" onclick="startGrade(9)">
+        <span class="icon">&#x1F4CB;</span>
+        <div class="card-title">9TH GRADE</div>
+        <div class="card-desc">Class of &#39;29. Learn the paperwork. Every ASB form, every procedure, from scratch.</div>
+        <div class="card-bal">Starting: $0</div>
+      </a>
       <a class="card" onclick="startGrade(10)">
         <span class="icon">&#x1F9D1;&#x200D;&#x1F393;</span>
         <div class="card-title">10TH GRADE</div>
-        <div class="card-desc">Class of &#39;28. Three years until graduation. Lots of time to build up savings.</div>
+        <div class="card-desc">Class of &#39;28. Haunted House, Candy-Grams, Bundt Cakes. Build the bank.</div>
         <div class="card-bal">Starting: $358</div>
       </a>
       <a class="card" onclick="startGrade(11)">
@@ -300,12 +306,8 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
     <div class="final-tally" id="end-tally"></div>
     <div style="height:10vh"></div>
   </div>
-  <!-- Fixed-position nav so buttons are ALWAYS visible -->
-  <div class="nav-right">
-    <button class="btn" onclick="restart()">&#x1F504; TRY AGAIN</button>
-    <button class="btn" onclick="show('sHub')">&#x1F3AD; PICK NEW GRADE</button>
-    <button class="btn" onclick="show('s0')">&#x1F3E0; TITLE</button>
-  </div>
+  <!-- Fixed-position nav — populated dynamically by finalize functions -->
+  <div class="nav-right" id="end-nav"></div>
 </div>
 
 <div class="credits">For educational use only. Music: Kevin MacLeod (incompetech.com) — CC BY 4.0.</div>
@@ -409,12 +411,15 @@ var TABLEWARE_OPTIONS = [
 
 // ============ STATE ============
 var state = {};
-function freshState(grade) {
-  var startBal = grade===10 ? 358 : grade===11 ? 900 : 821;
+function freshState(grade, carryover) {
+  // Default starting balances per grade (used when starting fresh, not carrying over)
+  var defaults = { 9:0, 10:358, 11:900, 12:821 };
+  var startBal = (typeof carryover === 'number') ? carryover : (defaults[grade] || 0);
   return {
-    grade: grade, balance: startBal, startBalance: startBal, log: [{label:'Starting balance', delta:startBal}],
+    grade: grade, balance: startBal, startBalance: startBal,
+    log: [{label: (typeof carryover === 'number') ? 'Carryover from '+(grade-1)+'th grade' : 'Starting balance', delta:startBal}],
     fund: {}, // fundraiser choices
-    // Math-lab choices:
+    // Math-lab choices (11th/12th):
     gradNite: null, venue:null, food:null, luncheon:null,
     dj:null, photo:null, decor:null, tableware:null,
     prices: { pkg:'', promTicket:'', gradNiteOnly:'', promOnly:'' }
@@ -622,6 +627,20 @@ var PRODUCTS = {
 //   { label, product: 'donut_fall' }   — triggers math lesson, profit auto-calculated
 //   { label, yield: 500 }              — simple reveal, static yield
 var FUND_STEPS = {
+  9: [
+    { month:'SEPTEMBER &mdash; 9TH GRADE',
+      prompt:'<h3>&#x1F4CB; Welcome to ASB &mdash; Learn the Paperwork.</h3><p>Before you can fundraise, you need to learn <strong>how the money works</strong>. Every event, every dollar, every receipt &mdash; there\'s a form for it. Fill them out wrong? Your fundraiser gets denied. Fill them out right? You\'re running the show.</p><p>Your class is going to run a <strong>Donut Sale</strong>. But first, the paperwork.</p>',
+      options:[
+        { label:'&#x1F4CB; START THE DONUT SALE PAPERWORK', forms9th:true },
+        { label:'&#x274C; Skip the paperwork &mdash; just sell donuts', yield:0, cutscene:{gif:'terry-tate', title:'TERRY TATE: NO FORMS, NO FUNDRAISER', msg:'You can\'t sell ANYTHING without the forms. Fundraising Event Request. Revenue Potential. Expenditure Approval. Cash Count. You skipped all of it. Terry Tate shut the whole thing down before you opened the donut box. GAME OVER.'} }
+      ] },
+    { month:'FEBRUARY &mdash; 9TH GRADE',
+      prompt:'<h3>&#x1F36C; Valentine Candy-Grams.</h3><p>You know the forms now. Time to run one on your own. Wholesale: <strong>$0.75 per gram</strong>. You set the price.</p>',
+      options:[
+        { label:'&#x1F36C; RUN THE VALENTINE CANDY-GRAM SALE', product:'candy_grams' },
+        { label:'&#x1F4A4; Skip Valentine\'s week', yield:0, cutscene:{gif:'bobby', title:'SKIPPED VALENTINE\'S?', msg:'You learned all the forms and then didn\'t use them. Bobby had his gram ready. He\'s upset.'} }
+      ] }
+  ],
   10: [
     { month:'OCTOBER &mdash; 10TH GRADE',
       prompt:'<h3>&#x1F383; Halloween Haunted House <span style="color:#8b0000;">(REQUIRED)</span>.</h3><p>Your class target this year: <strong>$1,500</strong>. The Haunted House is a <strong>required tradition</strong> at our school &mdash; your class runs it every year, no opt-out. You control the theme, decorations, costumes, ticket price, and whether you feed volunteers.</p><p>Here\'s the deal: <strong>ASB covers all expenses</strong>, but <strong>your class keeps the profit</strong>. Profit = <strong>Revenue &minus; Expenses</strong>. Revenue is how many tickets you sell &times; ticket price. Expenses are costumes, decorations, and volunteer food. The more profit you make, the more your class banks toward future events.</p>',
@@ -733,8 +752,8 @@ function renderCutscene(cs, yieldAmt, onDone) {
   };
 }
 
-function startGrade(grade) {
-  state = freshState(grade);
+function startGrade(grade, carryover) {
+  state = freshState(grade, carryover);
   setGradeMusic(grade);
   renderBank(); show('sFund'); runFundStep(0);
 }
@@ -758,8 +777,10 @@ function setGradeMusic(grade) {
 function runFundStep(idx) {
   var steps = FUND_STEPS[state.grade];
   if (idx >= steps.length) {
-    if (state.grade === 10) { run10thEndParty(); return; }
-    show('sLab'); runLab(); return;
+    if (state.grade === 9)  { runEndParty(finalize9th); return; }
+    if (state.grade === 10) { runEndParty(finalize10th); return; }
+    if (state.grade === 11) { runEndParty(finalize11th); return; }
+    show('sLab'); runLab(); return; // 12th → prom lab
   }
   var step = steps[idx];
   setMonth(step.month);
@@ -779,6 +800,8 @@ function runFundStep(idx) {
         });
       } else if (opt.hauntedHouse) {
         runHauntedHouse(function(){ runFundStep(idx+1); });
+      } else if (opt.forms9th) {
+        run9thFormsTutorial(function(){ runFundStep(idx+1); });
       } else {
         adjust(opt.yield, step.month + ': ' + cleanLabel);
         if (opt.cutscene) {
@@ -1068,6 +1091,14 @@ function triggerBobby(kind) {
     html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F3C8; TERRY TATE: THIS IS JUST DETENTION</h2>';
     html += '<img src="'+randomTerryTate()+'" alt="Terry Tate Office Linebacker" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8);" onerror="this.style.display=\'none\'">';
     html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>Your class stood in an empty parking lot eating nothing.</strong></p><p>You banked almost everything and threw no party. 10th graders need a reason to keep showing up to ASB meetings. You gave them concrete and awkward silence.</p><p style="color:#8b0000; font-weight:bold; margin-top:1vh;">That&#39;s not a party. That&#39;s detention. Terry Tate charged on principle.</p></div>';
+  } else if (kind === 'fcmat') {
+    html += '<h2 class="title-mono title-big" style="color:#ff3333; margin:2vh 0;">&#x1F6A8; FCMAT VIOLATION &mdash; COMMINGLING</h2>';
+    html += '<img src="'+randomTerryTate()+'" alt="Terry Tate" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8);" onerror="this.style.display=\'none\'">';
+    html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>You took collected cash and used it to buy supplies.</strong></p>';
+    html += '<p>That is called <strong>commingling</strong> &mdash; mixing revenue with expenditures. Under California FCMAT rules for student body funds, this is not allowed. Ever.</p>';
+    html += '<p>The correct procedure: deposit all cash with the bookkeeper FIRST. Then the advisor uses the school credit card for purchases. Receipt comes back. Check request closes the loop.</p>';
+    html += '<p>Cash never goes from the cash box to the store. Period.</p>';
+    html += '<p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Terry Tate shut down the entire operation. GAME OVER.</p></div>';
   }
   document.getElementById('bobby-body').innerHTML = html;
   // show('sBobby') handles audio (rickroll on, bg muted)
@@ -1356,6 +1387,348 @@ function validateWorksheet() {
   return allGood && filled === cells.length;
 }
 
+// ============ 9TH GRADE: FORMS TUTORIAL (DONUT SALE) ============
+// Scenario: Class wants to sell donuts for 6 Friday mornings AT LUNCH AND AFTER SCHOOL ONLY.
+// FCMAT rule: California lunch regulations apply — can only sell during lunch and after school.
+// Wholesale: $6/dozen (12 donuts). Sell for $1 each. ~8 dozen/week realistic for 450-student school.
+// Real benchmark: donuts netted $250-$750 depending on community outreach vs. students-only.
+var FORM_DONUT_WHOLESALE = 6;     // $6 per dozen
+var FORM_DONUT_SELL_EACH = 1;     // $1 per donut
+var FORM_DONUT_DOZENS = 8;        // 8 dozen per week (realistic for 450 students, lunch only)
+var FORM_DONUT_WEEKS = 6;         // 6 Fridays
+var FORM_DONUT_TOTAL_DOZENS = FORM_DONUT_DOZENS * FORM_DONUT_WEEKS;  // 48 dozen
+var FORM_DONUT_TOTAL_COST = FORM_DONUT_TOTAL_DOZENS * FORM_DONUT_WHOLESALE;  // $288
+var FORM_DONUT_TOTAL_REVENUE = FORM_DONUT_TOTAL_DOZENS * 12 * FORM_DONUT_SELL_EACH;  // $576
+var FORM_DONUT_PROFIT = FORM_DONUT_TOTAL_REVENUE - FORM_DONUT_TOTAL_COST;  // $288
+
+function run9thFormsTutorial(onDone) {
+  state.forms = { step:0 };
+  form9_Step1_Request(onDone);
+}
+
+// STEP 1 — Fundraising Event Request form
+function form9_Step1_Request(onDone) {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F4CB;</div>';
+  html += '<div class="expert-bubble"><h3>FORM 1: REQUEST FOR APPROVAL &mdash; FUNDRAISING EVENT</h3>';
+  html += '<p>Before you sell a single donut, you need <strong>approval</strong>. This form goes to the ASB advisor, then the principal, then the bookkeeper. Everyone signs off.</p>';
+  html += '<p><strong>RULE: Must be submitted at least 2 weeks before the event.</strong> Miss the deadline = no fundraiser.</p>';
+  html += '<div class="quote">"No form, no fundraiser. No exceptions."</div></div></div>';
+
+  html += '<div class="math-panel"><h3>FILL OUT THE FUNDRAISING REQUEST</h3>';
+  html += '<p style="color:#555; margin-bottom:1vh;">Your donut sale will run <strong>6 Fridays at lunch</strong>, starting <strong>October 18</strong>. Today is <strong>October 1</strong>.</p>';
+  html += '<p style="color:#8b0000; font-size:0.9em; margin-bottom:1vh;"><strong>FCMAT RULE:</strong> Under California lunch regulations, student fundraisers can only sell food <strong>during lunch and after school</strong>. Not before school, not during class. This limits how many donuts you can realistically move.</p>';
+  html += '<div class="math-row"><label>Name of Club</label><input type="text" id="f1-club" placeholder="e.g. Class of 2029"></div>';
+  html += '<div class="math-row"><label>Proposed Event</label><input type="text" id="f1-event" placeholder="e.g. Donut Sale"></div>';
+  html += '<div class="math-row"><label>Proposed Start Date (mm/dd)</label><input type="text" id="f1-date" placeholder="e.g. 10/18"></div>';
+  html += '<div class="math-row"><label>Date Submitting This Form (mm/dd)</label><input type="text" id="f1-submit" placeholder="e.g. 10/01"></div>';
+  html += '<div class="math-row"><label>Description of fundraiser</label><input type="text" id="f1-desc" placeholder="Describe what you\'re doing"></div>';
+  html += '<div class="math-row"><label>Location</label><input type="text" id="f1-loc" placeholder="e.g. Front gate before school"></div>';
+  html += '</div>';
+  html += '<button class="btn" id="f1-ok">SUBMIT FORM &raquo;</button>';
+
+  document.getElementById('fund-content').innerHTML = html;
+  document.getElementById('f1-ok').onclick = function(){
+    var club = document.getElementById('f1-club').value.trim();
+    var event = document.getElementById('f1-event').value.trim();
+    var date = document.getElementById('f1-date').value.trim();
+    var submit = document.getElementById('f1-submit').value.trim();
+    var desc = document.getElementById('f1-desc').value.trim();
+    var loc = document.getElementById('f1-loc').value.trim();
+
+    // Check for blank fields — Terry sends it back
+    if (!club || !event || !date || !submit || !desc || !loc) {
+      showFormError('You left fields blank. Terry Tate is sending this back.', 'Every box needs to be filled out. The advisor won\'t even look at it if it\'s incomplete. Try again.',
+        function(){ form9_Step1_Request(onDone); });
+      return;
+    }
+
+    // Check 2-week rule — parse dates loosely
+    var eventMonth = parseInt(date.split('/')[0]) || 0;
+    var eventDay = parseInt(date.split('/')[1]) || 0;
+    var subMonth = parseInt(submit.split('/')[0]) || 0;
+    var subDay = parseInt(submit.split('/')[1]) || 0;
+    var eventDayOfYear = eventMonth * 31 + eventDay;
+    var subDayOfYear = subMonth * 31 + subDay;
+    if (eventDayOfYear - subDayOfYear < 14) {
+      showFormError('TOO LATE. Fundraisers must be requested at least <strong>2 weeks</strong> before the event date.', 'You submitted on '+submit+' for an event on '+date+'. That\'s not enough lead time. The window closed. Your donut sale is DENIED for this round.',
+        function(){ form9_Step1_Request(onDone); });
+      return;
+    }
+
+    // Passed — continue
+    showFormSuccess('Fundraising Request: APPROVED',
+      'The advisor signed it. The principal signed it. The bookkeeper recorded it. Your donut sale is officially on the calendar.',
+      function(){ form9_Step2_Revenue(onDone); });
+  };
+}
+
+// STEP 2 — Revenue Potential / Sales Analysis form
+function form9_Step2_Revenue(onDone) {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F4CB;</div>';
+  html += '<div class="expert-bubble"><h3>FORM 2: SALES ANALYSIS &mdash; REVENUE POTENTIAL</h3>';
+  html += '<p>Now you forecast. How much will you make? This form proves to the advisor that the fundraiser is worth doing.</p>';
+  html += '<p>Your plan: buy <strong>'+FORM_DONUT_DOZENS+' dozen donuts per week</strong> at <strong>$'+FORM_DONUT_WHOLESALE+'/dozen</strong> wholesale. Sell at <strong>$'+FORM_DONUT_SELL_EACH+' each</strong> during lunch only. Run it for <strong>'+FORM_DONUT_WEEKS+' Fridays</strong>. ('+FORM_DONUT_DOZENS+' dozen/week is realistic for a 450-student campus at lunch.)</p>';
+  html += '<div class="quote">"Revenue Potential = units sold &times; selling price. If this number doesn\'t make sense, the whole fundraiser gets questioned."</div></div></div>';
+
+  html += '<div class="math-panel"><h3>COMPUTE YOUR REVENUE POTENTIAL</h3>';
+  html += '<div class="math-row"><label>Total dozens purchased (10/week &times; 4 weeks)</label><input type="number" id="f2-dozens" placeholder="?"></div>';
+  html += '<div class="math-row"><label>Total individual donuts (dozens &times; 12)</label><input type="number" id="f2-units" placeholder="?"></div>';
+  html += '<div class="math-row"><label>Unit selling price ($)</label><input type="number" id="f2-price" step="0.01" placeholder="?"></div>';
+  html += '<div class="math-row"><label>Revenue potential (units &times; price) ($)</label><input type="number" id="f2-rev" step="1" placeholder="?"></div>';
+  html += '</div>';
+  html += '<button class="btn" id="f2-ok">SUBMIT FORM &raquo;</button>';
+
+  document.getElementById('fund-content').innerHTML = html;
+  document.getElementById('f2-ok').onclick = function(){
+    var dozens = +document.getElementById('f2-dozens').value;
+    var units = +document.getElementById('f2-units').value;
+    var price = +document.getElementById('f2-price').value;
+    var rev = +document.getElementById('f2-rev').value;
+
+    if (!dozens || !units || !price || !rev) {
+      showFormError('Blank fields.', 'Every line on this form needs a number. Terry is sending it back.', function(){ form9_Step2_Revenue(onDone); });
+      return;
+    }
+    if (dozens !== FORM_DONUT_TOTAL_DOZENS) {
+      showFormError('Total dozens is wrong.', '10 dozen per week &times; 4 weeks = '+FORM_DONUT_TOTAL_DOZENS+'. Fix it and resubmit.', function(){ form9_Step2_Revenue(onDone); });
+      return;
+    }
+    if (units !== FORM_DONUT_TOTAL_DOZENS * 12) {
+      showFormError('Total donuts is wrong.', dozens+' dozen &times; 12 = '+(dozens*12)+'. Check your math.', function(){ form9_Step2_Revenue(onDone); });
+      return;
+    }
+    if (Math.abs(price - FORM_DONUT_SELL_EACH) > 0.01) {
+      showFormError('Wrong selling price.', 'You\'re selling at $'+FORM_DONUT_SELL_EACH+' each. That\'s the plan.', function(){ form9_Step2_Revenue(onDone); });
+      return;
+    }
+    if (Math.abs(rev - FORM_DONUT_TOTAL_REVENUE) > 1) {
+      showFormError('Revenue potential doesn\'t match.', units+' donuts &times; $'+price+' = $'+(units*price)+'. Redo the math.', function(){ form9_Step2_Revenue(onDone); });
+      return;
+    }
+
+    showFormSuccess('Revenue Potential: VERIFIED',
+      'Your forecast: '+units+' donuts at $'+price+' each = <strong>'+money(FORM_DONUT_TOTAL_REVENUE)+'</strong> potential revenue. Attached to your fundraiser request.',
+      function(){ form9_Step3_Expenditure(onDone); });
+  };
+}
+
+// STEP 3 — Expenditure Approval (advisor needs to buy donuts)
+function form9_Step3_Expenditure(onDone) {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F4CB;</div>';
+  html += '<div class="expert-bubble"><h3>FORM 3: EXPENDITURE APPROVAL</h3>';
+  html += '<p>Your advisor is buying the donuts with the <strong>school credit card</strong>. But they can\'t just go spend ASB money without pre-approval. This form is the green light.</p>';
+  html += '<p>The advisor will buy <strong>'+FORM_DONUT_TOTAL_DOZENS+' dozen</strong> over 4 weeks at <strong>$'+FORM_DONUT_WHOLESALE+'/dozen</strong> wholesale.</p>';
+  html += '<div class="quote">"This is a pre-approval form. The advisor needs it BEFORE buying anything. No form = no purchase = no donuts."</div></div></div>';
+
+  html += '<div class="math-panel"><h3>FILL OUT THE EXPENDITURE APPROVAL</h3>';
+  html += '<div class="math-row"><label>Item description</label><input type="text" id="f3-desc" placeholder="e.g. Donuts (wholesale)"></div>';
+  html += '<div class="math-row"><label>Quantity (total dozens)</label><input type="number" id="f3-qty" placeholder="?"></div>';
+  html += '<div class="math-row"><label>Unit price (per dozen, $)</label><input type="number" id="f3-unit" step="0.01" placeholder="?"></div>';
+  html += '<div class="math-row"><label>Total amount ($)</label><input type="number" id="f3-total" step="1" placeholder="?"></div>';
+  html += '<div class="math-row"><label>Club to be charged</label><input type="text" id="f3-club" placeholder="e.g. Class of 2029"></div>';
+  html += '</div>';
+  html += '<button class="btn" id="f3-ok">SUBMIT FORM &raquo;</button>';
+
+  document.getElementById('fund-content').innerHTML = html;
+  document.getElementById('f3-ok').onclick = function(){
+    var desc = document.getElementById('f3-desc').value.trim();
+    var qty = +document.getElementById('f3-qty').value;
+    var unit = +document.getElementById('f3-unit').value;
+    var total = +document.getElementById('f3-total').value;
+    var club = document.getElementById('f3-club').value.trim();
+
+    if (!desc || !qty || !unit || !total || !club) {
+      showFormError('Missing fields.', 'Every line matters. The bookkeeper will reject this.', function(){ form9_Step3_Expenditure(onDone); });
+      return;
+    }
+    if (qty !== FORM_DONUT_TOTAL_DOZENS) {
+      showFormError('Wrong quantity.', 'You\'re buying '+FORM_DONUT_TOTAL_DOZENS+' dozen total (10/week &times; 4 weeks).', function(){ form9_Step3_Expenditure(onDone); });
+      return;
+    }
+    if (Math.abs(unit - FORM_DONUT_WHOLESALE) > 0.01) {
+      showFormError('Wrong unit price.', 'Wholesale is $'+FORM_DONUT_WHOLESALE+' per dozen.', function(){ form9_Step3_Expenditure(onDone); });
+      return;
+    }
+    if (Math.abs(total - FORM_DONUT_TOTAL_COST) > 1) {
+      showFormError('Total doesn\'t match.', qty+' dozen &times; $'+unit+' = $'+(qty*unit)+'.', function(){ form9_Step3_Expenditure(onDone); });
+      return;
+    }
+
+    showFormSuccess('Expenditure Approval: APPROVED',
+      'The advisor now has permission to spend <strong>'+money(FORM_DONUT_TOTAL_COST)+'</strong> on donuts using the school credit card. They\'ll bring the receipt back.',
+      function(){ form9_Step4_TheTrap(onDone); });
+  };
+}
+
+// STEP 4 — THE TRAP: Do you use collected cash to buy donuts?
+function form9_Step4_TheTrap(onDone) {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F36A;</div>';
+  html += '<div class="expert-bubble"><h3>THE SALE HAPPENED!</h3>';
+  html += '<p>Your first two Fridays went great. You sold donuts, collected <strong>$240 in cash</strong> so far. The advisor needs to buy donuts for next Friday.</p>';
+  html += '<p>A student suggests: <em>"We\'ve got $240 in cash right here. Let\'s just take it to the donut shop and buy next week\'s supply. It\'s faster!"</em></p></div></div>';
+
+  html += '<div class="pick-grid">';
+  html += '<div class="pick-card" data-id="correct" style="border-color:#1e5a2e;"><div class="ic">&#x2705;</div><div class="vname">NO &mdash; Follow procedure</div><div class="vnote">Deposit the cash with the bookkeeper first. Advisor uses credit card for purchases. Bring receipt back.</div></div>';
+  html += '<div class="pick-card" data-id="wrong" style="border-color:#8b0000;"><div class="ic">&#x1F4B5;</div><div class="vname">Sure &mdash; use the cash</div><div class="vnote">It\'s right here. Faster than all that paperwork.</div></div>';
+  html += '</div>';
+
+  document.getElementById('fund-content').innerHTML = html;
+  document.querySelectorAll('#fund-content .pick-card').forEach(function(el){
+    el.onclick = function(){
+      if (el.getAttribute('data-id') === 'wrong') {
+        triggerBobby('fcmat');
+        return;
+      }
+      showFormSuccess('CORRECT PROCEDURE',
+        '<strong>You NEVER use collected cash to buy supplies.</strong> The cash goes to the bookkeeper for deposit. The advisor uses the school credit card. The receipt comes back. That\'s the loop.<br><br>Using cash directly is called <strong>commingling</strong> &mdash; mixing money streams. It\'s a FCMAT violation in California. Even if you meant well, it\'s not allowed.',
+        function(){ form9_Step5_CashCount(onDone); });
+    };
+  });
+}
+
+// STEP 5 — Cash Count form
+function form9_Step5_CashCount(onDone) {
+  // Simulate: collected $480 total over 4 weeks. Denominations:
+  // 80 x $5 bills = $400, 16 x $5 = $80 (total $480)
+  // Actually let's do realistic small bills: selling $1 donuts
+  // 380 x $1 = $380, 20 x $5 = $100 = $480
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F4CB;</div>';
+  html += '<div class="expert-bubble"><h3>FORM 4: CASH COUNT</h3>';
+  html += '<p>All 4 Fridays are done. You collected <strong>$'+FORM_DONUT_TOTAL_REVENUE+'</strong> total. Now <strong>two students</strong> count every bill and coin, fill out the cash count form, and take it to the bookkeeper for deposit.</p>';
+  html += '<div class="quote">"Two students count. Not one. Two. If the count is wrong, both of you redo it."</div></div></div>';
+
+  html += '<div class="math-panel"><h3>COUNT THE CASH</h3>';
+  html += '<p style="color:#555; margin-bottom:1vh;">Here\'s what\'s in the cash box: <strong>456 one-dollar bills</strong> and <strong>24 five-dollar bills</strong>.</p>';
+  html += '<div class="math-row"><label>Dollar bills: 456 &times; $1.00 = ?</label><input type="number" id="f5-ones" step="1" placeholder="$"></div>';
+  html += '<div class="math-row"><label>Five-dollar bills: 24 &times; $5.00 = ?</label><input type="number" id="f5-fives" step="1" placeholder="$"></div>';
+  html += '<div class="math-row"><label><strong>GRAND TOTAL ($)</strong></label><input type="number" id="f5-total" step="1" placeholder="$"></div>';
+  html += '</div>';
+  html += '<button class="btn" id="f5-ok">SUBMIT CASH COUNT &raquo;</button>';
+
+  document.getElementById('fund-content').innerHTML = html;
+  document.getElementById('f5-ok').onclick = function(){
+    var ones = +document.getElementById('f5-ones').value;
+    var fives = +document.getElementById('f5-fives').value;
+    var total = +document.getElementById('f5-total').value;
+
+    if (!ones || !fives || !total) {
+      showFormError('Blank fields.', 'Count every denomination. Both students sign off.', function(){ form9_Step5_CashCount(onDone); });
+      return;
+    }
+    if (ones !== 456) {
+      showFormError('Dollar bills count is wrong.', '456 bills &times; $1 = $456. Recount.', function(){ form9_Step5_CashCount(onDone); });
+      return;
+    }
+    if (fives !== 120) {
+      showFormError('Five-dollar bills count is wrong.', '24 bills &times; $5 = $120. Recount.', function(){ form9_Step5_CashCount(onDone); });
+      return;
+    }
+    if (total !== 576) {
+      showFormError('Grand total doesn\'t match.', '$456 + $120 = $576. Add it up.', function(){ form9_Step5_CashCount(onDone); });
+      return;
+    }
+
+    showFormSuccess('Cash Count: VERIFIED &mdash; deposited with bookkeeper',
+      'Both students signed. $480 deposited. The money is now officially in your class account.',
+      function(){ form9_Step6_Receipt(onDone); });
+  };
+}
+
+// STEP 6 — Advisor brings receipt, fill out check request
+function form9_Step6_Receipt(onDone) {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F4CB;</div>';
+  html += '<div class="expert-bubble"><h3>FORM 5: CLOSING THE LOOP &mdash; CHECK REQUEST</h3>';
+  html += '<p>The advisor bought all the donuts on the school credit card. Total spent: <strong>'+money(FORM_DONUT_TOTAL_COST)+'</strong>. They have the <strong>receipt</strong>.</p>';
+  html += '<p>Now you fill out the <strong>Expenditure Approval form</strong> (again, with receipt attached this time) and the <strong>Purchase Order / Check Request</strong> so the advisor gets reimbursed.</p>';
+  html += '<div class="quote">"No receipt = no reimbursement. The advisor fronted the money. If you lose the receipt, they\'re out $'+FORM_DONUT_TOTAL_COST+' of their own money. Don\'t do that."</div></div></div>';
+
+  html += '<div class="math-panel"><h3>CLOSE OUT THE DONUT SALE</h3>';
+  html += '<div class="math-row"><label>Total revenue collected ($)</label><input type="number" id="f6-rev" step="1" placeholder="$"></div>';
+  html += '<div class="math-row"><label>Total expenses (from receipt) ($)</label><input type="number" id="f6-exp" step="1" placeholder="$"></div>';
+  html += '<div class="math-row"><label><strong>NET PROFIT (revenue &minus; expenses) ($)</strong></label><input type="number" id="f6-profit" step="1" placeholder="$"></div>';
+  html += '<div class="math-row"><label>Receipt attached?</label><select id="f6-receipt"><option value="">-- select --</option><option value="yes">Yes &mdash; receipt is attached</option><option value="no">No &mdash; I lost it</option></select></div>';
+  html += '</div>';
+  html += '<button class="btn" id="f6-ok">SUBMIT &amp; CLOSE OUT &raquo;</button>';
+
+  document.getElementById('fund-content').innerHTML = html;
+  document.getElementById('f6-ok').onclick = function(){
+    var rev = +document.getElementById('f6-rev').value;
+    var exp = +document.getElementById('f6-exp').value;
+    var profit = +document.getElementById('f6-profit').value;
+    var receipt = document.getElementById('f6-receipt').value;
+
+    if (!rev || !exp || !profit) {
+      showFormError('Missing numbers.', 'Fill in every line.', function(){ form9_Step6_Receipt(onDone); });
+      return;
+    }
+    if (receipt === 'no' || receipt === '') {
+      showFormError('WHERE IS THE RECEIPT?', 'The advisor spent $'+FORM_DONUT_TOTAL_COST+' of their own money (via school card). No receipt = no reimbursement = your advisor is out $'+FORM_DONUT_TOTAL_COST+'. Go find that receipt.', function(){ form9_Step6_Receipt(onDone); });
+      return;
+    }
+    if (Math.abs(rev - FORM_DONUT_TOTAL_REVENUE) > 1) {
+      showFormError('Revenue doesn\'t match.', 'You collected $'+FORM_DONUT_TOTAL_REVENUE+' total (from the cash count). Use that number.', function(){ form9_Step6_Receipt(onDone); });
+      return;
+    }
+    if (Math.abs(exp - FORM_DONUT_TOTAL_COST) > 1) {
+      showFormError('Expenses don\'t match the receipt.', 'Receipt says $'+FORM_DONUT_TOTAL_COST+'. Use the receipt total.', function(){ form9_Step6_Receipt(onDone); });
+      return;
+    }
+    if (Math.abs(profit - FORM_DONUT_PROFIT) > 1) {
+      showFormError('Profit math is wrong.', '$'+FORM_DONUT_TOTAL_REVENUE+' &minus; $'+FORM_DONUT_TOTAL_COST+' = $'+FORM_DONUT_PROFIT+'. Revenue minus expenses.', function(){ form9_Step6_Receipt(onDone); });
+      return;
+    }
+
+    // SUCCESS — they completed the full forms cycle
+    adjust(FORM_DONUT_PROFIT, 'Donut Sale (net profit after forms)');
+    var html2 = '<div class="info-box reveal-flash"><h2 style="color:#1e5a2e;">&#x2705; DONUT SALE: COMPLETE</h2>';
+    html2 += '<p>You did every form in order:</p>';
+    html2 += '<ol style="text-align:left; max-width:500px; margin:1vh auto; line-height:1.8;">';
+    html2 += '<li><strong>Fundraising Event Request</strong> &mdash; submitted 2+ weeks early &#x2705;</li>';
+    html2 += '<li><strong>Revenue Potential</strong> &mdash; forecast matched reality &#x2705;</li>';
+    html2 += '<li><strong>Expenditure Approval</strong> &mdash; advisor pre-approved &#x2705;</li>';
+    html2 += '<li><strong>Cash Count</strong> &mdash; two students counted, deposited &#x2705;</li>';
+    html2 += '<li><strong>Check Request + Receipt</strong> &mdash; advisor reimbursed &#x2705;</li>';
+    html2 += '</ol>';
+    html2 += '<div style="background:#fff8dc; border:2px solid #d4af37; border-radius:8px; padding:1.2vh 1.5vw; margin:1.5vh auto; max-width:640px;">';
+    html2 += '<h3 style="margin:0 0 0.8vh 0; color:#5a3a0a;">&#x1F4A1; THE PROFIT FORMULA</h3>';
+    html2 += '<p style="margin:0.3vh 0;"><strong>Profit = Revenue &minus; Expenses</strong></p>';
+    html2 += '<p style="margin:0.3vh 0;">'+money(FORM_DONUT_TOTAL_REVENUE)+' &minus; '+money(FORM_DONUT_TOTAL_COST)+' = <strong>'+money(FORM_DONUT_PROFIT)+'</strong></p>';
+    html2 += '<p style="margin:0.3vh 0;">That $'+FORM_DONUT_PROFIT+' is now in your class bank.</p>';
+    html2 += '<p style="margin:0.6vh 0 0 0; font-size:0.92em; color:#5a3a0a;"><em>Every fundraiser follows this same loop: Request → Revenue Potential → Expenditure Approval → Sell → Cash Count → Deposit → Receipt → Check Request. Learn it once, use it every year.</em></p>';
+    html2 += '</div></div>';
+    html2 += '<button class="btn" id="f-done">CONTINUE &raquo;</button>';
+
+    document.getElementById('fund-content').innerHTML = html2;
+    document.getElementById('f-done').onclick = onDone;
+  };
+}
+
+// FCMAT violation cutscene (using cash to buy supplies)
+// Add to triggerBobby if not already there
+
+// Helper: show form error with Terry Tate mindgames GIF, then retry
+function showFormError(title, msg, retryFn) {
+  var html = '<div class="info-box" style="border-color:#8b0000;">';
+  html += '<img src="memes/terry-tate-mindgames.gif" alt="Terry Tate reviewing" style="max-width:min(300px,60vw); border:4px solid #d4af37; border-radius:8px; margin:1vh auto; display:block;" onerror="this.style.display=\'none\'">';
+  html += '<h2 style="color:#8b0000;">&#x274C; '+title+'</h2>';
+  html += '<p>'+msg+'</p>';
+  html += '</div>';
+  html += '<button class="btn" id="form-retry">&#x1F504; FIX IT AND RESUBMIT &raquo;</button>';
+  document.getElementById('fund-content').innerHTML = html;
+  document.getElementById('form-retry').onclick = retryFn;
+}
+
+// Helper: show form success, then continue
+function showFormSuccess(title, msg, nextFn) {
+  var html = '<div class="info-box reveal-flash" style="border-color:#1e5a2e;">';
+  html += '<h2 style="color:#1e5a2e;">&#x2705; '+title+'</h2>';
+  html += '<p>'+msg+'</p>';
+  html += '</div>';
+  html += '<button class="btn" id="form-next">CONTINUE &raquo;</button>';
+  document.getElementById('fund-content').innerHTML = html;
+  document.getElementById('form-next').onclick = nextFn;
+}
+
 // ============ 10TH GRADE: HAUNTED HOUSE ============
 var HAUNTED_THEMES = [
   { id:'graveyard',  name:'Classic Graveyard',       ic:'&#x26B0;' },
@@ -1622,7 +1995,10 @@ var PARTY_DESSERT = [
   { id:'none',      name:'No dessert',           cost:0,   ic:'&#x274C;',  desc:'Skip it.' }
 ];
 
-function run10thEndParty() {
+// Generic end-of-year party (9th, 10th, 11th) — pass the finalize callback for grade-specific ending
+var _partyFinalizeCallback = null;
+function runEndParty(finalizeFn) {
+  _partyFinalizeCallback = finalizeFn;
   show('sLab');
   state.party = { budget:null, loc:null, food:null, side:null, dessert:null };
   epStep1_Budget();
@@ -1768,21 +2144,41 @@ function epResults() {
   html += '<tr><td>Your budget</td><td>'+money(budget)+'</td></tr>';
   html += '<tr><td><strong>Left over (stays in bank)</strong></td><td><strong style="color:#1e5a2e;">'+money(diff)+'</strong></td></tr>';
   html += '</table>';
-  html += '<p>The 80% you banked stays for next year. Solid sophomore class.</p></div>';
+  var gradeWord = state.grade===9 ? 'freshman' : state.grade===10 ? 'sophomore' : 'junior';
+  html += '<p>The 80% you banked stays for next year. Solid '+gradeWord+' class.</p></div>';
   html += '<button class="btn" id="ep-end">SEE FINAL LEDGER &raquo;</button>';
 
   document.getElementById('lab-content').innerHTML = html;
 
-  // Apply the party spend to the bank log (but remember they're only spending out of 20% conceptually — the bank is the raised amount, so we record party cost)
+  // Apply the party spend to the bank log
   adjust(-total, 'End-of-year party (20% spend + $500 gen fund)');
-  // Also credit the $500 from general fund since the "budget" assumed it
   adjust(500, 'ASB general fund contribution ($500)');
 
-  document.getElementById('ep-end').onclick = function(){ finalize10th(); };
+  document.getElementById('ep-end').onclick = function(){
+    if (_partyFinalizeCallback) _partyFinalizeCallback();
+  };
+}
+
+function finalize9th() {
+  var bg = document.getElementById('end-bg');
+  var stamp = document.getElementById('end-stamp');
+  var title = document.getElementById('end-title');
+  var box = document.getElementById('end-box');
+  var tally = document.getElementById('end-tally');
+  bg.className='screen-bg bg-win';
+  stamp.textContent = '\u2705  FRESHMAN YEAR = DONE';
+  stamp.className = 'stamp stamp-win';
+  title.textContent = 'YOU LEARNED THE FORMS';
+  box.innerHTML = '<p style="font-size:1.2em;">You filled out every form, followed every procedure, deposited the cash properly, and the advisor got reimbursed. You learned how ASB money actually works &mdash; from fundraiser request to cash count to check request. That knowledge carries forward every year.</p>';
+  var t = '<table><tr><th>Line</th><th>Amount</th></tr>';
+  state.log.forEach(function(e){ t += '<tr><td>'+e.label+'</td><td>'+money(e.delta)+'</td></tr>'; });
+  t += '<tr><td><strong>FINAL BANK</strong></td><td><strong>'+money(state.balance)+'</strong></td></tr></table>';
+  tally.innerHTML = t;
+  renderEndNav();
+  show('sEnd');
 }
 
 function finalize10th() {
-  // Stamp the ending screen with 10th-grade flavor
   var bg = document.getElementById('end-bg');
   var stamp = document.getElementById('end-stamp');
   var title = document.getElementById('end-title');
@@ -1797,6 +2193,26 @@ function finalize10th() {
   state.log.forEach(function(e){ t += '<tr><td>'+e.label+'</td><td>'+money(e.delta)+'</td></tr>'; });
   t += '<tr><td><strong>FINAL BANK</strong></td><td><strong>'+money(state.balance)+'</strong></td></tr></table>';
   tally.innerHTML = t;
+  renderEndNav();
+  show('sEnd');
+}
+
+function finalize11th() {
+  var bg = document.getElementById('end-bg');
+  var stamp = document.getElementById('end-stamp');
+  var title = document.getElementById('end-title');
+  var box = document.getElementById('end-box');
+  var tally = document.getElementById('end-tally');
+  bg.className='screen-bg bg-win';
+  stamp.textContent = '\u2705  JUNIOR YEAR = DONE';
+  stamp.className = 'stamp stamp-win';
+  title.textContent = 'READY FOR SENIOR YEAR';
+  box.innerHTML = '<p style="font-size:1.2em;">You fundraised all year, ran a solid end-of-year celebration, and banked the rest for senior year. Prom, Grad Nite, and the rest of the big expenses start now. Your balance rolls forward.</p>';
+  var t = '<table><tr><th>Line</th><th>Amount</th></tr>';
+  state.log.forEach(function(e){ t += '<tr><td>'+e.label+'</td><td>'+money(e.delta)+'</td></tr>'; });
+  t += '<tr><td><strong>FINAL BANK</strong></td><td><strong>'+money(state.balance)+'</strong></td></tr></table>';
+  tally.innerHTML = t;
+  renderEndNav();
   show('sEnd');
 }
 
@@ -1868,10 +2284,31 @@ function finalize() {
   h += '<div class="row"><span>ENDING BALANCE</span><span class="'+(bal>=0?'pos':'neg')+'">'+money(bal)+'</span></div>';
   tally.innerHTML = h;
 
+  renderEndNav();
   show('sEnd');
 }
 
 function restart() { startGrade(state.grade); }
+
+// Build end-of-grade navigation: continue to next year (if positive balance + not 12th), replay, or start fresh
+function renderEndNav() {
+  var nav = document.getElementById('end-nav');
+  var html = '';
+  var nextGrade = state.grade + 1;
+  var canContinue = (state.grade < 12 && state.balance >= 0);
+
+  if (state.grade < 12) {
+    if (canContinue) {
+      html += '<button class="btn" onclick="startGrade('+nextGrade+','+state.balance+')">&#x27A1; CONTINUE TO '+nextGrade+'TH GRADE (balance: '+money(state.balance)+')</button>';
+    } else if (state.balance < 0) {
+      html += '<button class="btn" disabled style="opacity:0.4; cursor:not-allowed;">&#x1F6AB; CAN\'T ADVANCE &mdash; NEGATIVE BALANCE</button>';
+      html += '<p style="color:#8b0000; font-size:0.9em; margin:0.5vh 0;">You need to replay this grade and finish with a positive balance before moving on.</p>';
+    }
+  }
+  html += '<button class="btn" onclick="restart()">&#x1F504; REPLAY '+state.grade+'TH GRADE</button>';
+  html += '<button class="btn" onclick="show(\'sHub\')">&#x1F3E0; BACK TO START</button>';
+  nav.innerHTML = html;
+}
 
 // Rickroll reward block — appears on every ending. The Captain Insano experience.
 function rickrollReward(setupText) {
