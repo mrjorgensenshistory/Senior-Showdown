@@ -228,7 +228,8 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
         &nbsp;&nbsp;&#x2022; <strong>10th grade</strong> &mdash; Haunted House, product fundraisers, building the bank<br>
         &nbsp;&nbsp;&#x2022; <strong>11th grade</strong> &mdash; Bigger fundraisers, growing your savings for senior year<br>
         &nbsp;&nbsp;&#x2022; <strong>12th grade</strong> &mdash; Prom, Grad Nite, pricing, budgeting &mdash; the real thing</p>
-      <p style="margin-top:1.5vh; font-style:italic; color:#8b0000;">Every dollar raised in 9th&ndash;11th grade carries forward. Every dollar wasted is a dollar your senior class doesn&#39;t have.</p>
+      <p style="margin-top:1.5vh;"><strong>Reality check:</strong> Classes get <em>smaller</em> every year as students transfer out. You might start 9th grade with 80+ students fundraising, but by senior year you could be down to 60 or fewer &mdash; and those are the ones who need to cover prom. Fewer students = fewer ticket buyers = harder math.</p>
+      <p style="margin-top:1vh; font-style:italic; color:#8b0000;">Every dollar raised in 9th&ndash;11th grade carries forward. Every dollar wasted is a dollar your senior class doesn&#39;t have.</p>
     </div>
   </div>
   <div class="nav-right">
@@ -246,25 +247,25 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
       <a class="card" onclick="startGrade(9)">
         <span class="icon">&#x1F4CB;</span>
         <div class="card-title">9TH GRADE</div>
-        <div class="card-desc">Class of &#39;29 &bull; 74 students. Learn the paperwork. Every ASB form, every procedure, from scratch.</div>
+        <div class="card-desc">Class of &#39;29. Learn the paperwork. Every ASB form, every procedure, from scratch.</div>
         <div class="card-bal">Starting: $100.55</div>
       </a>
       <a class="card" onclick="startGrade(10)">
         <span class="icon">&#x1F9D1;&#x200D;&#x1F393;</span>
         <div class="card-title">10TH GRADE</div>
-        <div class="card-desc">Class of &#39;28 &bull; 73 students. Haunted House, Candy-Grams, Bundt Cakes. Build the bank.</div>
+        <div class="card-desc">Class of &#39;28. Haunted House, Candy-Grams, Bundt Cakes. Build the bank.</div>
         <div class="card-bal">Starting: $358</div>
       </a>
       <a class="card" onclick="startGrade(11)">
         <span class="icon">&#x1F4DA;</span>
         <div class="card-title">11TH GRADE</div>
-        <div class="card-desc">Class of &#39;27 &bull; 66 students. 14 months until prom. Your upcoming adventure.</div>
+        <div class="card-desc">Class of &#39;27. 14 months until prom. Your upcoming adventure.</div>
         <div class="card-bal">Starting: $804</div>
       </a>
       <a class="card" onclick="startGrade(12)">
         <span class="icon">&#x1F514;</span>
         <div class="card-title">12TH GRADE</div>
-        <div class="card-desc">Class of &#39;26 &bull; 59 students. Prom, Grad Nite, pricing + Senior Luncheon finale.</div>
+        <div class="card-desc">Class of &#39;26. Prom, Grad Nite, pricing + Senior Luncheon finale.</div>
         <div class="card-bal">Starting: $821.10</div>
       </a>
     </div>
@@ -334,9 +335,9 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
 
 <script>
 // ============ CONSTANTS ============
-// Class sizes by grade (real enrollment numbers)
+// Class sizes by grade (current enrollment — classes shrink as students transfer out each year)
 var CLASS_SIZES = { 7:80, 8:77, 9:74, 10:73, 11:66, 12:59 };
-var SENIOR_COUNT = 59; // 12th grade — used for prom/pricing math
+var SENIOR_COUNT = CLASS_SIZES[12]; // 12th grade — used for prom/pricing math
 var YEARBOOK_COST = 45;
 var LUNCHEON_CATERED = 20;
 var LUNCHEON_POTLUCK = 4;
