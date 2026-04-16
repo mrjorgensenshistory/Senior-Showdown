@@ -1377,23 +1377,32 @@ var HAUNTED_DECOR = [
   { id:'basic',   name:'Basic decor kit',      cost:200, desc:'Store-bought props, strobe, fog, spider webs.' },
   { id:'premium', name:'Premium decor',        cost:500, desc:'Animatronics, black lights, full set pieces.' }
 ];
-// Ticket demand curve (max $10, pool 450 students)
+var HAUNTED_PROPS = [
+  { id:'none',   name:'No extra props',           cost:0,    boost:1.00, desc:'Just the basics. Costumes and decor only.' },
+  { id:'light',  name:'A few jump-scare props',   cost:100,  boost:1.20, desc:'Motion-activated screamers, a couple mannequins. Word spreads.' },
+  { id:'mid',    name:'Solid prop setup',          cost:250,  boost:1.35, desc:'Fog, animatronic hands, strobe tunnel. Instagram-worthy.' },
+  { id:'heavy',  name:'Full haunted experience',   cost:500,  boost:1.45, desc:'Professional-grade props, sound effects, actors in walls.' },
+  { id:'insane', name:'Over-the-top everything',   cost:800,  boost:1.50, desc:'You basically built a theme park. Looks incredible, costs a fortune.' }
+];
+var HAUNTED_MAX_ATTENDANCE = 250; // hard cap — campus only has so many people willing to show up
+
+// Ticket demand curve — calibrated to real benchmark: ~180 tickets at $5 = ~$900 revenue
 function hauntedTicketVolume(price) {
   // $5 is the sweet spot — anything above tanks fast, $10 = nobody shows
-  if (price <= 2)  return 200;
-  if (price <= 3)  return 180;
-  if (price <= 4)  return 160;
-  if (price <= 5)  return 140;
-  if (price <= 6)  return 60;   // steep dropoff past $5
-  if (price <= 7)  return 30;
-  if (price <= 8)  return 12;
-  if (price <= 9)  return 4;
+  if (price <= 2)  return 250;
+  if (price <= 3)  return 230;
+  if (price <= 4)  return 210;
+  if (price <= 5)  return 180; // real benchmark — last year sold ~180 at $5
+  if (price <= 6)  return 75;  // steep dropoff past $5
+  if (price <= 7)  return 35;
+  if (price <= 8)  return 15;
+  if (price <= 9)  return 5;
   return 0; // $10+ = literally nobody comes
 }
 var HAUNTED_TICKET_SAMPLES = [2, 3, 5, 6, 7, 8, 10];
 
 function runHauntedHouse(onDone) {
-  state.haunted = { price:null, theme:null, costumes:null, decor:null, pizza:null };
+  state.haunted = { price:null, theme:null, costumes:null, decor:null, props:null, pizza:null };
   hhStep1(onDone);
 }
 
@@ -1472,15 +1481,35 @@ function hhStep4(onDone) {
   document.querySelectorAll('#fund-content .pick-card').forEach(function(el){
     el.onclick = function(){
       state.haunted.decor = el.getAttribute('data-id');
-      hhStep5(onDone);
+      hhStep5_Props(onDone);
     };
   });
 }
 
-// STEP 5 — FEED YOUR VOLUNTEERS — the gate
-function hhStep5(onDone) {
+// STEP 5 — PROPS (diminishing returns, capped attendance)
+function hhStep5_Props(onDone) {
+  var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F383;</div>';
+  html += '<div class="expert-bubble"><h3>STEP 5 &mdash; PROPS &amp; SPECIAL EFFECTS</h3>';
+  html += '<p>Props attract more visitors &mdash; better reviews spread fast. But there are only <strong>450 students</strong> on campus. At some point, no amount of props will bring in more people because everyone who wants to come is already coming.</p>';
+  html += '<p><strong>Spend wisely.</strong> More props = more attendance, but the boost gets smaller the more you spend. There\'s a ceiling.</p></div></div>';
+  html += '<div class="pick-grid">';
+  HAUNTED_PROPS.forEach(function(p){
+    html += '<div class="pick-card" data-id="'+p.id+'"><div class="ic">&#x1F3AD;</div><div class="vname">'+p.name+'</div><div class="vprice">'+money(p.cost)+'</div><div class="vnote">'+p.desc+'</div></div>';
+  });
+  html += '</div>';
+  document.getElementById('fund-content').innerHTML = html;
+  document.querySelectorAll('#fund-content .pick-card').forEach(function(el){
+    el.onclick = function(){
+      state.haunted.props = el.getAttribute('data-id');
+      hhStep6_Food(onDone);
+    };
+  });
+}
+
+// STEP 6 — FEED YOUR VOLUNTEERS — the gate
+function hhStep6_Food(onDone) {
   var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F355;</div>';
-  html += '<div class="expert-bubble"><h3>STEP 5 &mdash; FEED YOUR VOLUNTEERS?</h3>';
+  html += '<div class="expert-bubble"><h3>STEP 6 &mdash; FEED YOUR VOLUNTEERS?</h3>';
   html += '<p>You have about 40 volunteers running this for 5 hours. They need dinner. Pizza run: <strong>$120</strong> (10 large pies + drinks).</p>';
   html += '<div class="quote">"Hungry volunteers = angry volunteers. Hungry teenage volunteers = catastrophe."</div></div></div>';
   html += '<div class="pick-grid">';
@@ -1501,12 +1530,16 @@ function hhStep5(onDone) {
 // RESULTS — compute profit and show breakdown, then continue
 function hhResults(onDone) {
   var h = state.haunted;
-  var tickets = hauntedTicketVolume(h.price);
+  var baseTickets = hauntedTicketVolume(h.price);
+  var propsPick = HAUNTED_PROPS.find(function(p){return p.id===h.props;}) || HAUNTED_PROPS[0];
+  var boosted = Math.round(baseTickets * propsPick.boost);
+  var tickets = Math.min(boosted, HAUNTED_MAX_ATTENDANCE); // hard cap
   var revenue = tickets * h.price;
   var costumeCost = HAUNTED_COSTUMES.find(function(c){return c.id===h.costumes;}).cost;
   var decorCost = HAUNTED_DECOR.find(function(d){return d.id===h.decor;}).cost;
+  var propsCost = propsPick.cost;
   var pizzaCost = 120;
-  var totalExp = costumeCost + decorCost + pizzaCost;
+  var totalExp = costumeCost + decorCost + propsCost + pizzaCost;
   var rawProfit = revenue - totalExp;
   // ASB covers losses on the Haunted House — class can't lose money, but keeps any profit
   var profit = Math.max(0, rawProfit);
@@ -1536,6 +1569,7 @@ function hhResults(onDone) {
   html += '<tr><td>Tickets sold</td><td>'+tickets+' @ '+money(h.price)+'</td><td><strong>'+money(revenue)+'</strong></td></tr>';
   html += '<tr><td>Costumes</td><td>flat</td><td>&minus;'+money(costumeCost)+'</td></tr>';
   html += '<tr><td>Decorations</td><td>flat</td><td>&minus;'+money(decorCost)+'</td></tr>';
+  if (propsCost > 0) html += '<tr><td>Props &amp; effects</td><td>flat</td><td>&minus;'+money(propsCost)+'</td></tr>';
   html += '<tr><td>Volunteer pizza</td><td>flat</td><td>&minus;'+money(pizzaCost)+'</td></tr>';
   html += '<tr><td>Net</td><td>Revenue &minus; Cost</td><td><strong style="color:'+(rawProfit>=0?'#1e5a2e':'#8b0000')+';">'+money(rawProfit)+'</strong></td></tr>';
   if (rawProfit < 0) {
