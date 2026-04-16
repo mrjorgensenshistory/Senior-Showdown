@@ -246,25 +246,25 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
       <a class="card" onclick="startGrade(9)">
         <span class="icon">&#x1F4CB;</span>
         <div class="card-title">9TH GRADE</div>
-        <div class="card-desc">Class of &#39;29. Learn the paperwork. Every ASB form, every procedure, from scratch.</div>
+        <div class="card-desc">Class of &#39;29 &bull; 74 students. Learn the paperwork. Every ASB form, every procedure, from scratch.</div>
         <div class="card-bal">Starting: $100.55</div>
       </a>
       <a class="card" onclick="startGrade(10)">
         <span class="icon">&#x1F9D1;&#x200D;&#x1F393;</span>
         <div class="card-title">10TH GRADE</div>
-        <div class="card-desc">Class of &#39;28. Haunted House, Candy-Grams, Bundt Cakes. Build the bank.</div>
+        <div class="card-desc">Class of &#39;28 &bull; 73 students. Haunted House, Candy-Grams, Bundt Cakes. Build the bank.</div>
         <div class="card-bal">Starting: $358</div>
       </a>
       <a class="card" onclick="startGrade(11)">
         <span class="icon">&#x1F4DA;</span>
         <div class="card-title">11TH GRADE</div>
-        <div class="card-desc">Class of &#39;27. 14 months until prom. Your upcoming adventure.</div>
+        <div class="card-desc">Class of &#39;27 &bull; 66 students. 14 months until prom. Your upcoming adventure.</div>
         <div class="card-bal">Starting: $804</div>
       </a>
       <a class="card" onclick="startGrade(12)">
         <span class="icon">&#x1F514;</span>
         <div class="card-title">12TH GRADE</div>
-        <div class="card-desc">Class of &#39;26. Five months until prom. Pricing + Senior Luncheon finale.</div>
+        <div class="card-desc">Class of &#39;26 &bull; 59 students. Prom, Grad Nite, pricing + Senior Luncheon finale.</div>
         <div class="card-bal">Starting: $821.10</div>
       </a>
     </div>
@@ -334,7 +334,9 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
 
 <script>
 // ============ CONSTANTS ============
-var SENIOR_COUNT = 66;
+// Class sizes by grade (real enrollment numbers)
+var CLASS_SIZES = { 7:80, 8:77, 9:74, 10:73, 11:66, 12:59 };
+var SENIOR_COUNT = 59; // 12th grade — used for prom/pricing math
 var YEARBOOK_COST = 45;
 var LUNCHEON_CATERED = 20;
 var LUNCHEON_POTLUCK = 4;
