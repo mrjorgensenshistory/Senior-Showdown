@@ -1211,8 +1211,7 @@ function renderPricingLab() {
   html += '<p style="margin-bottom:1vh;">Break-even Senior Package price if all '+SENIOR_COUNT+' seniors buy: <span class="big-num">'+money(breakEvenPkg)+'</span></p>';
   html += '<p style="margin-bottom:1vh; font-size:0.95em;">You can price it LOWER (more seniors buy, but you owe the gap in fundraising) or HIGHER (fewer seniors buy, but each one covers more).</p>';
   html += '<div class="math-row"><label><strong>Senior Package Price</strong> ($) &mdash; what you charge each senior</label><input type="number" id="p-pkg" min="0" step="5" placeholder="$"></div>';
-  html += '<div class="math-row" style="opacity:0.7;"><label><strong>Prom-Only Ticket</strong> &mdash; individual prom tickets (juniors only)</label><span style="font-size:1.1em; font-weight:bold; padding:0.4vh 0.5vw;">$120 <span style="font-size:0.85em; color:#555;">(fixed price)</span></span></div>';
-  html += '<input type="hidden" id="p-pro" value="120">';
+  html += '<div class="math-row"><label><strong>Prom-Only Ticket</strong> ($) &mdash; individual prom tickets (juniors only)</label><input type="number" id="p-pro" min="0" step="5" placeholder="$"></div>';
   html += '<div class="math-row"><label><strong>Grad Nite-Only Ticket</strong> ($) &mdash; seniors who want only Disney</label><input type="number" id="p-gno" min="0" step="5" placeholder="$"></div>';
   html += '<div style="margin:1.5vh 0; padding:1vh; border:2px dashed #888; border-radius:8px; background:rgba(0,0,0,0.03);">';
   html += '<p style="font-size:0.95em; color:#555;">&#x1F4A1; <strong>Future option (not available this year):</strong> Sell prom tickets to <strong>10th graders</strong> at <strong>$135</strong>. That could bring in ~15 additional ticket sales and <strong>$2,025 in extra revenue</strong>. Something to think about for next year\'s class.</p>';
@@ -1222,7 +1221,7 @@ function renderPricingLab() {
   html += '<p style="font-size:0.95em; color:#8b0000; font-weight:bold; margin-bottom:1vh;">&#x26A0; Realistic cap: <strong>80 total prom tickets max.</strong> This year we sold 73. Students always think they\'ll sell more than they do. Plan for 80 or fewer.</p>';
   html += '<div class="math-row"><label><strong>Senior Packages sold</strong> (0&ndash;'+SENIOR_COUNT+')</label><input type="number" id="q-pkg" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder=""></div>';
   html += '<div class="math-row"><label><strong>Grad Nite-Only tickets sold</strong> (seniors w/o package)</label><input type="number" id="q-gno" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder=""></div>';
-  html += '<div class="math-row"><label><strong>Prom-Only tickets sold</strong> (juniors at $120 each)</label><input type="number" id="q-pro" min="0" step="1" placeholder=""></div>';
+  html += '<div class="math-row"><label><strong>Prom-Only tickets sold</strong> (juniors)</label><input type="number" id="q-pro" min="0" step="1" placeholder=""></div>';
   html += '<p id="q-warn" style="color:#8b0000; font-weight:bold; font-size:0.95em; min-height:1.2em;"></p>';
   html += '<p style="font-size:0.95em; color:#555; margin-top:1vh;">Drop numbers into the boxes. Edit as many times as you want &mdash; the projection below updates live.</p>';
   html += '</div>';
@@ -1237,15 +1236,15 @@ function renderPricingLab() {
 
   document.getElementById('lab-content').innerHTML = html;
 
-  ['p-pkg','p-gno','q-pkg','q-gno','q-pro'].forEach(function(id){ document.getElementById(id).addEventListener('input', updateProjection); });
+  ['p-pkg','p-pro','p-gno','q-pkg','q-gno','q-pro'].forEach(function(id){ document.getElementById(id).addEventListener('input', updateProjection); });
   document.getElementById('lock-btn').onclick = function(){
     var pkg = +document.getElementById('p-pkg').value || 0;
-    var pro = 120; // Fixed prom-only ticket price
+    var pro = +document.getElementById('p-pro').value || 0;
     var gno = +document.getElementById('p-gno').value || 0;
     var qPkg = +document.getElementById('q-pkg').value;
     var qGno = +document.getElementById('q-gno').value;
     var qPro = +document.getElementById('q-pro').value;
-    if (!pkg || !gno) { alert('Fill in the Senior Package price and Grad Nite-Only price.'); return; }
+    if (!pkg || !pro || !gno) { alert('Fill in ALL three prices: Senior Package, Prom-Only, and Grad Nite-Only.'); return; }
     if (isNaN(qPkg) || isNaN(qGno) || isNaN(qPro)) { alert('Fill in all three quantities (how many you expect to sell). Use 0 if none.'); return; }
     if (qPkg + qGno > SENIOR_COUNT) { alert('Senior Packages + Grad-Nite-Only can\'t exceed '+SENIOR_COUNT+' seniors. Adjust.'); return; }
     // Realistic 80-ticket cap. Students always think they'll sell more.
@@ -1269,7 +1268,7 @@ function simulateTakeRate(pkgPrice, hardPerSenior) {
   return 35;
 }
 function simulatePromOnly(promPrice) {
-  // Prom-only is fixed at $120 — realistic junior demand
+  // Prom-only — realistic junior demand
   return 15; // ~15 juniors typically buy prom-only
 }
 function simulateGradOnly(gnoPrice) {
@@ -1280,7 +1279,7 @@ function simulateGradOnly(gnoPrice) {
 
 function updateProjection() {
   var pkg = +document.getElementById('p-pkg').value || 0;
-  var pro = 120; // Fixed prom-only ticket price
+  var pro = +document.getElementById('p-pro').value || 0;
   var gno = +document.getElementById('p-gno').value || 0;
 
   var qPkgEl = document.getElementById('q-pkg');
@@ -1341,7 +1340,7 @@ function updateProjection() {
   // Only render the worksheet once all 6 driver inputs (3 prices + 3 quantities) have values
   var out = document.getElementById('proj-out');
   if (!out) return;
-  if (!pkg || !gno || isNaN(qPkg) || isNaN(qGno) || isNaN(qPro)) {
+  if (!pkg || !pro || !gno || isNaN(qPkg) || isNaN(qGno) || isNaN(qPro)) {
     out.innerHTML = '<p style="color:#555; font-style:italic; padding:1vh;">Fill in all three PRICES and all three QUANTITIES above. Then the worksheet will unlock and you can compute the budget.</p>';
     return;
   }
@@ -1352,7 +1351,7 @@ function updateProjection() {
   html += wsRow('w-pkg-rev', 'Senior Package revenue',   qPkg+' \u00D7 $'+pkg+' = ?',   pkgRev);
   html += wsRow('w-pro-rev', 'Prom-Only revenue',         qPro+' \u00D7 $'+pro+' = ?',   proRev);
   html += wsRow('w-gno-rev', 'Grad Nite-Only revenue',    qGno+' \u00D7 $'+gno+' = ?',   gnoRev);
-  html += wsRow('w-total-rev', 'TOTAL REVENUE',           '$'+pkgRev+' + $'+proRev+' + $'+gnoRev+' = ?', totalRev, true);
+  html += wsRow('w-total-rev', 'TOTAL REVENUE',           'Senior Package rev + Prom-Only rev + Grad Nite-Only rev = ?', totalRev, true);
 
   html += '<p style="font-weight:bold; color:#8b0000; margin:2vh 0 1vh 0;">EXPENSE SIDE &mdash; what the class has to pay</p>';
   html += '<p style="font-size:0.9em; color:#555; margin-bottom:1vh;">Attendance math first: <strong>Grad Nite attendees = Packages + Grad-Only = '+qPkg+' + '+qGno+' = '+gradNiteAttendees+'</strong>. <strong>Prom attendees = Packages + Prom-Only = '+qPkg+' + '+qPro+' = '+promAttendees+'</strong>.</p>';
@@ -1368,7 +1367,7 @@ function updateProjection() {
 
   html += '<p style="font-weight:bold; color:#8b0000; margin:2vh 0 1vh 0;">FINAL BALANCE</p>';
   html += '<p style="font-size:0.9em; color:#555; margin-bottom:0.5vh;">Bank carried in: <strong>'+money(state.balance)+'</strong></p>';
-  html += wsRow('w-net',      'End-of-senior-year balance', money(state.balance)+' + $'+totalRev+' \u2212 $'+totalExp+' = ?', net, true);
+  html += wsRow('w-net',      'End-of-senior-year balance', money(state.balance)+' + Total Revenue \u2212 Total Expenses = ?', net, true);
 
   // FCMAT cash-on-hand check — show whether locked expenses (excluding luncheon) are covered
   var lockedExp = totalExp - luncheonExp;
@@ -2880,7 +2879,7 @@ function runRealityCheck(realBalance) {
   // Inputs
   html += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:1vh 2vw; max-width:600px; margin:0 auto 1.5vh;">';
   html += '<div><label style="font-weight:bold;">Senior Package price ($)</label><br><input type="number" id="rc-pkg-price" min="0" step="1" value="'+(state.projection?state.projection.pkg:'')+'" style="width:100%; padding:0.4vh 0.5vw; font-size:1.1em; border:2px solid #d4af37; border-radius:5px;"></div>';
-  html += '<div><label style="font-weight:bold;">Prom-Only price</label><br><input type="text" value="$120 (fixed)" disabled style="width:100%; padding:0.4vh 0.5vw; font-size:1.1em; border:2px solid #ccc; border-radius:5px; background:#eee; color:#555;"></div>';
+  html += '<div><label style="font-weight:bold;">Prom-Only price ($)</label><br><input type="number" id="rc-pro-price" min="0" step="1" value="'+(state.projection?state.projection.pro:'')+'" style="width:100%; padding:0.4vh 0.5vw; font-size:1.1em; border:2px solid #d4af37; border-radius:5px;"></div>';
   html += '<div><label style="font-weight:bold;">Grad Nite-Only price ($)</label><br><input type="number" id="rc-gno-price" min="0" step="1" value="'+(state.projection?state.projection.gno:'')+'" style="width:100%; padding:0.4vh 0.5vw; font-size:1.1em; border:2px solid #d4af37; border-radius:5px;"></div>';
   html += '<div></div>'; // empty cell
   html += '<div><label style="font-weight:bold;">Senior Packages sold (max '+SENIOR_COUNT+')</label><br><input type="number" id="rc-pkg-qty" min="0" max="'+SENIOR_COUNT+'" step="1" value="'+(state.projection?state.projection.pkgBuyers:'')+'" style="width:100%; padding:0.4vh 0.5vw; font-size:1.1em; border:2px solid #d4af37; border-radius:5px;"></div>';
@@ -2908,7 +2907,7 @@ function runRealityCheck(realBalance) {
   state._rcRealBeforeProm = realBeforeProm;
 
   // Attach live update listeners
-  var ids = ['rc-pkg-price','rc-gno-price','rc-pkg-qty','rc-gno-qty','rc-pro-qty'];
+  var ids = ['rc-pkg-price','rc-pro-price','rc-gno-price','rc-pkg-qty','rc-gno-qty','rc-pro-qty'];
   ids.forEach(function(id){
     var el = document.getElementById(id);
     if (el) { el.addEventListener('input', rcUpdateProjection); }
@@ -2929,7 +2928,7 @@ function rcUpdateProjection() {
   var realBeforeProm = state._rcRealBeforeProm || 0;
 
   var pkg = +(document.getElementById('rc-pkg-price').value) || 0;
-  var pro = 120; // fixed
+  var pro = +(document.getElementById('rc-pro-price').value) || 0;
   var gno = +(document.getElementById('rc-gno-price').value) || 0;
   var qPkg = +(document.getElementById('rc-pkg-qty').value) || 0;
   var qGno = +(document.getElementById('rc-gno-qty').value) || 0;
@@ -2973,7 +2972,7 @@ function rcUpdateProjection() {
     disneyTix:disneyTix, disneyBus:disneyBus, yearbookExp:yearbookExp, promFood:promFood,
     venueCost:venueCost, busCost:busCost, otherProm:otherProm,
     gradNiteAttendees:gradNiteAttendees, promAttendees:promAttendees, qPkg:qPkg, qGno:qGno, qPro:qPro,
-    pkg:pkg, gno:gno
+    pkg:pkg, pro:pro, gno:gno
   };
 
   // Render projection table
@@ -3064,7 +3063,7 @@ function rcLockIn() {
     '<h2 style="font-family:\'Bangers\'; color:#1e5a2e; font-size:clamp(1.6rem,3.5vw,2.5rem); letter-spacing:3px; margin-bottom:1vh;">THE MATH WORKS.</h2>' +
     '<p style="font-size:1.2em; color:#333; margin-bottom:1vh;">With your <strong>real</strong> class savings and these ticket prices, you end the year with <strong style="color:#1e5a2e; font-size:1.15em;">'+money(calc.endingBalance)+'</strong> remaining.</p>' +
     '<p style="font-size:1.1em; color:#333;">Prom. Grad Nite. Yearbooks. Senior Luncheon. <strong>All covered.</strong></p>' +
-    '<p style="margin-top:1.5vh; font-size:1em; color:#555;">Senior Package: <strong>$'+calc.pkg+'</strong> &nbsp;|&nbsp; Prom-Only: <strong>$120</strong> &nbsp;|&nbsp; Grad Nite-Only: <strong>$'+calc.gno+'</strong></p>' +
+    '<p style="margin-top:1.5vh; font-size:1em; color:#555;">Senior Package: <strong>$'+calc.pkg+'</strong> &nbsp;|&nbsp; Prom-Only: <strong>$'+calc.pro+'</strong> &nbsp;|&nbsp; Grad Nite-Only: <strong>$'+calc.gno+'</strong></p>' +
     '<p style="font-size:0.95em; color:#555;">Packages sold: '+calc.qPkg+' &nbsp;|&nbsp; Prom-Only: '+calc.qPro+' &nbsp;|&nbsp; Grad Nite-Only: '+calc.qGno+'</p>' +
     '<div style="margin-top:2vh; font-family:\'Bangers\'; color:#d4af37; font-size:clamp(1.3rem,2.8vw,2rem); letter-spacing:2px;">YOUR CLASS IS READY FOR SENIOR YEAR.</div>' +
     '</div>';
