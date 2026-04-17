@@ -1213,7 +1213,7 @@ function triggerBobby(kind) {
     html += '<img src="'+randomTerryTate()+'" alt="Terry Tate" style="max-width:min(500px,80vw); border:6px solid #d4af37; border-radius:10px; box-shadow:0 0 30px rgba(255,50,50,0.8);" onerror="this.style.display=\'none\'">';
     html += '<div class="info-box" style="max-width:600px; margin:2vh auto;"><p style="font-size:1.2em;"><strong>You took collected cash and used it to buy supplies.</strong></p>';
     html += '<p>That is called <strong>commingling</strong> &mdash; mixing revenue with expenditures. Under California FCMAT rules for student body funds, this is not allowed. Ever.</p>';
-    html += '<p>The correct procedure: deposit all cash with the bookkeeper FIRST. Then the advisor uses the school credit card for purchases. Receipt comes back. Check request closes the loop.</p>';
+    html += '<p>The correct procedure: deposit all cash with the bookkeeper FIRST. Then the advisor uses the personal credit card for purchases. Receipt comes back. Check request closes the loop.</p>';
     html += '<p>Cash never goes from the cash box to the store. Period.</p>';
     html += '<p style="color:#8b0000; font-weight:bold; margin-top:1vh;">Terry Tate shut down the entire operation. GAME OVER.</p></div>';
   } else if (kind === 'hocoNoFood') {
@@ -1729,7 +1729,7 @@ function form9_Step2_Revenue(onDone) {
 function form9_Step3_Expenditure(onDone) {
   var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F4CB;</div>';
   html += '<div class="expert-bubble"><h3>FORM 3: EXPENDITURE APPROVAL</h3>';
-  html += '<p>Your advisor is buying the donuts with the <strong>school credit card</strong>. But they can\'t just go spend ASB money without pre-approval. This form is the green light.</p>';
+  html += '<p>Your advisor is buying the donuts with their <strong>own personal credit card</strong>. They front the money, then ASB reimburses them later via a check request. But they can\'t just go spend and expect reimbursement without pre-approval. This form is the green light.</p>';
   html += '<p>The advisor will buy <strong>'+FORM_DONUT_TOTAL_DOZENS+' dozen</strong> at <strong>$'+FORM_DONUT_WHOLESALE+'/dozen</strong> wholesale. One trip, 35-minute drive.</p>';
   html += '<div class="quote">"This is a pre-approval form. The advisor needs it BEFORE buying anything. No form = no purchase = no donuts."</div></div></div>';
 
@@ -1817,7 +1817,7 @@ function form9_Step3_Expenditure(onDone) {
     }
 
     showFormSuccess('Expenditure Approval: APPROVED',
-      '<strong>It was voted on and signed by the ASB Executive team, signed by the advisor, and signed by the principal.</strong><br><br>The advisor now has permission to spend <strong>'+money(FORM_DONUT_TOTAL_COST)+'</strong> on donuts using the school credit card. They\'ll make the 35-minute drive, pick them up, and bring the receipt back.<br><br><div style="background:#fff8dc; border:2px solid #d4af37; border-radius:8px; padding:1vh 1.5vw; margin-top:1vh;"><strong>&#x1F4A1; Remember:</strong> Student signature, advisor signature, principal signature. Every. Single. Form.</div>',
+      '<strong>It was voted on and signed by the ASB Executive team, signed by the advisor, and signed by the principal.</strong><br><br>The advisor now has permission to spend <strong>'+money(FORM_DONUT_TOTAL_COST)+'</strong> on donuts using the personal credit card. They\'ll make the 35-minute drive, pick them up, and bring the receipt back.<br><br><div style="background:#fff8dc; border:2px solid #d4af37; border-radius:8px; padding:1vh 1.5vw; margin-top:1vh;"><strong>&#x1F4A1; Remember:</strong> Student signature, advisor signature, principal signature. Every. Single. Form.</div>',
       function(){ form9_Step4_TheTrap(onDone); });
   };
 }
@@ -1842,7 +1842,7 @@ function form9_Step4_TheTrap(onDone) {
         return;
       }
       showFormSuccess('CORRECT PROCEDURE',
-        '<strong>You NEVER use collected cash to buy supplies.</strong> The cash goes to the bookkeeper for deposit. The advisor uses the school credit card. The receipt comes back. That\'s the loop.<br><br>Using cash directly is called <strong>commingling</strong> &mdash; mixing money streams. It\'s a FCMAT violation in California. Even if you meant well, it\'s not allowed.',
+        '<strong>You NEVER use collected cash to buy supplies.</strong> The cash goes to the bookkeeper for deposit. The advisor uses the personal credit card. The receipt comes back. That\'s the loop.<br><br>Using cash directly is called <strong>commingling</strong> &mdash; mixing money streams. It\'s a FCMAT violation in California. Even if you meant well, it\'s not allowed.',
         function(){ form9_Step5_CashCount(onDone); });
     };
   });
@@ -1964,7 +1964,7 @@ function form9_Step5_CashCount(onDone) {
 function form9_Step6_Receipt(onDone) {
   var html = '<div class="expert-wrap"><div class="expert-portrait">&#x1F4CB;</div>';
   html += '<div class="expert-bubble"><h3>FORM 5: CLOSING THE LOOP &mdash; CHECK REQUEST</h3>';
-  html += '<p>The advisor bought all the donuts on the school credit card. Total spent: <strong>'+money(FORM_DONUT_TOTAL_COST)+'</strong>. They have the <strong>receipt</strong>.</p>';
+  html += '<p>The advisor bought all the donuts on the personal credit card. Total spent: <strong>'+money(FORM_DONUT_TOTAL_COST)+'</strong>. They have the <strong>receipt</strong>.</p>';
   html += '<p>Now you fill out the <strong>Expenditure Approval form</strong> (again, with receipt attached this time) and the <strong>Purchase Order / Check Request</strong> so the advisor gets reimbursed.</p>';
   html += '<div class="quote">"No receipt = no reimbursement. The advisor fronted the money. If you lose the receipt, they\'re out $'+FORM_DONUT_TOTAL_COST+' of their own money. Don\'t do that."</div></div></div>';
 
@@ -2022,7 +2022,7 @@ function form9_Step6_Receipt(onDone) {
       return;
     }
     if (receipt === 'no') {
-      showFormError('WHERE IS THE RECEIPT?', 'The advisor spent $'+FORM_DONUT_TOTAL_COST+' on the school credit card. No receipt = no reimbursement = your advisor is personally out $'+FORM_DONUT_TOTAL_COST+'. <strong>In real life, losing the receipt means the advisor eats the cost.</strong> Don\'t do that to your advisor. Go find that receipt.', function(){ form9_Step6_Receipt(onDone); });
+      showFormError('WHERE IS THE RECEIPT?', 'The advisor spent $'+FORM_DONUT_TOTAL_COST+' on the personal credit card. No receipt = no reimbursement = your advisor is personally out $'+FORM_DONUT_TOTAL_COST+'. <strong>In real life, losing the receipt means the advisor eats the cost.</strong> Don\'t do that to your advisor. Go find that receipt.', function(){ form9_Step6_Receipt(onDone); });
       return;
     }
     if (Math.abs(rev - FORM_DONUT_TOTAL_REVENUE) > 1) {
