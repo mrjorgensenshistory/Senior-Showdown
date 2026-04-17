@@ -1621,6 +1621,11 @@ function form9_Step1_Request(onDone) {
       return;
     }
 
+    // Save answers for later forms
+    state.forms.eventDate = date;
+    state.forms.clubName = club;
+    state.forms.submitDate = submit;
+
     // Passed
     showFormSuccess('Fundraising Request: APPROVED',
       '<strong>It was turned in, voted on by the ASB Executive team (ASB President, VP, Treasurer, and Secretary), signed by the advisor, and finally, signed by the principal.</strong><br><br>Your donut sale is officially on the calendar.<br><br><div style="background:#fff8dc; border:2px solid #d4af37; border-radius:8px; padding:1vh 1.5vw; margin-top:1vh;"><strong>&#x1F4A1; Remember:</strong> Every ASB form needs <strong>three signatures</strong>: student, advisor, and principal. If ANY of those are missing &mdash; especially the principal &mdash; it\'s not approved. The principal has final say, even if ASB voted yes.</div>',
@@ -1742,11 +1747,13 @@ function form9_Step3_Expenditure(onDone) {
   html += '<div class="form-subtitle">For items to be purchased without a purchase order, but that requires pre-approval from ASB.</div>';
   html += '</div>';
 
+  var savedDate = (state.forms && state.forms.eventDate) || '';
+  var savedClub = (state.forms && state.forms.clubName) || '';
   html += '<div class="form-row-inline">';
   html += '<div class="form-field"><label>Date Requested:&nbsp;</label><input type="text" placeholder="mm/dd" style="max-width:120px;"></div>';
-  html += '<div class="form-field"><label>Date of Event:&nbsp;</label><input type="text" placeholder="mm/dd" style="max-width:120px;"></div>';
+  html += '<div class="form-field"><label>Date of Event:&nbsp;</label><input type="text" placeholder="'+savedDate+'" style="max-width:120px;"'+(savedDate ? ' value="'+savedDate+'" readonly' : '')+'></div>';
   html += '</div>';
-  html += '<div class="form-field"><label>Club to be Charged:&nbsp;</label><input type="text" id="f3-club" placeholder="e.g. Class of 29"></div>';
+  html += '<div class="form-field"><label>Club to be Charged:&nbsp;</label><input type="text" id="f3-club" placeholder="'+(savedClub || 'e.g. Class of 29')+'"'+(savedClub ? ' value="'+savedClub+'"' : '')+'></div>';
   html += '<div class="form-field"><label>Payee &mdash; Name of Club/Staff Member to be Reimbursed:&nbsp;</label><input type="text" value="Mr. Jorgensen" readonly></div>';
 
   html += '<div class="form-section-title">LINE ITEMS</div>';
