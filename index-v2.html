@@ -1633,8 +1633,8 @@ function form9_Step2_Revenue(onDone) {
   html += '<p>This form proves to the advisor that the fundraiser is <strong>worth doing</strong>.</p>';
   html += '<p>Just because you WANT to sell donuts doesn\'t mean it\'s worth the advisor\'s time. Think about it: the advisor (or another adult) has to <strong>drive 35 minutes each way</strong> to pick up your donuts. That\'s gas, time, and effort. And they\'re not just supporting YOUR class &mdash; they support <strong>6 total grades</strong> and have other duties.</p>';
   html += '<p style="margin-top:1vh;"><strong>&#x1F6A8; THE $100 RULE:</strong> If a fundraiser isn\'t projected to make at least <strong>$100 profit</strong>, it\'s not worth the time. The advisor will deny it. Come up with something else.</p>';
-  html += '<p style="margin-top:1vh;">Your plan: buy <strong>'+FORM_DONUT_DOZENS+' dozen donuts</strong> at <strong>$'+FORM_DONUT_WHOLESALE+'/dozen</strong> wholesale (cheaper bakery, 35-min drive). Sell at <strong>$'+FORM_DONUT_SELL_EACH+' each</strong> during lunch. One day, one pickup.</p>';
-  html += '<div class="quote">"Revenue Potential = units sold &times; selling price. If the projected profit doesn\'t clear $100, I\'m not driving 35 minutes to pick up your donuts."</div></div></div>';
+  html += '<p style="margin-top:1vh;">Your plan: buy <strong>'+FORM_DONUT_DOZENS+' dozen donuts</strong> (that\'s '+FORM_DONUT_DOZENS+' &times; 12 = <strong>'+(FORM_DONUT_DOZENS*12)+' individual donuts</strong>) at <strong>$'+FORM_DONUT_WHOLESALE+' per dozen</strong> wholesale (cheaper bakery, 35-min drive). Sell each donut individually for <strong>$'+FORM_DONUT_SELL_EACH+' per donut</strong> during lunch. One day, one pickup.</p>';
+  html += '<div class="quote">"Revenue Potential = total donuts &times; price per donut. If the projected profit doesn\'t clear $100, I\'m not driving 35 minutes to pick up your donuts."</div></div></div>';
 
   html += '<div class="paper-form">';
   html += '<div class="form-header">';
@@ -1655,7 +1655,7 @@ function form9_Step2_Revenue(onDone) {
   html += '<div class="form-section-title">ITEM ANALYSIS</div>';
   html += '<table class="form-table">';
   html += '<tr><th colspan="5">Item 1 &mdash; Donut Sale</th></tr>';
-  html += '<tr><th>Description</th><th>Dozens Purchased</th><th>(A) Units to Sell<br><span style="font-weight:normal;font-size:0.85em;">dozens &times; 12</span></th><th>(B) Unit Selling Price</th><th>(C) Revenue Potential<br><span style="font-weight:normal;font-size:0.85em;">A &times; B</span></th></tr>';
+  html += '<tr><th>Description</th><th>Dozens Purchased</th><th>(A) Total Individual Donuts<br><span style="font-weight:normal;font-size:0.85em;">dozens &times; 12</span></th><th>(B) Price Per Donut</th><th>(C) Revenue Potential<br><span style="font-weight:normal;font-size:0.85em;">A &times; B</span></th></tr>';
   html += '<tr>';
   html += '<td><input type="text" value="Donuts (wholesale bakery)" readonly style="text-align:left;color:#666;"></td>';
   html += '<td><input type="number" id="f2-dozens" placeholder="?"></td>';
