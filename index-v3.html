@@ -478,10 +478,14 @@ function show(id) {
   document.getElementById(id).classList.add('active');
   document.getElementById('bank').style.display = (id==='sFund' || id==='sLab' || id==='sEnd') ? 'block' : 'none';
   document.getElementById('month-tag').style.display = (id==='sFund') ? 'block' : 'none';
-  // Audio control: rickroll plays on Bobby gameovers AND the final results.
-  // Everywhere else: Happy Happy Game Show.
+  // Audio control
   if (id === 'sBobby' || id === 'sEnd') {
     playRickroll();
+  } else if (id === 'sHub' || id === 'sIntro') {
+    // Exited game — kill ALL audio
+    stopBg();
+    var rick = document.getElementById('rick-music');
+    if (rick) { try { rick.pause(); rick.currentTime = 0; rick.volume = 0; } catch(e) {} }
   } else if (audioUnlocked) {
     stopRickroll();
   }
