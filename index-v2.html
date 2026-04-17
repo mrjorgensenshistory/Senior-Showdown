@@ -326,7 +326,7 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
        audio/sfx-win.mp3         — win fanfare (search "game show win" / "victory")
        audio/sfx-lose.mp3        — lose sting (search "game show lose" / "wrong answer")
      Game is silent if files are missing — safe to ship without audio. -->
-<audio id="bg-music" loop preload="auto"><source src="audio/bg-think.mp3" type="audio/mpeg"></audio>
+<audio id="bg-music" loop preload="auto"><source src="audio/bg-11.mp3" type="audio/mpeg"></audio>
 <audio id="rick-music" loop preload="auto"><source src="audio/rickroll.mp3" type="audio/mpeg"></audio>
 <audio id="bg-walkin" preload="auto"><source src="audio/bg-walkin.mp3" type="audio/mpeg"></audio>
 <audio id="sfx-select" preload="auto"><source src="audio/sfx-select.mp3" type="audio/mpeg"></audio>
@@ -808,6 +808,8 @@ function renderCutscene(cs, yieldAmt, onDone) {
 }
 
 function startGrade(grade, carryover) {
+  // Kill all audio before starting fresh — prevents double-play on grade switch
+  stopBg();
   state = freshState(grade, carryover);
   setGradeMusic(grade);
   renderBank(); show('sFund'); runFundStep(0);
@@ -822,11 +824,15 @@ function setGradeMusic(grade) {
   if (!el) return;
   // Only reload if the src actually changed
   var cur = el.querySelector('source');
-  if (cur && cur.getAttribute('src') === track) return;
-  try { el.pause(); } catch(e) {}
+  if (cur && cur.getAttribute('src') === track) {
+    // Same track — just reset to beginning for a clean restart
+    try { el.currentTime = 0; } catch(e) {}
+    return;
+  }
+  try { el.pause(); el.currentTime = 0; } catch(e) {}
   if (cur) cur.setAttribute('src', track); else { var s = document.createElement('source'); s.src = track; s.type='audio/mpeg'; el.appendChild(s); }
   try { el.load(); } catch(e) {}
-  if (audioUnlocked) { try { el.volume = 0.25; el.play().catch(function(){}); } catch(e) {} }
+  // Don't play here — show() → stopRickroll() will start playback
 }
 
 function runFundStep(idx) {
@@ -3160,6 +3166,7 @@ function stopBg() {
 
 // Rickroll audio control — Happy Happy Game Show goes silent, Rick takes over.
 function playRickroll() {
+  // Stop bg completely — pause + mute to prevent any lingering async play
   var bg = document.getElementById('bg-music');
   if (bg) { try { bg.pause(); bg.volume = 0; } catch(e) {} }
   var rick = document.getElementById('rick-music');
@@ -3167,7 +3174,7 @@ function playRickroll() {
 }
 function stopRickroll() {
   var rick = document.getElementById('rick-music');
-  if (rick) { try { rick.pause(); rick.currentTime = 0; } catch(e) {} }
+  if (rick) { try { rick.pause(); rick.currentTime = 0; rick.volume = 0; } catch(e) {} }
   var bg = document.getElementById('bg-music');
   if (bg && audioUnlocked) { try { bg.volume = 0.25; bg.play().catch(function(){}); } catch(e) {} }
 }
