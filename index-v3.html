@@ -263,7 +263,8 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
     <div class="subtitle">BUILD YOUR SENIOR YEAR</div>
     <div style="margin-top:1vh; color:#d4af37; font-family:'Bangers'; letter-spacing:2px; font-size:clamp(1rem,2vw,1.4rem);">VERSION 2 &mdash; DO-THE-MATH WORKSHEET</div>
     <div style="height:5vh"></div>
-    <button class="btn" onclick="show('sIntro')">&#x1F4B0; CLICK HERE TO PLAY</button>
+    <button class="btn" onclick="show('sIntro')">&#x1F4B0; HIGH SCHOOL &mdash; CLICK TO PLAY</button>
+    <button class="btn" onclick="startMiddleSchool()" style="margin-top:1.5vh; background:linear-gradient(135deg,#1a5276,#2e86c1); border-color:#2e86c1;">&#x1F3EB; MIDDLE SCHOOL EDITION (GRADE 8)</button>
     <div style="margin-top:3vh; font-size:0.9rem; color:#ccc; font-family:Arial;">
       Based on real Senior Class data and lots of blood, sweat, and tears.
     </div>
@@ -1046,6 +1047,30 @@ function startGrade(grade, carryover) {
   state = freshState(grade, carryover);
   setGradeMusic(grade);
   renderBank(); show('sFund'); runFundStep(0);
+}
+
+function startMiddleSchool() {
+  // Show a quick intro, then launch 9th grade with $2,000
+  show('sIntro');
+  var content = document.querySelector('#sIntro .content');
+  if (!content) { startGrade(9, 2000); return; }
+  content.innerHTML = '<div class="info-box">' +
+    '<h2 style="color:#2e86c1;">&#x1F3EB; MIDDLE SCHOOL EDITION</h2>' +
+    '<p style="font-size:1.1em;">This version is for <strong>Grade 8</strong>.</p>' +
+    '<p>The game is identical to the high school version with <strong>one difference:</strong></p>' +
+    '<p style="font-size:1.2em; margin:2vh 0; color:#1e5a2e; font-weight:bold;">You start 9th grade with $2,000 in your class bank.</p>' +
+    '<p>Your hard work during <strong>7th and 8th grade</strong> is paying off &mdash; all those bake sales, car washes, and candy-gram fundraisers your middle school class ran are carrying forward into high school.</p>' +
+    '<p>That head start means more options for prom, Grad Nite, and senior year. But you still have to manage the money wisely &mdash; $2,000 can disappear fast if you make bad choices.</p>' +
+    '<p style="margin-top:1.5vh; font-style:italic; color:#555;">Everything else works the same: forms, fundraisers, events, and the senior year finale.</p>' +
+    '</div>';
+  var nav = document.querySelector('#sIntro .nav-right');
+  if (nav) {
+    nav.innerHTML = '<button class="btn" id="ms-go" style="font-size:1.2rem;">&#x1F393; START 9TH GRADE WITH $2,000 &raquo;</button>' +
+      '<button class="btn" onclick="show(\'s0\')" style="font-size:0.9rem; min-width:150px;">&laquo; BACK TO TITLE</button>';
+    document.getElementById('ms-go').onclick = function() { startGrade(9, 2000); };
+  } else {
+    startGrade(9, 2000);
+  }
 }
 
 // Swap the bg loop track based on grade (10/11/12 each get a unique Kevin MacLeod tune)
