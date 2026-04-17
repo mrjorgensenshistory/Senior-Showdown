@@ -185,6 +185,50 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
 
 .reveal-flash { animation: reveal 1.2s ease-out; }
 @keyframes reveal { 0% { transform:scale(0.8); opacity:0;} 60% { transform:scale(1.1); opacity:1;} 100% { transform:scale(1); opacity:1;} }
+
+/* DocuSign-style paper form replicas */
+.paper-form { background:#fff; color:#000; border:1px solid #999; border-radius:4px;
+  padding:2.5vh 3vw; max-width:850px; width:95%; margin:2vh auto;
+  font-family:'Times New Roman',Times,serif; font-size:clamp(0.85rem,1.6vw,1.05rem); line-height:1.6;
+  box-shadow:0 4px 16px rgba(0,0,0,0.3); position:relative; }
+.paper-form::before { content:''; position:absolute; top:0; left:0; right:0; height:6px;
+  background:linear-gradient(90deg,#1a3a6b,#d4af37,#1a3a6b); border-radius:4px 4px 0 0; }
+.paper-form .form-header { text-align:center; border-bottom:2px solid #000; padding-bottom:1.5vh; margin-bottom:2vh; }
+.paper-form .form-header h2 { font-family:'Times New Roman',serif; font-size:1.5em; font-weight:bold; margin:0; letter-spacing:1px; }
+.paper-form .form-header .school-name { font-size:0.85em; color:#333; margin:0.3vh 0; }
+.paper-form .form-header .form-subtitle { font-size:0.8em; color:#555; font-style:italic; }
+.paper-form .form-field { display:flex; align-items:baseline; margin:0.8vh 0; flex-wrap:wrap; gap:0.5vw; }
+.paper-form .form-field label { font-weight:bold; font-size:0.95em; white-space:nowrap; min-width:fit-content; }
+.paper-form .form-field input, .paper-form .form-field select {
+  flex:1; min-width:120px; border:none; border-bottom:1.5px solid #000; border-radius:0;
+  background:transparent; font-family:'Times New Roman',serif; font-size:1em; padding:2px 4px;
+  color:#1a3a6b; outline:none; }
+.paper-form .form-field input:focus, .paper-form .form-field select:focus {
+  border-bottom-color:#d4af37; background:rgba(212,175,55,0.08); }
+.paper-form .form-field input::placeholder { color:#bbb; font-style:italic; font-size:0.9em; }
+.paper-form .form-field input[readonly] { color:#666; background:rgba(0,0,0,0.03); }
+.paper-form .form-table { width:100%; border-collapse:collapse; margin:1.5vh 0; }
+.paper-form .form-table th { background:#f0f0f0; border:1px solid #000; padding:4px 8px;
+  font-size:0.85em; text-align:center; font-weight:bold; }
+.paper-form .form-table td { border:1px solid #000; padding:4px 8px; }
+.paper-form .form-table input { width:100%; border:none; background:transparent;
+  font-family:'Times New Roman',serif; font-size:1em; padding:2px; color:#1a3a6b; outline:none; text-align:center; }
+.paper-form .form-table input:focus { background:rgba(212,175,55,0.08); }
+.paper-form .sig-section { margin-top:2.5vh; padding-top:1.5vh; border-top:1px solid #999; }
+.paper-form .sig-line { display:flex; align-items:baseline; margin:1.5vh 0; gap:1vw; }
+.paper-form .sig-line label { font-size:0.85em; font-weight:bold; white-space:nowrap; }
+.paper-form .sig-line input { flex:1; border:none; border-bottom:1.5px solid #000;
+  background:transparent; font-family:'Brush Script MT',cursive; font-size:1.2em; color:#1a3a6b; padding:2px 4px; }
+.paper-form .sig-line input:focus { border-bottom-color:#d4af37; background:rgba(212,175,55,0.08); }
+.paper-form .sig-line .sig-date { width:100px; min-width:80px; flex:0; text-align:center; }
+.paper-form .form-note { font-size:0.8em; color:#555; font-style:italic; margin:0.5vh 0 1vh; }
+.paper-form .form-rule { font-size:0.8em; color:#8b0000; font-weight:bold; margin:1vh 0; }
+.paper-form .form-section-title { font-weight:bold; font-size:1em; margin:1.5vh 0 0.5vh;
+  padding-bottom:0.3vh; border-bottom:1px solid #999; }
+.paper-form .denom-table td:first-child { text-align:left; font-weight:bold; }
+.paper-form .denom-table td { text-align:center; }
+.paper-form .form-row-inline { display:flex; gap:2vw; flex-wrap:wrap; margin:0.5vh 0; }
+.paper-form .form-row-inline .form-field { flex:1; min-width:200px; }
 </style></head><body>
 
 <div class="bank" id="bank" style="display:none;">
@@ -1486,16 +1530,44 @@ function form9_Step1_Request(onDone) {
   html += '<p style="margin-top:1vh;"><strong>FCMAT FOOD RULE:</strong> You can only sell food <strong>during lunch and after school</strong>. Not before school, not during class. However, you CAN collect money (take orders) during school hours.</p>';
   html += '<div class="quote">"No form, no fundraiser. No exceptions. Every form needs three signatures: student, advisor, and principal."</div></div></div>';
 
-  html += '<div class="math-panel"><h3>FILL OUT THE FUNDRAISING REQUEST</h3>';
-  html += '<p style="color:#555; margin-bottom:1vh;">Your class wants to run a <strong>donut sale</strong>. Today is <strong>October 1</strong>. You need to pick a date and get this submitted in time.</p>';
-  html += '<div class="math-row"><label>Name of Club</label><input type="text" id="f1-club" placeholder="e.g. class of 29"></div>';
-  html += '<div class="math-row"><label>Proposed Event</label><input type="text" id="f1-event" placeholder="e.g. Donut Sale"></div>';
-  html += '<div class="math-row"><label>Proposed Event Date (mm/dd)</label><input type="text" id="f1-date" placeholder="mm/dd"></div>';
-  html += '<div class="math-row"><label>Date Submitting This Form (mm/dd)</label><input type="text" id="f1-submit" placeholder="mm/dd"></div>';
-  html += '<div class="math-row"><label>Description of fundraiser</label><input type="text" id="f1-desc" placeholder="Describe what you\'re doing"></div>';
-  html += '<div class="math-row"><label>When will you sell? (time of day)</label><input type="text" id="f1-when" placeholder="e.g. lunch, after school"></div>';
-  html += '<div class="math-row"><label>Location</label><input type="text" id="f1-loc" placeholder="Where on campus?"></div>';
-  html += '<div class="math-row"><label>Student Signature</label><input type="text" id="f1-sig" placeholder="Type your name"></div>';
+  html += '<div class="paper-form">';
+  html += '<div class="form-header">';
+  html += '<h2>REQUEST FOR APPROVAL: FUNDRAISING EVENT</h2>';
+  html += '<div class="school-name">Academy of Careers and Exploration</div>';
+  html += '<div class="form-subtitle">Helendale Secondary School &mdash; Helendale, CA</div>';
+  html += '</div>';
+  html += '<div class="form-note">Applications must be submitted at least four (4) weeks before the fundraiser.</div>';
+  html += '<div class="form-rule">Your class wants to run a donut sale. Today is October 1. You need to pick a date and get this submitted in time.</div>';
+
+  html += '<div class="form-row-inline">';
+  html += '<div class="form-field"><label>Name of School:&nbsp;</label><input type="text" value="ACE" readonly></div>';
+  html += '<div class="form-field"><label>Date:&nbsp;</label><input type="text" id="f1-submit" placeholder="mm/dd"></div>';
+  html += '</div>';
+
+  html += '<div class="form-field"><label>Name of Club:&nbsp;</label><input type="text" id="f1-club" placeholder="e.g. Class of 29"></div>';
+  html += '<div class="form-field"><label>Name of Person Completing Form:&nbsp;</label><input type="text" id="f1-sig" placeholder="Type your name"></div>';
+  html += '<div class="form-field"><label>Proposed Event:&nbsp;</label><input type="text" id="f1-event" placeholder="e.g. Donut Sale"></div>';
+  html += '<div class="form-field"><label>Proposed Date(s) of Event:&nbsp;</label><input type="text" id="f1-date" placeholder="mm/dd"></div>';
+  html += '<div class="form-field"><label>Time of Sale:&nbsp;</label><input type="text" id="f1-when" placeholder="e.g. lunch, after school"></div>';
+  html += '<div class="form-field"><label>Description of Fundraiser:&nbsp;</label><input type="text" id="f1-desc" placeholder="Describe what you\'re doing"></div>';
+  html += '<div class="form-field"><label>Location:&nbsp;</label><input type="text" id="f1-loc" placeholder="Where on campus?"></div>';
+
+  html += '<div class="form-row-inline">';
+  html += '<div class="form-field"><label>Club Contact Person:&nbsp;</label><input type="text" placeholder="Your name" style="color:#666;" ></div>';
+  html += '<div class="form-field"><label>ASB / Club Advisor:&nbsp;</label><input type="text" value="Mr. Jorgensen" readonly></div>';
+  html += '</div>';
+
+  html += '<div class="form-field"><label>Status:&nbsp;</label><select style="flex:0; min-width:180px;"><option value="new">New Event</option><option value="prev">Held Previously</option></select></div>';
+
+  html += '<div class="sig-section">';
+  html += '<div class="form-section-title">CERTIFICATION &amp; APPROVAL SIGNATURES</div>';
+  html += '<div class="form-note">I certify that the information provided is accurate and that the fundraiser will comply with all ASB and school policies.</div>';
+  html += '<div class="sig-line"><label>Student Club Representative:&nbsp;</label><input type="text" placeholder="Sign here"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '<div class="sig-line"><label>Club Advisor:&nbsp;</label><input type="text" value="Mr. Jorgensen" readonly><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '<div class="sig-line"><label>Principal:&nbsp;</label><input type="text" placeholder="Pending"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '<div class="sig-line"><label>ASB Bookkeeper:&nbsp;</label><input type="text" placeholder="Pending"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '</div>';
+
   html += '</div>';
   html += '<button class="btn" id="f1-ok">SUBMIT FORM &raquo;</button>';
 
@@ -1554,13 +1626,41 @@ function form9_Step2_Revenue(onDone) {
   html += '<p style="margin-top:1vh;">Your plan: buy <strong>'+FORM_DONUT_DOZENS+' dozen donuts</strong> at <strong>$'+FORM_DONUT_WHOLESALE+'/dozen</strong> wholesale (cheaper bakery, 35-min drive). Sell at <strong>$'+FORM_DONUT_SELL_EACH+' each</strong> during lunch. One day, one pickup.</p>';
   html += '<div class="quote">"Revenue Potential = units sold &times; selling price. If the projected profit doesn\'t clear $100, I\'m not driving 35 minutes to pick up your donuts."</div></div></div>';
 
-  html += '<div class="math-panel"><h3>COMPUTE YOUR REVENUE POTENTIAL</h3>';
-  html += '<div class="math-row"><label>Total dozens purchased</label><input type="number" id="f2-dozens" placeholder="?"></div>';
-  html += '<div class="math-row"><label>Total individual donuts (dozens &times; 12)</label><input type="number" id="f2-units" placeholder="?"></div>';
-  html += '<div class="math-row"><label>Unit selling price ($)</label><input type="number" id="f2-price" step="0.01" placeholder="?"></div>';
-  html += '<div class="math-row"><label>Revenue potential (units &times; price) ($)</label><input type="number" id="f2-rev" step="1" placeholder="?"></div>';
-  html += '<div class="math-row"><label>Total cost (dozens &times; wholesale price) ($)</label><input type="number" id="f2-cost" step="1" placeholder="?"></div>';
-  html += '<div class="math-row"><label><strong>Projected profit (revenue &minus; cost) ($)</strong></label><input type="number" id="f2-profit" step="1" placeholder="?"></div>';
+  html += '<div class="paper-form">';
+  html += '<div class="form-header">';
+  html += '<h2>SALES ANALYSIS REPORT</h2>';
+  html += '<div class="school-name">Helendale Secondary School &mdash; ACE &amp; RMS</div>';
+  html += '<div class="form-subtitle">Revenue Potential Worksheet</div>';
+  html += '</div>';
+
+  html += '<div class="form-row-inline">';
+  html += '<div class="form-field"><label>Organization / Club:&nbsp;</label><input type="text" placeholder="e.g. Class of 29"></div>';
+  html += '<div class="form-field"><label>Fiscal Year:&nbsp;</label><input type="text" value="2029-2030" readonly></div>';
+  html += '</div>';
+  html += '<div class="form-row-inline">';
+  html += '<div class="form-field"><label>Report Prepared by:&nbsp;</label><input type="text" placeholder="Your name"></div>';
+  html += '<div class="form-field"><label>Type of Activity / Event:&nbsp;</label><input type="text" placeholder="e.g. Donut Sale"></div>';
+  html += '</div>';
+
+  html += '<div class="form-section-title">ITEM ANALYSIS</div>';
+  html += '<table class="form-table">';
+  html += '<tr><th colspan="5">Item 1 &mdash; Donut Sale</th></tr>';
+  html += '<tr><th>Description</th><th>Dozens Purchased</th><th>(A) Units to Sell<br><span style="font-weight:normal;font-size:0.85em;">dozens &times; 12</span></th><th>(B) Unit Selling Price</th><th>(C) Revenue Potential<br><span style="font-weight:normal;font-size:0.85em;">A &times; B</span></th></tr>';
+  html += '<tr>';
+  html += '<td><input type="text" value="Donuts (wholesale bakery)" readonly style="text-align:left;color:#666;"></td>';
+  html += '<td><input type="number" id="f2-dozens" placeholder="?"></td>';
+  html += '<td><input type="number" id="f2-units" placeholder="?"></td>';
+  html += '<td><input type="number" id="f2-price" step="0.01" placeholder="$"></td>';
+  html += '<td><input type="number" id="f2-rev" step="1" placeholder="$"></td>';
+  html += '</tr>';
+  html += '</table>';
+
+  html += '<div class="form-section-title">COST &amp; PROFIT SUMMARY</div>';
+  html += '<div class="form-field"><label>Total Cost (dozens &times; wholesale price per dozen):&nbsp;$</label><input type="number" id="f2-cost" step="1" placeholder="?" style="max-width:160px;"></div>';
+  html += '<div class="form-field" style="margin-top:1vh;"><label><strong>Projected Profit (Revenue &minus; Cost):&nbsp;$</strong></label><input type="number" id="f2-profit" step="1" placeholder="?" style="max-width:160px; font-weight:bold;"></div>';
+
+  html += '<div class="form-note" style="margin-top:1.5vh;">If projected profit does not exceed $100, the advisor may deny the fundraiser.</div>';
+
   html += '</div>';
   html += '<button class="btn" id="f2-ok">SUBMIT FORM &raquo;</button>';
 
@@ -1623,13 +1723,56 @@ function form9_Step3_Expenditure(onDone) {
   html += '<p>The advisor will buy <strong>'+FORM_DONUT_TOTAL_DOZENS+' dozen</strong> at <strong>$'+FORM_DONUT_WHOLESALE+'/dozen</strong> wholesale. One trip, 35-minute drive.</p>';
   html += '<div class="quote">"This is a pre-approval form. The advisor needs it BEFORE buying anything. No form = no purchase = no donuts."</div></div></div>';
 
-  html += '<div class="math-panel"><h3>FILL OUT THE EXPENDITURE APPROVAL</h3>';
-  html += '<div class="math-row"><label>Item description</label><input type="text" id="f3-desc" placeholder="e.g. Donuts (wholesale)"></div>';
-  html += '<div class="math-row"><label>Quantity (total dozens)</label><input type="number" id="f3-qty" placeholder="?"></div>';
-  html += '<div class="math-row"><label>Unit price (per dozen, $)</label><input type="number" id="f3-unit" step="0.01" placeholder="?"></div>';
-  html += '<div class="math-row"><label>Total amount ($)</label><input type="number" id="f3-total" step="1" placeholder="?"></div>';
-  html += '<div class="math-row"><label>Club to be charged</label><input type="text" id="f3-club" placeholder="e.g. class of 29"></div>';
-  html += '<div class="math-row"><label>Student Signature</label><input type="text" id="f3-sig" placeholder="Type your name"></div>';
+  html += '<div class="paper-form">';
+  html += '<div class="form-header">';
+  html += '<h2>EXPENDITURE APPROVAL</h2>';
+  html += '<div class="school-name">Academy of Careers and Exploration / Riverview Middle School</div>';
+  html += '<div class="form-subtitle">For items to be purchased without a purchase order, but that requires pre-approval from ASB.</div>';
+  html += '</div>';
+
+  html += '<div class="form-row-inline">';
+  html += '<div class="form-field"><label>Date Requested:&nbsp;</label><input type="text" placeholder="mm/dd" style="max-width:120px;"></div>';
+  html += '<div class="form-field"><label>Date of Event:&nbsp;</label><input type="text" placeholder="mm/dd" style="max-width:120px;"></div>';
+  html += '</div>';
+  html += '<div class="form-field"><label>Club to be Charged:&nbsp;</label><input type="text" id="f3-club" placeholder="e.g. Class of 29"></div>';
+  html += '<div class="form-field"><label>Payee &mdash; Name of Club/Staff Member to be Reimbursed:&nbsp;</label><input type="text" value="Mr. Jorgensen" readonly></div>';
+
+  html += '<div class="form-section-title">LINE ITEMS</div>';
+  html += '<table class="form-table">';
+  html += '<tr><th>Item #</th><th>Description</th><th>Quantity</th><th>Unit Price</th><th>Total Amount</th></tr>';
+  html += '<tr>';
+  html += '<td style="text-align:center;">1</td>';
+  html += '<td><input type="text" id="f3-desc" placeholder="e.g. Donuts (wholesale)" style="text-align:left;"></td>';
+  html += '<td><input type="number" id="f3-qty" placeholder="?"></td>';
+  html += '<td><input type="number" id="f3-unit" step="0.01" placeholder="$"></td>';
+  html += '<td><input type="number" id="f3-total" step="1" placeholder="$"></td>';
+  html += '</tr>';
+  html += '<tr><td style="text-align:center;">2</td><td><input type="text" placeholder="&mdash;" disabled style="color:#ccc;"></td><td><input disabled></td><td><input disabled></td><td><input disabled></td></tr>';
+  html += '<tr><td style="text-align:center;">3</td><td><input type="text" placeholder="&mdash;" disabled style="color:#ccc;"></td><td><input disabled></td><td><input disabled></td><td><input disabled></td></tr>';
+  html += '</table>';
+
+  html += '<div style="display:flex; justify-content:flex-end; gap:2vw; flex-wrap:wrap; margin:0.5vh 0;">';
+  html += '<div class="form-field" style="justify-content:flex-end;"><label>Subtotal:&nbsp;$</label><input type="text" style="max-width:100px; text-align:center;" placeholder="&mdash;" disabled></div>';
+  html += '</div>';
+  html += '<div style="display:flex; justify-content:flex-end; gap:2vw; flex-wrap:wrap; margin:0.3vh 0;">';
+  html += '<div class="form-field" style="justify-content:flex-end;"><label>+ Est. Sales Tax:&nbsp;$</label><input type="text" value="0.00" readonly style="max-width:100px; text-align:center; color:#666;"></div>';
+  html += '</div>';
+  html += '<div style="display:flex; justify-content:flex-end; gap:2vw; flex-wrap:wrap; margin:0.3vh 0;">';
+  html += '<div class="form-field" style="justify-content:flex-end;"><label>+ Est. Shipping:&nbsp;$</label><input type="text" value="0.00" readonly style="max-width:100px; text-align:center; color:#666;"></div>';
+  html += '</div>';
+  html += '<div style="display:flex; justify-content:flex-end; gap:2vw; flex-wrap:wrap; margin:0.3vh 0;">';
+  html += '<div class="form-field" style="justify-content:flex-end;"><label><strong>TOTAL:&nbsp;$</strong></label><input type="text" style="max-width:100px; text-align:center; font-weight:bold;" placeholder="&mdash;" disabled></div>';
+  html += '</div>';
+
+  html += '<div class="sig-section">';
+  html += '<div class="form-section-title">CERTIFICATION &amp; APPROVAL SIGNATURES</div>';
+  html += '<div class="form-note">I certify that these expenditures are necessary for the approved fundraiser and comply with ASB policies.</div>';
+  html += '<div class="sig-line"><label>Student Club Representative:&nbsp;</label><input type="text" id="f3-sig" placeholder="Sign here"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '<div class="sig-line"><label>Club Advisor:&nbsp;</label><input type="text" value="Mr. Jorgensen" readonly><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '<div class="sig-line"><label>Principal:&nbsp;</label><input type="text" placeholder="Pending"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '<div class="sig-line"><label>ASB Bookkeeper:&nbsp;</label><input type="text" placeholder="Pending"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '</div>';
+
   html += '</div>';
   html += '<button class="btn" id="f3-ok">SUBMIT FORM &raquo;</button>';
 
@@ -1703,14 +1846,72 @@ function form9_Step5_CashCount(onDone) {
   html += '<p><strong>This form is critical.</strong> If the count is wrong, the bookkeeper sends it back. If money is missing, that\'s a problem for everyone involved.</p>';
   html += '<div class="quote">"Two students count. Not one. Two. If the count is wrong, both of you redo it."</div></div></div>';
 
-  html += '<div class="math-panel"><h3>COUNT THE CASH</h3>';
-  html += '<p style="color:#555; margin-bottom:1vh;">Here\'s what\'s in the cash box from today\'s sale: <strong>142 one-dollar bills</strong> and <strong>10 five-dollar bills</strong>.</p>';
-  html += '<p style="color:#555; margin-bottom:1vh; font-size:0.9em;"><em>The real cash count form has rows for every denomination &mdash; pennies through $100 bills, plus coins, checks, and a supporting docs checklist. In real life, you fill out ALL of it.</em></p>';
-  html += '<div class="math-row"><label>Dollar bills: 142 &times; $1.00 = ?</label><input type="number" id="f5-ones" step="1" placeholder="$"></div>';
-  html += '<div class="math-row"><label>Five-dollar bills: 10 &times; $5.00 = ?</label><input type="number" id="f5-fives" step="1" placeholder="$"></div>';
-  html += '<div class="math-row"><label><strong>GRAND TOTAL ($)</strong></label><input type="number" id="f5-total" step="1" placeholder="$"></div>';
-  html += '<div class="math-row"><label>Counter 1 name (student)</label><input type="text" id="f5-counter1" placeholder="Your name"></div>';
-  html += '<div class="math-row"><label>Counter 2 name (student)</label><input type="text" id="f5-counter2" placeholder="Second student\'s name"></div>';
+  html += '<div class="paper-form">';
+  html += '<div class="form-header">';
+  html += '<h2 style="color:#1a3a6b;">ASB CASH COUNT</h2>';
+  html += '<div class="school-name">Helendale Secondary School</div>';
+  html += '<div class="form-subtitle">Two students must independently verify the count</div>';
+  html += '</div>';
+
+  html += '<div class="form-row-inline">';
+  html += '<div class="form-field"><label>Name of School:&nbsp;</label><input type="text" value="ACE" readonly></div>';
+  html += '<div class="form-field"><label>Fiscal Year:&nbsp;</label><input type="text" value="2029-2030" readonly></div>';
+  html += '</div>';
+  html += '<div class="form-row-inline">';
+  html += '<div class="form-field"><label>Name of Club:&nbsp;</label><input type="text" placeholder="e.g. Class of 29"></div>';
+  html += '<div class="form-field"><label>Date:&nbsp;</label><input type="text" placeholder="mm/dd"></div>';
+  html += '</div>';
+  html += '<div class="form-field"><label>Name of Activity / Fundraiser:&nbsp;</label><input type="text" placeholder="e.g. Donut Sale"></div>';
+
+  html += '<div class="form-section-title">DENOMINATION COUNT</div>';
+  html += '<div class="form-note">Cash box contents: <strong>142 one-dollar bills</strong> and <strong>10 five-dollar bills</strong>. Count every denomination row.</div>';
+  html += '<table class="form-table denom-table">';
+  html += '<tr><th>Denomination</th><th>Value</th><th># of Bills/Coins</th><th>Total (A &times; B)</th></tr>';
+  // Coin rows (disabled/zero)
+  html += '<tr><td>Pennies</td><td>$0.01</td><td><input type="text" value="0" readonly style="color:#999;"></td><td><input type="text" value="$0.00" readonly style="color:#999;"></td></tr>';
+  html += '<tr><td>Nickels</td><td>$0.05</td><td><input type="text" value="0" readonly style="color:#999;"></td><td><input type="text" value="$0.00" readonly style="color:#999;"></td></tr>';
+  html += '<tr><td>Dimes</td><td>$0.10</td><td><input type="text" value="0" readonly style="color:#999;"></td><td><input type="text" value="$0.00" readonly style="color:#999;"></td></tr>';
+  html += '<tr><td>Quarters</td><td>$0.25</td><td><input type="text" value="0" readonly style="color:#999;"></td><td><input type="text" value="$0.00" readonly style="color:#999;"></td></tr>';
+  html += '<tr><td>Half Dollars</td><td>$0.50</td><td><input type="text" value="0" readonly style="color:#999;"></td><td><input type="text" value="$0.00" readonly style="color:#999;"></td></tr>';
+  html += '<tr><td>Dollar Coins</td><td>$1.00</td><td><input type="text" value="0" readonly style="color:#999;"></td><td><input type="text" value="$0.00" readonly style="color:#999;"></td></tr>';
+  // Bill rows
+  html += '<tr style="background:#fffff0;"><td><strong>$1 Bills</strong></td><td>$1.00</td><td><input type="text" value="142" readonly style="color:#666;"></td><td><input type="number" id="f5-ones" step="1" placeholder="$?" style="font-weight:bold;"></td></tr>';
+  html += '<tr style="background:#fffff0;"><td><strong>$5 Bills</strong></td><td>$5.00</td><td><input type="text" value="10" readonly style="color:#666;"></td><td><input type="number" id="f5-fives" step="1" placeholder="$?" style="font-weight:bold;"></td></tr>';
+  html += '<tr><td>$10 Bills</td><td>$10.00</td><td><input type="text" value="0" readonly style="color:#999;"></td><td><input type="text" value="$0.00" readonly style="color:#999;"></td></tr>';
+  html += '<tr><td>$20 Bills</td><td>$20.00</td><td><input type="text" value="0" readonly style="color:#999;"></td><td><input type="text" value="$0.00" readonly style="color:#999;"></td></tr>';
+  html += '<tr><td>$50 Bills</td><td>$50.00</td><td><input type="text" value="0" readonly style="color:#999;"></td><td><input type="text" value="$0.00" readonly style="color:#999;"></td></tr>';
+  html += '<tr><td>$100 Bills</td><td>$100.00</td><td><input type="text" value="0" readonly style="color:#999;"></td><td><input type="text" value="$0.00" readonly style="color:#999;"></td></tr>';
+  html += '</table>';
+
+  // Summary rows
+  html += '<div style="display:flex; justify-content:flex-end; gap:2vw; flex-wrap:wrap; margin:0.5vh 0;">';
+  html += '<div class="form-field" style="justify-content:flex-end;"><label>Total Coin:&nbsp;$</label><input type="text" value="0.00" readonly style="max-width:100px; text-align:center; color:#666;"></div>';
+  html += '</div>';
+  html += '<div style="display:flex; justify-content:flex-end; gap:2vw; flex-wrap:wrap; margin:0.3vh 0;">';
+  html += '<div class="form-field" style="justify-content:flex-end;"><label>Total Cash:&nbsp;$</label><input type="text" placeholder="?" style="max-width:100px; text-align:center;" disabled></div>';
+  html += '</div>';
+  html += '<div style="display:flex; justify-content:flex-end; gap:2vw; flex-wrap:wrap; margin:0.3vh 0;">';
+  html += '<div class="form-field" style="justify-content:flex-end;"><label>Total Checks:&nbsp;$</label><input type="text" value="0.00" readonly style="max-width:100px; text-align:center; color:#666;"></div>';
+  html += '</div>';
+  html += '<div style="display:flex; justify-content:flex-end; gap:2vw; flex-wrap:wrap; margin:0.5vh 0; border-top:2px solid #000; padding-top:0.5vh;">';
+  html += '<div class="form-field" style="justify-content:flex-end;"><label><strong>GRAND TOTAL:&nbsp;$</strong></label><input type="number" id="f5-total" step="1" placeholder="$?" style="max-width:120px; text-align:center; font-weight:bold; font-size:1.1em;"></div>';
+  html += '</div>';
+
+  // Supporting documentation checklist (display only)
+  html += '<div class="form-section-title">SUPPORTING DOCUMENTATION</div>';
+  html += '<div style="font-size:0.85em; color:#333; line-height:1.8;">';
+  html += '&#x2611; Cash count verified by two students<br>';
+  html += '&#x2611; Cash matches sales records<br>';
+  html += '&#x2611; All bills sorted by denomination<br>';
+  html += '&#x2611; Deposited with ASB Bookkeeper same day';
+  html += '</div>';
+
+  html += '<div class="sig-section">';
+  html += '<div class="form-section-title">VERIFICATION SIGNATURES</div>';
+  html += '<div class="sig-line"><label>Cash Count Prepared by:&nbsp;</label><input type="text" id="f5-counter1" placeholder="Student 1 name"></div>';
+  html += '<div class="sig-line"><label>Verified by (2nd counter):&nbsp;</label><input type="text" id="f5-counter2" placeholder="Student 2 name"></div>';
+  html += '</div>';
+
   html += '</div>';
   html += '<button class="btn" id="f5-ok">SUBMIT CASH COUNT &raquo;</button>';
 
@@ -1757,12 +1958,41 @@ function form9_Step6_Receipt(onDone) {
   html += '<p>Now you fill out the <strong>Expenditure Approval form</strong> (again, with receipt attached this time) and the <strong>Purchase Order / Check Request</strong> so the advisor gets reimbursed.</p>';
   html += '<div class="quote">"No receipt = no reimbursement. The advisor fronted the money. If you lose the receipt, they\'re out $'+FORM_DONUT_TOTAL_COST+' of their own money. Don\'t do that."</div></div></div>';
 
-  html += '<div class="math-panel"><h3>CLOSE OUT THE DONUT SALE</h3>';
-  html += '<p style="color:#555; margin-bottom:1vh;"><strong>Reminder:</strong> You deposited <strong>$'+FORM_DONUT_TOTAL_REVENUE+'</strong> from the cash count. The receipt from the advisor says <strong>$'+FORM_DONUT_TOTAL_COST+'</strong>.</p>';
-  html += '<div class="math-row"><label>Total revenue collected ($)</label><input type="number" id="f6-rev" step="1" placeholder="$"></div>';
-  html += '<div class="math-row"><label>Total expenses (from receipt) ($)</label><input type="number" id="f6-exp" step="1" placeholder="$"></div>';
-  html += '<div class="math-row"><label><strong>NET PROFIT (revenue &minus; expenses) ($)</strong></label><input type="number" id="f6-profit" step="1" placeholder="$"></div>';
-  html += '<div class="math-row"><label>Receipt attached?</label><select id="f6-receipt"><option value="">-- select --</option><option value="yes">Yes &mdash; receipt is attached</option><option value="no">No &mdash; I lost it</option></select></div>';
+  html += '<div class="paper-form">';
+  html += '<div class="form-header">';
+  html += '<h2>ASB CHECK REQUEST FORM</h2>';
+  html += '<div class="school-name">Academy of Careers and Exploration</div>';
+  html += '<div class="form-subtitle">Close-out &amp; Reconciliation</div>';
+  html += '</div>';
+
+  html += '<div class="form-note"><strong>Reminder:</strong> You deposited <strong>$'+FORM_DONUT_TOTAL_REVENUE+'</strong> from the cash count. The receipt from the advisor says <strong>$'+FORM_DONUT_TOTAL_COST+'</strong>.</div>';
+
+  html += '<div class="form-row-inline">';
+  html += '<div class="form-field"><label>Fiscal Year:&nbsp;</label><input type="text" value="2029-2030" readonly></div>';
+  html += '<div class="form-field"><label>Date:&nbsp;</label><input type="text" placeholder="mm/dd"></div>';
+  html += '</div>';
+  html += '<div class="form-row-inline">';
+  html += '<div class="form-field"><label>Date of Expenditure:&nbsp;</label><input type="text" placeholder="mm/dd"></div>';
+  html += '<div class="form-field"><label>Amount (from receipt):&nbsp;$</label><input type="text" value="'+FORM_DONUT_TOTAL_COST+'.00" readonly></div>';
+  html += '</div>';
+  html += '<div class="form-field"><label>Vendor / Payee Name:&nbsp;</label><input type="text" value="Wholesale Bakery (35-min drive)" readonly></div>';
+  html += '<div class="form-field"><label>Club / Group:&nbsp;</label><input type="text" placeholder="e.g. Class of 29"></div>';
+  html += '<div class="form-field"><label>Purpose of Expenditure:&nbsp;</label><input type="text" value="Donut purchase for fundraiser" readonly></div>';
+
+  html += '<div class="form-field"><label>Receipt Attached?&nbsp;</label><select id="f6-receipt" style="max-width:260px;"><option value="">-- select --</option><option value="yes">Yes &mdash; receipt is attached</option><option value="no">No &mdash; I lost it</option></select></div>';
+
+  html += '<div class="form-section-title">RECONCILIATION</div>';
+  html += '<div class="form-field"><label>Total Revenue Collected:&nbsp;$</label><input type="number" id="f6-rev" step="1" placeholder="?" style="max-width:160px;"></div>';
+  html += '<div class="form-field"><label>Total Expenses (from receipt):&nbsp;$</label><input type="number" id="f6-exp" step="1" placeholder="?" style="max-width:160px;"></div>';
+  html += '<div class="form-field" style="margin-top:0.5vh;"><label><strong>Net Profit (Revenue &minus; Expenses):&nbsp;$</strong></label><input type="number" id="f6-profit" step="1" placeholder="?" style="max-width:160px; font-weight:bold;"></div>';
+
+  html += '<div class="sig-section">';
+  html += '<div class="form-section-title">APPROVAL SIGNATURES</div>';
+  html += '<div class="sig-line"><label>ASB / Club Representative:&nbsp;</label><input type="text" placeholder="Sign here"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '<div class="sig-line"><label>Advisor:&nbsp;</label><input type="text" value="Mr. Jorgensen" readonly><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '<div class="sig-line"><label>Principal:&nbsp;</label><input type="text" placeholder="Pending"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '</div>';
+
   html += '</div>';
   html += '<button class="btn" id="f6-ok">SUBMIT &amp; CLOSE OUT &raquo;</button>';
 
