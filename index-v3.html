@@ -1771,7 +1771,7 @@ function form9_Step3_Expenditure(onDone) {
   html += '</table>';
 
   html += '<div style="display:flex; justify-content:flex-end; gap:2vw; flex-wrap:wrap; margin:0.5vh 0;">';
-  html += '<div class="form-field" style="justify-content:flex-end;"><label>Subtotal:&nbsp;$</label><input type="text" style="max-width:100px; text-align:center;" placeholder="&mdash;" disabled></div>';
+  html += '<div class="form-field" style="justify-content:flex-end;"><label>Subtotal:&nbsp;$</label><input type="number" step="1" style="max-width:100px; text-align:center;" placeholder="?"></div>';
   html += '</div>';
   html += '<div style="display:flex; justify-content:flex-end; gap:2vw; flex-wrap:wrap; margin:0.3vh 0;">';
   html += '<div class="form-field" style="justify-content:flex-end;"><label>+ Est. Sales Tax:&nbsp;$</label><input type="text" value="0.00" readonly style="max-width:100px; text-align:center; color:#666;"></div>';
@@ -1780,7 +1780,7 @@ function form9_Step3_Expenditure(onDone) {
   html += '<div class="form-field" style="justify-content:flex-end;"><label>+ Est. Shipping:&nbsp;$</label><input type="text" value="0.00" readonly style="max-width:100px; text-align:center; color:#666;"></div>';
   html += '</div>';
   html += '<div style="display:flex; justify-content:flex-end; gap:2vw; flex-wrap:wrap; margin:0.3vh 0;">';
-  html += '<div class="form-field" style="justify-content:flex-end;"><label><strong>TOTAL:&nbsp;$</strong></label><input type="text" style="max-width:100px; text-align:center; font-weight:bold;" placeholder="&mdash;" disabled></div>';
+  html += '<div class="form-field" style="justify-content:flex-end;"><label><strong>TOTAL:&nbsp;$</strong></label><input type="number" id="f3-total2" step="1" style="max-width:100px; text-align:center; font-weight:bold;" placeholder="?"></div>';
   html += '</div>';
 
   html += '<div class="sig-section">';
