@@ -1574,8 +1574,8 @@ function form9_Step1_Request(onDone) {
   html += '<div class="form-note">I certify that the information provided is accurate and that the fundraiser will comply with all ASB and school policies.</div>';
   html += '<div class="sig-line"><label>Student Club Representative:&nbsp;</label><input type="text" placeholder="Sign here"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
   html += '<div class="sig-line"><label>Club Advisor:&nbsp;</label><input type="text" value="Mr. Jorgensen" readonly><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
-  html += '<div class="sig-line"><label>Principal:&nbsp;</label><input type="text" placeholder="Pending"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
-  html += '<div class="sig-line"><label>ASB Bookkeeper:&nbsp;</label><input type="text" placeholder="Pending"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '<div class="sig-line" style="opacity:0.5;"><label>Principal:&nbsp;</label><input type="text" value="(signs after you submit)" readonly style="font-style:italic;"></div>';
+  html += '<div class="sig-line" style="opacity:0.5;"><label>ASB Bookkeeper:&nbsp;</label><input type="text" value="(verifies after principal)" readonly style="font-style:italic;"></div>';
   html += '</div>';
 
   html += '</div>';
@@ -1786,8 +1786,8 @@ function form9_Step3_Expenditure(onDone) {
   html += '<div class="form-note">I certify that these expenditures are necessary for the approved fundraiser and comply with ASB policies.</div>';
   html += '<div class="sig-line"><label>Student Club Representative:&nbsp;</label><input type="text" id="f3-sig" placeholder="Sign here"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
   html += '<div class="sig-line"><label>Club Advisor:&nbsp;</label><input type="text" value="Mr. Jorgensen" readonly><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
-  html += '<div class="sig-line"><label>Principal:&nbsp;</label><input type="text" placeholder="Pending"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
-  html += '<div class="sig-line"><label>ASB Bookkeeper:&nbsp;</label><input type="text" placeholder="Pending"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '<div class="sig-line" style="opacity:0.5;"><label>Principal:&nbsp;</label><input type="text" value="(signs after you submit)" readonly style="font-style:italic;"></div>';
+  html += '<div class="sig-line" style="opacity:0.5;"><label>ASB Bookkeeper:&nbsp;</label><input type="text" value="(verifies after principal)" readonly style="font-style:italic;"></div>';
   html += '</div>';
 
   html += '</div>';
@@ -2007,7 +2007,7 @@ function form9_Step6_Receipt(onDone) {
   html += '<div class="form-section-title">APPROVAL SIGNATURES</div>';
   html += '<div class="sig-line"><label>ASB / Club Representative:&nbsp;</label><input type="text" placeholder="Sign here"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
   html += '<div class="sig-line"><label>Advisor:&nbsp;</label><input type="text" value="Mr. Jorgensen" readonly><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
-  html += '<div class="sig-line"><label>Principal:&nbsp;</label><input type="text" placeholder="Pending"><label>&nbsp;Date:&nbsp;</label><input type="text" class="sig-date" placeholder="mm/dd"></div>';
+  html += '<div class="sig-line" style="opacity:0.5;"><label>Principal:&nbsp;</label><input type="text" value="(signs after you submit)" readonly style="font-style:italic;"></div>';
   html += '</div>';
 
   html += '</div>';
