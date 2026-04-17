@@ -1053,23 +1053,23 @@ function startMiddleSchool() {
   // Show a quick intro, then launch 9th grade with $2,000
   show('sIntro');
   var content = document.querySelector('#sIntro .content');
-  if (!content) { startGrade(9, 2000); return; }
+  if (!content) { startGrade(9, 1800); return; }
   content.innerHTML = '<div class="info-box">' +
     '<h2 style="color:#2e86c1;">&#x1F3EB; MIDDLE SCHOOL EDITION</h2>' +
     '<p style="font-size:1.1em;">This version is for <strong>Grade 8</strong>.</p>' +
     '<p>The game is identical to the high school version with <strong>one difference:</strong></p>' +
-    '<p style="font-size:1.2em; margin:2vh 0; color:#1e5a2e; font-weight:bold;">You start 9th grade with $2,000 in your class bank.</p>' +
-    '<p>Your hard work during <strong>7th and 8th grade</strong> is paying off &mdash; all those bake sales, car washes, and candy-gram fundraisers your middle school class ran are carrying forward into high school.</p>' +
-    '<p>That head start means more options for prom, Grad Nite, and senior year. But you still have to manage the money wisely &mdash; $2,000 can disappear fast if you make bad choices.</p>' +
+    '<p style="font-size:1.2em; margin:2vh 0; color:#1e5a2e; font-weight:bold;">You start 9th grade with $1,800 in your class bank.</p>' +
+    '<p>Your hard work during <strong>7th and 8th grade</strong> is paying off &mdash; all those bake sales, car washes, and candy-gram fundraisers your middle school class ran built up $2,000. But your 7th grade end-of-year celebration cost $200, so <strong>$1,800</strong> carries forward into high school.</p>' +
+    '<p>That head start means more options for prom, Grad Nite, and senior year. But you still have to manage the money wisely &mdash; $1,800 can disappear fast if you make bad choices.</p>' +
     '<p style="margin-top:1.5vh; font-style:italic; color:#555;">Everything else works the same: forms, fundraisers, events, and the senior year finale.</p>' +
     '</div>';
   var nav = document.querySelector('#sIntro .nav-right');
   if (nav) {
-    nav.innerHTML = '<button class="btn" id="ms-go" style="font-size:1.2rem;">&#x1F393; START 9TH GRADE WITH $2,000 &raquo;</button>' +
+    nav.innerHTML = '<button class="btn" id="ms-go" style="font-size:1.2rem;">&#x1F393; START 9TH GRADE WITH $1,800 &raquo;</button>' +
       '<button class="btn" onclick="show(\'s0\')" style="font-size:0.9rem; min-width:150px;">&laquo; BACK TO TITLE</button>';
-    document.getElementById('ms-go').onclick = function() { startGrade(9, 2000); };
+    document.getElementById('ms-go').onclick = function() { startGrade(9, 1800); };
   } else {
-    startGrade(9, 2000);
+    startGrade(9, 1800);
   }
 }
 
