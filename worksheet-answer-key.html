@@ -11,14 +11,16 @@
   .title { font-size:22pt; font-weight:bold; letter-spacing:2px; color:#8b0000; }
   .subtitle { font-size:11pt; font-style:italic; margin-top:3px; }
   .stamp { display:inline-block; background:#8b0000; color:#fff; padding:4px 12px; font-weight:bold; letter-spacing:2px; margin:6px 0; }
-  .section { margin:14px 0; }
+  .section { margin:12px 0; }
   .section-title { font-size:11pt; font-weight:bold; background:#8b0000; color:#fff; padding:4px 10px; letter-spacing:1px; }
+  .grade-band { font-size:10pt; font-weight:bold; background:#1e5a2e; color:#d4af37; padding:3px 10px; margin-top:6px; letter-spacing:1px; }
   .section-sub { font-size:9pt; font-style:italic; color:#444; padding:3px 0 6px 0; }
   ol.questions { padding-left:24px; }
-  ol.questions li { font-size:10pt; margin-bottom:9px; line-height:1.5; }
+  ol.questions li { font-size:10pt; margin-bottom:7px; line-height:1.5; }
   .answer { color:#1e5a2e; font-weight:bold; }
   .note { font-size:9pt; color:#555; font-style:italic; display:block; margin-top:2px; }
   .pers { background:#fff8dc; padding:2px 5px; border-left:3px solid #d4af37; font-style:italic; font-size:9.5pt; }
+  .codebox { background:#1e5a2e; color:#d4af37; padding:8px 14px; margin:8px 0; font-family:'Courier New',monospace; font-size:11pt; letter-spacing:2px; }
   .no-print { background:#8b0000; color:#fff; padding:14px; text-align:center; max-width:8.5in; margin:0 auto 14px auto; font-family:Arial,sans-serif; }
   .no-print button { background:#fff; color:#8b0000; border:none; padding:8px 18px; font-weight:bold; cursor:pointer; font-size:12pt; border-radius:4px; }
   @media print {
@@ -44,84 +46,102 @@
   </div>
 
   <div class="section">
-    <div class="section-title">PART 1 &mdash; GAME TRIVIA (same answer for every student)</div>
+    <div class="section-title">CODES &mdash; FORMAT &amp; VERIFICATION</div>
+    <div class="section-sub">Each grade gives the student an 8-character code. First 4 chars = grade tag (everyone same). Last 4 chars = unique to student name.</div>
+    <div class="codebox">
+      9th grade &rarr; starts with <strong>WAVE-</strong> &nbsp;|&nbsp;
+      10th grade &rarr; <strong>HAUN-</strong> &nbsp;|&nbsp;
+      11th grade &rarr; <strong>HOCO-</strong> &nbsp;|&nbsp;
+      12th grade &rarr; <strong>PROM-</strong>
+    </div>
+    <p style="font-size:10pt;">Use <strong>code-master-list.html</strong> to generate the unique 4-char suffix for each student in your roster. Two students with the same name = same code (rare). Different names = different codes guaranteed.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title">PART 1 &mdash; GAME TRIVIA</div>
+
+    <div class="grade-band">9TH GRADE</div>
     <ol class="questions">
-      <li>Football character who TACKLES on game-overs: <span class="answer">TERRY TATE (Office Linebacker)</span></li>
-      <li>Football character who is DISAPPOINTED: <span class="answer">BOBBY BOUCHER (from The Waterboy)</span></li>
-      <li>Most expensive prom venue themed after: <span class="answer">TITANIC</span>
-        <span class="note">(Titanic First-Class Ballroom &mdash; $6,775 rent + $5,694 bus)</span></li>
-      <li>Cheapest prom venue (FREE) themed after: <span class="answer">STRANGER THINGS</span>
-        <span class="note">(Hawkins High Gym &mdash; $0 rent, no bus)</span></li>
-      <li>Name of the free high-school gym venue: <span class="answer">HAWKINS HIGH GYM</span></li>
-      <li>Other prom venues (any TWO of these three):
-        <span class="note" style="display:block; margin-top:4px;">
-          &bull; <span class="answer">Enchantment Under The Sea</span> (Back to the Future, $1,000)<br>
-          &bull; <span class="answer">The Great Hall</span> (Harry Potter, $3,500 + $3,000 bus)<br>
-          &bull; <span class="answer">The Overlook Hotel</span> (The Shining, $5,000 + $4,194 bus)
-        </span>
-      </li>
-      <li>Max cars in 3 hours: <span class="answer">36 cars</span>
-        <span class="note">(2 lanes &times; 10 min/car &times; 3 hours)</span></li>
-      <li>ACE total students: <span class="answer">~300 students</span>
-        <span class="note">(Accept 250&ndash;350)</span></li>
-      <li>Disney Grad Nite bus cost: <span class="answer">$1,750</span></li>
-      <li>Yearbook cost per student: <span class="answer">$45</span></li>
-      <li>Sadie&rsquo;s Dance profit cap: <span class="answer">$800</span></li>
-      <li>Food bonus to Sadie&rsquo;s attendance: <span class="answer">+50%</span></li>
+      <li>Football tackle character: <span class="answer">TERRY TATE (Office Linebacker)</span></li>
+      <li>9th-grade dance: <span class="answer">SADIE&rsquo;S (or Sadie&rsquo;s Dance)</span></li>
+      <li>Profit cap: <span class="answer">$800</span></li>
+      <li>Food bonus to attendance: <span class="answer">+50%</span></li>
+      <li>ACE total students: <span class="answer">~300</span> <span class="note">(accept 250&ndash;350)</span></li>
     </ol>
-  </div>
 
-  <div class="section">
-    <div class="section-title">PART 2 &mdash; YOUR PLAYTHROUGH (different per student)</div>
-    <div class="section-sub">These are personal &mdash; compare to the screen the student showed you, or sample-check.</div>
+    <div class="grade-band">10TH GRADE</div>
+    <ol class="questions" start="6">
+      <li>October event: <span class="answer">HAUNTED HOUSE</span></li>
+      <li>December grams: <span class="answer">CHRISTMAS-grams</span></li>
+      <li>Bundt Cake month: <span class="answer">APRIL</span></li>
+      <li>Max cars in 3 hours: <span class="answer">36</span></li>
+    </ol>
+
+    <div class="grade-band">11TH GRADE</div>
+    <ol class="questions" start="10">
+      <li>Fall event shared with seniors: <span class="answer">HOMECOMING (HOCO)</span></li>
+      <li>Junior share: <span class="answer">50%</span></li>
+      <li>Valentine candy-grams month: <span class="answer">FEBRUARY</span></li>
+    </ol>
+
+    <div class="grade-band">12TH GRADE</div>
     <ol class="questions" start="13">
-      <li><strong>Verification Code:</strong> <span class="pers">6-character code from the game (e.g., G2OSF6). <strong>If TWO students show the same code &rArr; they copied.</strong></span></li>
-      <li>Starting / Ending balance: <span class="pers">Personal &mdash; varies. 8th grader starts at $1,800. 9th grader fresh-start at $100.55.</span></li>
-      <li>Net profit/loss: <span class="pers">Personal &mdash; ending minus starting.</span></li>
-      <li>Three fundraisers (in order):
-        <span class="note" style="display:block;">
-          9th grade: Donut Sale &rarr; Halloween-Grams &rarr; Fall Car Wash &rarr; Sadie&rsquo;s Dance &rarr; Spring Car Wash<br>
-          10th grade: Fall Car Wash &rarr; Haunted House &rarr; Christmas-Grams &rarr; Bundt Cake &rarr; Spring Car Wash<br>
-          11th grade: Fall Car Wash &rarr; HOCO Info (50% share) &rarr; Valentine Candy-Grams &rarr; Spring Car Wash<br>
-          12th grade: Fall Car Wash &rarr; Fall Auction &rarr; HOCO &rarr; Bake Sale &rarr; Spring Auction &rarr; Spring Car Wash &rarr; Luncheon
-        </span>
-      </li>
+      <li>Disney Grad Nite bus: <span class="answer">$1,750</span></li>
+      <li>Yearbook: <span class="answer">$45</span></li>
+      <li>Cheapest venue, TV show: <span class="answer">STRANGER THINGS</span> <span class="note">(Hawkins High Gym)</span></li>
+      <li>Most expensive venue, movie: <span class="answer">TITANIC</span> <span class="note">(Titanic First-Class Ballroom)</span></li>
+      <li>Disappointed character: <span class="answer">BOBBY BOUCHER (The Waterboy)</span></li>
     </ol>
   </div>
 
   <div class="section">
-    <div class="section-title">PART 3 &mdash; MATH CHECK (same answer for every student)</div>
-    <ol class="questions" start="17">
+    <div class="section-title">PART 2 &mdash; MATH CHECK</div>
+    <ol class="questions" start="18">
       <li>$1,750 &divide; 40 = <span class="answer">$43.75</span></li>
       <li>60 &times; $45 = <span class="answer">$2,700</span></li>
       <li>(32 &times; $15) &minus; $30 = <span class="answer">$450</span></li>
       <li>(50 &times; $20) &minus; $50 = <span class="answer">$950</span></li>
+      <li>$3,200 &divide; 2 = <span class="answer">$1,600 each side</span></li>
       <li>Skip the paperwork: <span class="answer">$0 (GAME OVER &mdash; Terry Tate shuts it down)</span>
-        <span class="note">If they wrote a dollar amount they didn&rsquo;t actually play that path.</span></li>
+        <span class="note">If they wrote a dollar amount, they didn&rsquo;t play that path.</span></li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <div class="section-title">PART 3 &mdash; YOUR PLAYTHROUGH</div>
+    <div class="section-sub">Personal &mdash; varies per student. Spot-check against expected ranges.</div>
+    <ol class="questions" start="24">
+      <li>9th ending: <span class="pers">Personal. 8th-grade start = $1,800. Fresh start = $100.55. Typical end: $500&ndash;$2,500.</span></li>
+      <li>10th ending: <span class="pers">Personal. Typical: $1,500&ndash;$4,000.</span></li>
+      <li>11th ending: <span class="pers">Personal. Typical: $3,000&ndash;$6,000.</span></li>
+      <li>12th ending: <span class="pers">Personal. After Senior Package math, ideally $0&ndash;$1,500.</span></li>
+      <li>Prom venue: <span class="pers">One of: Hawkins High Gym / Enchantment Under The Sea / The Great Hall / The Overlook Hotel / Titanic First-Class Ballroom.</span></li>
+      <li>DJ pick: <span class="pers">PRO ($200) or STUDENT ($0).</span></li>
     </ol>
   </div>
 
   <div class="section">
     <div class="section-title">PART 4 &mdash; REFLECTION</div>
-    <div class="section-sub">Open-response. Grade for effort + game-specific evidence.</div>
-    <ol class="questions" start="22">
-      <li><strong>Most profitable fundraiser:</strong> <span class="pers">Personal. Common winners: HOCO (12th grade), Spring Auction, Sadie&rsquo;s at $20 + food, Haunted House.</span></li>
-      <li><strong>Decision regret:</strong> <span class="pers">Look for game-specific language: &ldquo;Pro DJ was too expensive,&rdquo; &ldquo;Titanic venue ate my budget,&rdquo; &ldquo;Set ticket price too high.&rdquo;</span></li>
-      <li><strong>One thing learned:</strong> <span class="pers">Good answers reference: margin, fixed vs. variable cost, demand curve, splitting cost across class size, opportunity cost.</span></li>
-      <li><strong>Why bus cost matters more for small class:</strong>
-        <span class="answer" style="display:block;">$1,750 / 40 seniors = $43.75 each. But $1,750 / 20 seniors = $87.50 each. The fewer students, the more each one has to pay. Same bus, double the per-student cost.</span>
-      </li>
+    <div class="section-sub">Open response. Grade for effort + game-specific evidence.</div>
+    <ol class="questions" start="30">
+      <li><strong>Most profitable fundraiser:</strong> <span class="pers">Personal. Common: HOCO (12th), Spring Auction, Sadie&rsquo;s at $20 + food, Haunted House.</span></li>
+      <li><strong>Decision regret:</strong> <span class="pers">Look for game-specific language: &ldquo;Pro DJ too pricey,&rdquo; &ldquo;Titanic venue ate the budget,&rdquo; &ldquo;Ticket price too high.&rdquo;</span></li>
+      <li><strong>Bus cost &amp; class size:</strong>
+        <span class="answer" style="display:block;">$1,750 / 40 seniors = $43.75 each. $1,750 / 20 seniors = $87.50 each. Same bus, fewer kids = more each pays. (FIXED cost spread over fewer people.)</span></li>
+      <li><strong>One thing learned:</strong> <span class="pers">Good answers reference: margin, fixed vs. variable cost, demand curves, splitting cost across class size, opportunity cost.</span></li>
     </ol>
   </div>
 
-  <div class="section" style="margin-top:20px; padding:12px; background:#fff8dc; border:2px solid #8b6914;">
+  <div class="section" style="margin-top:18px; padding:12px; background:#fff8dc; border:2px solid #8b6914;">
     <div style="font-weight:bold; margin-bottom:6px;">&#x1F50D; HOW TO SPOT CHEATING</div>
     <ol class="questions" style="margin:0;">
-      <li><strong>Same verification code on two papers</strong> &rArr; identical playthrough, copied.</li>
-      <li><strong>Missing or invented verification code</strong> &rArr; didn&rsquo;t finish a real game.</li>
-      <li><strong>Q21 has a dollar amount instead of $0/Game Over</strong> &rArr; didn&rsquo;t actually try that path or doesn&rsquo;t know the cutscene.</li>
-      <li><strong>Wrong character names (Terry/Bobby)</strong> &rArr; can&rsquo;t Google this &mdash; they didn&rsquo;t play.</li>
-      <li><strong>Generic reflection answers</strong> with no game-specific terms &rArr; copied from AI or a friend who described it vaguely.</li>
+      <li><strong>Codes don&rsquo;t start with right prefix</strong> (WAVE/HAUN/HOCO/PROM) &rArr; fake.</li>
+      <li><strong>4-char suffix doesn&rsquo;t match master list for their name</strong> &rArr; either they used a different name in the game, or they made it up.</li>
+      <li><strong>Q23 (skip paperwork) has a dollar amount</strong> &rArr; they didn&rsquo;t actually play that path.</li>
+      <li><strong>Wrong character names (Terry/Bobby)</strong> &rArr; can&rsquo;t Google &mdash; they didn&rsquo;t play.</li>
+      <li><strong>Wrong specific numbers</strong> ($1,750 bus, $45 yearbook, 36 cars, +50% food) &rArr; copied a friend who guessed.</li>
+      <li><strong>Generic reflection answers</strong> with no game-specific terms &rArr; AI / copied.</li>
+      <li><strong>Only 1&ndash;2 codes filled in</strong> &rArr; only played some grades. Partial credit at your discretion.</li>
     </ol>
   </div>
 

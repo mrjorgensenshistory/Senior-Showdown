@@ -4015,26 +4015,28 @@ function renderEndNav() {
 }
 
 // ============ PROOF OF COMPLETION CERTIFICATE ============
-// Opens a new window with a printable certificate.
-// Includes a 6-character verification code that hashes the player's choices —
-// two students with the same code = they copied. Different choices = different code.
-function makeProofCode() {
-  // Hash key state fields into a short alphanumeric code
-  var s = state;
-  var seed = s.grade + '|' + s.startBalance + '|' + s.balance + '|';
-  // Include all log labels + deltas (the path they took through the game)
-  for (var i = 0; i < s.log.length; i++) {
-    seed += (s.log[i].label || '') + ':' + (s.log[i].delta || 0) + ';';
-  }
-  // Simple deterministic hash (djb2-ish)
+// Format: 4-char grade tag + 4-char student hash (e.g., WAVE-X9K2)
+// First 4 chars: same for every student who beat that grade (grade identifier).
+// Last 4 chars: deterministic hash of normalized student name + grade.
+// Teacher pre-computes a master list of name -> code so verification is instant.
+// IMPORTANT: The hash algorithm below MUST match code-master-list.html exactly.
+var GRADE_TAGS = { 9:'WAVE', 10:'HAUN', 11:'HOCO', 12:'PROM' };
+
+function makeProofCode(studentName, grade) {
+  var tag = GRADE_TAGS[grade] || 'XXXX';
+  // Normalize: uppercase, strip everything except A-Z and 0-9
+  var normalized = (studentName || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!normalized) return tag + '-XXXX';
+  var seed = normalized + '|' + grade + '|SHOWDOWN';
+  // djb2 hash — must match the version in code-master-list.html exactly
   var h = 5381;
   for (var k = 0; k < seed.length; k++) {
     h = ((h << 5) + h + seed.charCodeAt(k)) | 0;
   }
-  // Convert to base36, 6 chars, uppercase
-  var code = (Math.abs(h)).toString(36).toUpperCase();
-  while (code.length < 6) code = '0' + code;
-  return code.slice(-6);
+  var hash = (Math.abs(h)).toString(36).toUpperCase();
+  while (hash.length < 4) hash = '0' + hash;
+  hash = hash.slice(-4);
+  return tag + '-' + hash;
 }
 
 function generateProofCert() {
@@ -4049,7 +4051,7 @@ function generateProofCert() {
   if (!period) period = '?';
   period = period.trim();
 
-  var code = makeProofCode();
+  var code = makeProofCode(studentName, state.grade);
   var today = new Date();
   var dateStr = (today.getMonth()+1) + '/' + today.getDate() + '/' + today.getFullYear();
   var timeStr = today.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
@@ -4085,7 +4087,7 @@ function generateProofCert() {
     '.delta-pos { color:#1e5a2e; }' +
     '.delta-neg { color:#8b0000; }' +
     '.footer { margin-top:25px; padding-top:15px; border-top:2px solid #8b6914; display:flex; justify-content:space-between; align-items:center; }' +
-    '.code-box { background:#1e5a2e; color:#d4af37; padding:15px 30px; font-family:"Bangers",cursive; letter-spacing:8px; font-size:2.5em; border:3px solid #d4af37; text-align:center; }' +
+    '.code-box { background:#1e5a2e; color:#d4af37; padding:15px 30px; font-family:"Bangers",cursive; letter-spacing:6px; font-size:2.2em; border:3px solid #d4af37; text-align:center; }' +
     '.code-label { font-size:0.4em; letter-spacing:2px; display:block; margin-bottom:6px; color:#ffe9a0; }' +
     '.sig-line { border-top:1px solid #2a1a05; padding-top:4px; font-size:0.85em; min-width:200px; text-align:center; }' +
     '.print-btn { display:block; margin:20px auto; padding:12px 30px; background:#1e5a2e; color:#fff; border:none; font-family:"Bangers",cursive; font-size:1.3em; letter-spacing:2px; cursor:pointer; border-radius:5px; }' +

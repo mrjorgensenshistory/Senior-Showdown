@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Senior Showdown — Code Master List (TEACHER ONLY)</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:Arial,sans-serif; background:#1e5a2e; color:#fff; padding:20px; }
+  .container { max-width:1100px; margin:0 auto; }
+  .header { background:#8b0000; padding:12px 18px; border:3px solid #d4af37; }
+  .header h1 { font-size:22pt; letter-spacing:2px; }
+  .header .sub { font-size:10pt; font-style:italic; margin-top:4px; }
+  .warning { background:#ffd700; color:#000; padding:10px 14px; margin:14px 0; font-weight:bold; border:2px solid #000; }
+  .panel { background:#fff; color:#000; padding:16px; margin:14px 0; border-radius:6px; }
+  .panel h2 { color:#1e5a2e; font-size:14pt; margin-bottom:8px; border-bottom:2px solid #d4af37; padding-bottom:4px; }
+  textarea { width:100%; min-height:200px; padding:10px; font-family:'Courier New',monospace; font-size:11pt; border:2px solid #1e5a2e; border-radius:4px; }
+  button { background:#1e5a2e; color:#fff; border:none; padding:10px 24px; font-size:12pt; font-weight:bold; cursor:pointer; border-radius:4px; margin-right:8px; margin-top:8px; }
+  button:hover { background:#2a7e3e; }
+  button.secondary { background:#888; }
+  table { width:100%; border-collapse:collapse; margin-top:10px; font-family:'Courier New',monospace; font-size:11pt; }
+  th, td { padding:6px 10px; border:1px solid #888; text-align:left; }
+  th { background:#1e5a2e; color:#d4af37; letter-spacing:1px; }
+  tr:nth-child(even) { background:#f4ecd8; }
+  .code { font-weight:bold; color:#1e5a2e; letter-spacing:2px; }
+  .lookup-input { font-size:14pt; padding:10px; width:280px; letter-spacing:3px; text-transform:uppercase; font-family:'Courier New',monospace; border:2px solid #1e5a2e; border-radius:4px; }
+  .lookup-result { font-size:14pt; margin-top:12px; padding:12px; border-radius:6px; }
+  .lookup-result.ok { background:#1e5a2e; color:#fff; }
+  .lookup-result.bad { background:#8b0000; color:#fff; }
+  @media print {
+    body { background:#fff; color:#000; padding:0; }
+    .panel { box-shadow:none; }
+    .warning, .header, button, #lookup-section { display:none; }
+    table { font-size:9pt; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>&#x1F511; SENIOR SHOWDOWN &mdash; CODE MASTER LIST</h1>
+    <div class="sub">TEACHER USE ONLY &mdash; do NOT share this URL with students.</div>
+  </div>
+
+  <div class="warning">
+    &#x26A0; This tool generates the SAME codes the game generates. Keep this file private. If a student finds it, they can fake any code without playing.
+  </div>
+
+  <div class="panel">
+    <h2>STEP 1 &mdash; Paste your class roster</h2>
+    <p style="margin-bottom:8px; font-size:10pt;">One name per line. First &amp; last name. Spaces, hyphens, apostrophes &mdash; all fine, code normalizes them.</p>
+    <textarea id="roster" placeholder="Alex Garcia&#10;Maria Lopez&#10;John Smith&#10;Tyler Chen&#10;Brianna O'Neill&#10;Mary-Jane Wilson"></textarea>
+    <button onclick="generateTable()">&#x1F4CB; GENERATE CODE TABLE</button>
+    <button class="secondary" onclick="loadDemo()">Load sample roster</button>
+  </div>
+
+  <div class="panel" id="output-panel" style="display:none;">
+    <h2>STEP 2 &mdash; Master code list</h2>
+    <div style="font-size:10pt; margin-bottom:6px;">
+      Print this page or keep it on screen. When a student turns in a worksheet, find their name and compare codes.
+    </div>
+    <div id="output-table"></div>
+    <button onclick="window.print()">&#x1F5A8; PRINT THIS TABLE</button>
+    <button class="secondary" onclick="copyCSV()">Copy as CSV (for Excel)</button>
+  </div>
+
+  <div class="panel" id="lookup-section">
+    <h2>QUICK LOOKUP &mdash; verify a single code</h2>
+    <p style="font-size:10pt; margin-bottom:8px;">Type a student name + the code they wrote on their worksheet. This tells you if it&rsquo;s valid for that grade.</p>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <input type="text" id="lookup-name" placeholder="Student name" class="lookup-input" style="width:240px; letter-spacing:1px; text-transform:none;">
+      <input type="text" id="lookup-code" placeholder="WAVE-XXXX" class="lookup-input" style="width:200px;">
+      <button onclick="lookupCode()">VERIFY</button>
+    </div>
+    <div id="lookup-result"></div>
+  </div>
+
+</div>
+
+<script>
+// MUST match the algorithm in index-v3.html exactly.
+var GRADE_TAGS = { 9:'WAVE', 10:'HAUN', 11:'HOCO', 12:'PROM' };
+
+function makeProofCode(studentName, grade) {
+  var tag = GRADE_TAGS[grade] || 'XXXX';
+  var normalized = (studentName || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (!normalized) return tag + '-XXXX';
+  var seed = normalized + '|' + grade + '|SHOWDOWN';
+  var h = 5381;
+  for (var k = 0; k < seed.length; k++) {
+    h = ((h << 5) + h + seed.charCodeAt(k)) | 0;
+  }
+  var hash = (Math.abs(h)).toString(36).toUpperCase();
+  while (hash.length < 4) hash = '0' + hash;
+  hash = hash.slice(-4);
+  return tag + '-' + hash;
+}
+
+function generateTable() {
+  var raw = document.getElementById('roster').value;
+  var names = raw.split('\n').map(function(n){ return n.trim(); }).filter(function(n){ return n.length > 0; });
+  if (names.length === 0) { alert('Paste at least one name first.'); return; }
+
+  var html = '<table><thead><tr><th>#</th><th>Student</th><th>9th (WAVE)</th><th>10th (HAUN)</th><th>11th (HOCO)</th><th>12th (PROM)</th></tr></thead><tbody>';
+  names.forEach(function(name, i){
+    html += '<tr>';
+    html += '<td>' + (i+1) + '</td>';
+    html += '<td>' + escapeHtml(name) + '</td>';
+    html += '<td class="code">' + makeProofCode(name, 9) + '</td>';
+    html += '<td class="code">' + makeProofCode(name, 10) + '</td>';
+    html += '<td class="code">' + makeProofCode(name, 11) + '</td>';
+    html += '<td class="code">' + makeProofCode(name, 12) + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  html += '<p style="margin-top:10px; font-size:10pt; color:#555;">Total students: <strong>' + names.length + '</strong></p>';
+  document.getElementById('output-table').innerHTML = html;
+  document.getElementById('output-panel').style.display = 'block';
+  document.getElementById('output-panel').scrollIntoView({behavior:'smooth'});
+}
+
+function loadDemo() {
+  document.getElementById('roster').value = 'Alex Garcia\nMaria Lopez\nJohn Smith\nTyler Chen\nBrianna O\'Neill\nMary-Jane Wilson\nDavid Park\nSophia Reyes';
+  generateTable();
+}
+
+function copyCSV() {
+  var raw = document.getElementById('roster').value;
+  var names = raw.split('\n').map(function(n){ return n.trim(); }).filter(function(n){ return n.length > 0; });
+  var csv = 'Student,9th Grade,10th Grade,11th Grade,12th Grade\n';
+  names.forEach(function(name){
+    csv += '"' + name.replace(/"/g,'""') + '",' + makeProofCode(name,9) + ',' + makeProofCode(name,10) + ',' + makeProofCode(name,11) + ',' + makeProofCode(name,12) + '\n';
+  });
+  navigator.clipboard.writeText(csv).then(function(){
+    alert('CSV copied! Paste into Excel or Google Sheets.');
+  }, function(){
+    alert('Could not copy. Select the table manually.');
+  });
+}
+
+function lookupCode() {
+  var name = document.getElementById('lookup-name').value.trim();
+  var code = document.getElementById('lookup-code').value.trim().toUpperCase();
+  var resultEl = document.getElementById('lookup-result');
+  if (!name || !code) { resultEl.innerHTML = ''; return; }
+  var codes = {
+    9: makeProofCode(name, 9),
+    10: makeProofCode(name, 10),
+    11: makeProofCode(name, 11),
+    12: makeProofCode(name, 12)
+  };
+  var matchedGrade = null;
+  for (var g in codes) { if (codes[g] === code) { matchedGrade = g; break; } }
+  if (matchedGrade) {
+    resultEl.className = 'lookup-result ok';
+    resultEl.innerHTML = '&#x2705; VALID. <strong>' + escapeHtml(name) + '</strong> completed <strong>' + matchedGrade + 'th grade</strong>. Code matches.';
+  } else {
+    resultEl.className = 'lookup-result bad';
+    resultEl.innerHTML = '&#x274C; INVALID. No grade-code combo for <strong>' + escapeHtml(name) + '</strong> matches <strong>' + escapeHtml(code) + '</strong>.<br>' +
+      '<span style="font-size:10pt; font-weight:normal;">Expected codes for this name: ' +
+      '9th=' + codes[9] + ', 10th=' + codes[10] + ', 11th=' + codes[11] + ', 12th=' + codes[12] + '</span>';
+  }
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+
+</body>
+</html>
