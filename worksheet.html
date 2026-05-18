@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Senior Showdown — Student Worksheet</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:Georgia, serif; color:#000; background:#eee; padding:20px; line-height:1.4; }
+  .sheet { max-width:8.5in; margin:0 auto 30px auto; background:#fff; padding:0.5in; box-shadow:0 2px 8px rgba(0,0,0,0.2); }
+  .header { text-align:center; border-bottom:3px double #000; padding-bottom:10px; margin-bottom:14px; }
+  .title { font-size:22pt; font-weight:bold; letter-spacing:2px; }
+  .subtitle { font-size:11pt; font-style:italic; margin-top:3px; }
+  .info-row { display:flex; gap:10px; margin:10px 0 16px 0; font-size:10pt; }
+  .info-row .field { flex:1; border-bottom:1.5px solid #000; padding:14px 4px 2px 4px; position:relative; }
+  .info-row .field-label { position:absolute; top:-2px; left:4px; font-size:8pt; font-weight:bold; text-transform:uppercase; letter-spacing:1px; color:#333; }
+  .section { margin:14px 0; page-break-inside:avoid; }
+  .section-title { font-size:11pt; font-weight:bold; background:#000; color:#fff; padding:4px 10px; letter-spacing:1px; }
+  .section-sub { font-size:9pt; font-style:italic; color:#444; padding:3px 0 6px 0; }
+  ol.questions { padding-left:24px; }
+  ol.questions li { font-size:10pt; margin-bottom:7px; line-height:1.4; }
+  .blank { display:inline-block; border-bottom:1.5px solid #000; min-width:80px; margin:0 4px; padding:0 3px; }
+  .blank-long { min-width:280px; }
+  .blank-short { min-width:50px; }
+  .hint { font-size:8.5pt; color:#666; font-style:italic; }
+  .multi-blank { margin:4px 0 0 18px; font-size:10pt; }
+  .multi-blank div { margin:3px 0; }
+  .footer { margin-top:18px; padding:10px; border:2px solid #000; font-size:9pt; }
+  .footer .tcheck { font-weight:bold; margin-bottom:4px; letter-spacing:1px; }
+  .footer .tline { display:flex; gap:14px; margin-top:8px; }
+  .footer .tfield { flex:1; border-bottom:1px solid #000; padding:10px 0 2px 0; font-size:8pt; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:6px 18px; margin-top:4px; }
+  .pagebreak { page-break-after:always; }
+  .no-print { background:#1e5a2e; color:#fff; padding:14px; text-align:center; max-width:8.5in; margin:0 auto 14px auto; font-family:Arial,sans-serif; }
+  .no-print button { background:#fff; color:#1e5a2e; border:none; padding:8px 18px; font-weight:bold; cursor:pointer; font-size:12pt; border-radius:4px; }
+  @media print {
+    body { background:#fff; padding:0; }
+    .sheet { box-shadow:none; margin:0; padding:0.5in; max-width:none; }
+    .no-print { display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="no-print">
+  <p style="margin-bottom:8px;">Two-page worksheet. Print and hand out to students &mdash; they fill it in by hand while playing.</p>
+  <button onclick="window.print()">&#x1F5A8; PRINT WORKSHEET</button>
+</div>
+
+<!-- ============== PAGE 1 ============== -->
+<div class="sheet">
+
+  <div class="header">
+    <div class="title">SENIOR SHOWDOWN &mdash; PROOF OF COMPLETION</div>
+    <div class="subtitle">ASB Budget Simulation &mdash; Student Worksheet</div>
+  </div>
+
+  <div class="info-row">
+    <div class="field"><span class="field-label">Name</span>&nbsp;</div>
+    <div class="field" style="flex:0.4;"><span class="field-label">Period</span>&nbsp;</div>
+    <div class="field" style="flex:0.5;"><span class="field-label">Date</span>&nbsp;</div>
+    <div class="field" style="flex:0.5;"><span class="field-label">Grade Played</span>&nbsp;</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">PART 1 &mdash; GAME TRIVIA</div>
+    <div class="section-sub">You can only answer these if you actually played. No Googling.</div>
+    <ol class="questions">
+      <li>What football character TACKLES you on the &ldquo;Game Over&rdquo; screens when you skip the paperwork? <span class="blank">&nbsp;</span><br>
+        <span class="hint">(Hint: He&rsquo;s the office linebacker.)</span></li>
+
+      <li>What football character is DISAPPOINTED when you skip a fundraiser? <span class="blank">&nbsp;</span><br>
+        <span class="hint">(Hint: Adam Sandler movie about a waterboy.)</span></li>
+
+      <li>The MOST EXPENSIVE prom venue in the game is themed after what movie? <span class="blank blank-long">&nbsp;</span></li>
+
+      <li>The CHEAPEST prom venue (FREE) is themed after what TV show? <span class="blank blank-long">&nbsp;</span></li>
+
+      <li>What is the name of the FREE high-school gym venue? <span class="blank blank-long">&nbsp;</span><br>
+        <span class="hint">(Hint: It&rsquo;s from a Netflix show with Eleven.)</span></li>
+
+      <li>Name TWO of the other prom venue options (not free, not most expensive):
+        <div class="multi-blank">
+          <div>a) <span class="blank blank-long">&nbsp;</span></div>
+          <div>b) <span class="blank blank-long">&nbsp;</span></div>
+        </div>
+      </li>
+
+      <li>What is the MAXIMUM number of cars you can wash in 3 hours? <span class="blank blank-short">&nbsp;</span> cars</li>
+
+      <li>About how many students attend ACE total? <span class="blank blank-short">&nbsp;</span> students</li>
+
+      <li>How much does the Disney Grad Nite bus cost? $<span class="blank blank-short">&nbsp;</span></li>
+
+      <li>How much does a yearbook cost per student? $<span class="blank blank-short">&nbsp;</span></li>
+
+      <li>What is the PROFIT CAP on Sadie&rsquo;s Dance for freshmen? $<span class="blank blank-short">&nbsp;</span></li>
+
+      <li>If you include FOOD at Sadie&rsquo;s Dance, by what percent does attendance go up? <span class="blank blank-short">&nbsp;</span> %</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <div class="section-title">PART 2 &mdash; YOUR PLAYTHROUGH</div>
+    <div class="section-sub">These answers will be DIFFERENT for every student. Copy exactly from your game.</div>
+    <ol class="questions" start="13">
+      <li><strong>VERIFICATION CODE</strong> from your Proof Certificate at the end of the game (6 letters/numbers):
+        <div style="margin:6px 0 0 0;">
+          <span class="blank" style="min-width:40px; text-align:center; margin:0 3px;">&nbsp;</span>
+          <span class="blank" style="min-width:40px; text-align:center; margin:0 3px;">&nbsp;</span>
+          <span class="blank" style="min-width:40px; text-align:center; margin:0 3px;">&nbsp;</span>
+          <span class="blank" style="min-width:40px; text-align:center; margin:0 3px;">&nbsp;</span>
+          <span class="blank" style="min-width:40px; text-align:center; margin:0 3px;">&nbsp;</span>
+          <span class="blank" style="min-width:40px; text-align:center; margin:0 3px;">&nbsp;</span>
+        </div>
+      </li>
+
+      <li>Your STARTING balance: $<span class="blank">&nbsp;</span> &nbsp;&nbsp; Your ENDING balance: $<span class="blank">&nbsp;</span></li>
+
+      <li>Your NET profit (or loss): $<span class="blank">&nbsp;</span></li>
+
+      <li>List THREE fundraisers YOU ran (in order they happened):
+        <div class="multi-blank">
+          <div>1) <span class="blank blank-long">&nbsp;</span></div>
+          <div>2) <span class="blank blank-long">&nbsp;</span></div>
+          <div>3) <span class="blank blank-long">&nbsp;</span></div>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <div class="footer" style="text-align:center; font-size:8pt; font-style:italic;">
+    &nbsp;&nbsp;&nbsp;&nbsp;Continued on next page &rarr;
+  </div>
+
+</div>
+
+<!-- ============== PAGE 2 ============== -->
+<div class="sheet">
+
+  <div class="header" style="padding-bottom:5px; margin-bottom:10px;">
+    <div class="title" style="font-size:14pt;">SENIOR SHOWDOWN &mdash; PAGE 2</div>
+  </div>
+
+  <div class="info-row" style="margin:6px 0 12px 0;">
+    <div class="field"><span class="field-label">Name (again)</span>&nbsp;</div>
+    <div class="field" style="flex:0.4;"><span class="field-label">Period</span>&nbsp;</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">PART 3 &mdash; MATH CHECK</div>
+    <div class="section-sub">Show your work. These use real numbers from the game.</div>
+    <ol class="questions" start="17">
+      <li>The Disney Grad Nite bus costs $1,750. If you split it across 40 seniors, how much does EACH senior pay?
+        <div style="margin-top:5px;">$1,750 &divide; 40 = $<span class="blank">&nbsp;</span></div>
+      </li>
+
+      <li>Yearbooks cost $45 each. If 60 students buy them, total cost is:
+        <div style="margin-top:5px;">60 &times; $45 = $<span class="blank">&nbsp;</span></div>
+      </li>
+
+      <li>You wash 32 cars at $15 each. Supplies cost $30. What&rsquo;s your PROFIT?
+        <div style="margin-top:5px;">(32 &times; $15) &minus; $30 = $<span class="blank">&nbsp;</span></div>
+      </li>
+
+      <li>You sell 50 Sadie&rsquo;s tickets at $20 each, NO food. Decor cost $50. Profit?
+        <div style="margin-top:5px;">(50 &times; $20) &minus; $50 = $<span class="blank">&nbsp;</span></div>
+      </li>
+
+      <li>If you skip the paperwork and just sell donuts &mdash; how much money do you make?
+        <div style="margin-top:5px;">$<span class="blank">&nbsp;</span> &nbsp;<span class="hint">(Trick question. What happens?)</span></div>
+      </li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <div class="section-title">PART 4 &mdash; REFLECTION</div>
+    <div class="section-sub">1&ndash;2 sentences each. Your own words.</div>
+    <ol class="questions" start="22">
+      <li>Which fundraiser made you the MOST money, and WHY do you think it worked?
+        <div style="border-bottom:1px solid #000; height:18px; margin:4px 0;"></div>
+        <div style="border-bottom:1px solid #000; height:18px; margin:4px 0;"></div>
+      </li>
+
+      <li>What is ONE DECISION you regret? What would you do differently next time?
+        <div style="border-bottom:1px solid #000; height:18px; margin:4px 0;"></div>
+        <div style="border-bottom:1px solid #000; height:18px; margin:4px 0;"></div>
+      </li>
+
+      <li>What is ONE THING you learned about managing class money that surprised you?
+        <div style="border-bottom:1px solid #000; height:18px; margin:4px 0;"></div>
+        <div style="border-bottom:1px solid #000; height:18px; margin:4px 0;"></div>
+      </li>
+
+      <li>Why does the Disney bus cost matter MORE for a small class than a big class?
+        <div style="border-bottom:1px solid #000; height:18px; margin:4px 0;"></div>
+        <div style="border-bottom:1px solid #000; height:18px; margin:4px 0;"></div>
+      </li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    <div class="tcheck">TEACHER USE ONLY</div>
+    <div style="display:flex; gap:14px;">
+      <div style="flex:1;">
+        <div style="font-size:8pt; font-weight:bold;">Verification Code matches game?</div>
+        <div style="margin-top:3px;">&#x2610; YES &nbsp;&nbsp; &#x2610; NO</div>
+      </div>
+      <div style="flex:1;">
+        <div style="font-size:8pt; font-weight:bold;">Grade</div>
+        <div style="border-bottom:1.2px solid #000; height:16px; margin-top:2px;">&nbsp;</div>
+      </div>
+      <div style="flex:1.5;">
+        <div style="font-size:8pt; font-weight:bold;">Notes</div>
+        <div style="border-bottom:1.2px solid #000; height:16px; margin-top:2px;">&nbsp;</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

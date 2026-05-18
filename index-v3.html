@@ -4007,7 +4007,7 @@ function renderEndNav() {
   }
   // PROOF OF COMPLETION button — only show if balance is positive (they "won")
   if (state.balance >= 0) {
-    html += '<button class="btn" onclick="generateProofCert()" style="background:linear-gradient(135deg,#d4af37,#b8941f); border-color:#8b6914; color:#0a1a0f;">&#x1F4DC; GENERATE PROOF (TURN IN TO TEACHER)</button>';
+    html += '<button class="btn" onclick="generateProofCert()" style="background:linear-gradient(135deg,#d4af37,#b8941f); border-color:#8b6914; color:#0a1a0f;">&#x1F4DC; SHOW MY CODE &amp; STATS (write on worksheet)</button>';
   }
   html += '<button class="btn" onclick="restart()">&#x1F504; REPLAY '+state.grade+'TH GRADE</button>';
   html += '<button class="btn" onclick="show(\'sHub\')">&#x1F3E0; BACK TO START</button>';
@@ -4085,8 +4085,8 @@ function generateProofCert() {
     '.delta-pos { color:#1e5a2e; }' +
     '.delta-neg { color:#8b0000; }' +
     '.footer { margin-top:25px; padding-top:15px; border-top:2px solid #8b6914; display:flex; justify-content:space-between; align-items:center; }' +
-    '.code-box { background:#1e5a2e; color:#d4af37; padding:10px 20px; font-family:"Bangers",cursive; letter-spacing:4px; font-size:1.5em; border:2px solid #d4af37; }' +
-    '.code-label { font-size:0.7em; letter-spacing:2px; display:block; margin-bottom:3px; color:#ffe9a0; }' +
+    '.code-box { background:#1e5a2e; color:#d4af37; padding:15px 30px; font-family:"Bangers",cursive; letter-spacing:8px; font-size:2.5em; border:3px solid #d4af37; text-align:center; }' +
+    '.code-label { font-size:0.4em; letter-spacing:2px; display:block; margin-bottom:6px; color:#ffe9a0; }' +
     '.sig-line { border-top:1px solid #2a1a05; padding-top:4px; font-size:0.85em; min-width:200px; text-align:center; }' +
     '.print-btn { display:block; margin:20px auto; padding:12px 30px; background:#1e5a2e; color:#fff; border:none; font-family:"Bangers",cursive; font-size:1.3em; letter-spacing:2px; cursor:pointer; border-radius:5px; }' +
     '.print-btn:hover { background:#2a7e3e; }' +
@@ -4132,8 +4132,9 @@ function generateProofCert() {
       '</div>' +
     '</div>' +
     '</div>' +
-    '<button class="print-btn" onclick="window.print()">&#x1F5A8; PRINT THIS CERTIFICATE</button>' +
-    '<p style="text-align:center; font-size:0.85em; color:#666; max-width:780px; margin:10px auto;">Print this page OR screenshot it and turn it in. The Verification Code is unique to your choices &mdash; if two students show the same code, they made the exact same decisions in the same order.</p>' +
+    '<button class="print-btn" onclick="window.close()">&#x2716; CLOSE THIS WINDOW</button>' +
+    '<p style="text-align:center; font-size:1em; color:#1e5a2e; font-weight:bold; max-width:780px; margin:15px auto;">&#x2192; Copy your VERIFICATION CODE and STATS onto your paper worksheet now. &#x2190;</p>' +
+    '<p style="text-align:center; font-size:0.85em; color:#666; max-width:780px; margin:10px auto;">The code is unique to YOUR choices. Two students with the same code = they made the exact same decisions. Your teacher will check.</p>' +
     '</body></html>';
 
   // Open in a new window
