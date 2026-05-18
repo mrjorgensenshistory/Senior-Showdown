@@ -44,7 +44,7 @@
   </div>
 
   <div class="warning">
-    &#x26A0; This tool generates the SAME codes the game generates. Keep this file private. If a student finds it, they can fake any code without playing.
+    &#x26A0; This tool generates the verification PORTION of each code (WAVE-XXXX). The full code in the game looks like <strong>WAVE-XXXX-080</strong> where the last 3 digits are the student&rsquo;s end-of-grade quiz score (000&ndash;100). You verify the first 9 characters &mdash; the score is self-graded. Keep this file private.
   </div>
 
   <div class="panel">
@@ -70,7 +70,7 @@
     <p style="font-size:10pt; margin-bottom:8px;">Type a student name + the code they wrote on their worksheet. This tells you if it&rsquo;s valid for that grade.</p>
     <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
       <input type="text" id="lookup-name" placeholder="Student name" class="lookup-input" style="width:240px; letter-spacing:1px; text-transform:none;">
-      <input type="text" id="lookup-code" placeholder="WAVE-XXXX" class="lookup-input" style="width:200px;">
+      <input type="text" id="lookup-code" placeholder="WAVE-XXXX-080" class="lookup-input" style="width:250px;">
       <button onclick="lookupCode()">VERIFY</button>
     </div>
     <div id="lookup-result"></div>
@@ -141,9 +141,19 @@ function copyCSV() {
 
 function lookupCode() {
   var name = document.getElementById('lookup-name').value.trim();
-  var code = document.getElementById('lookup-code').value.trim().toUpperCase();
+  var fullCode = document.getElementById('lookup-code').value.trim().toUpperCase();
   var resultEl = document.getElementById('lookup-result');
-  if (!name || !code) { resultEl.innerHTML = ''; return; }
+  if (!name || !fullCode) { resultEl.innerHTML = ''; return; }
+
+  // Split out the score suffix if present (TAG-XXXX-PPP)
+  var verifyPart = fullCode;
+  var scorePart = null;
+  var m = fullCode.match(/^([A-Z]+-[A-Z0-9]+)-(\d{1,3})$/);
+  if (m) {
+    verifyPart = m[1];
+    scorePart = parseInt(m[2], 10);
+  }
+
   var codes = {
     9: makeProofCode(name, 9),
     10: makeProofCode(name, 10),
@@ -151,13 +161,14 @@ function lookupCode() {
     12: makeProofCode(name, 12)
   };
   var matchedGrade = null;
-  for (var g in codes) { if (codes[g] === code) { matchedGrade = g; break; } }
+  for (var g in codes) { if (codes[g] === verifyPart) { matchedGrade = g; break; } }
   if (matchedGrade) {
     resultEl.className = 'lookup-result ok';
-    resultEl.innerHTML = '&#x2705; VALID. <strong>' + escapeHtml(name) + '</strong> completed <strong>' + matchedGrade + 'th grade</strong>. Code matches.';
+    var scoreNote = (scorePart !== null) ? ' Quiz score: <strong>' + scorePart + '%</strong>.' : ' (No quiz score appended.)';
+    resultEl.innerHTML = '&#x2705; VALID. <strong>' + escapeHtml(name) + '</strong> completed <strong>' + matchedGrade + 'th grade</strong>.' + scoreNote;
   } else {
     resultEl.className = 'lookup-result bad';
-    resultEl.innerHTML = '&#x274C; INVALID. No grade-code combo for <strong>' + escapeHtml(name) + '</strong> matches <strong>' + escapeHtml(code) + '</strong>.<br>' +
+    resultEl.innerHTML = '&#x274C; INVALID. No grade-code combo for <strong>' + escapeHtml(name) + '</strong> matches <strong>' + escapeHtml(verifyPart) + '</strong>.<br>' +
       '<span style="font-size:10pt; font-weight:normal;">Expected codes for this name: ' +
       '9th=' + codes[9] + ', 10th=' + codes[10] + ', 11th=' + codes[11] + ', 12th=' + codes[12] + '</span>';
   }

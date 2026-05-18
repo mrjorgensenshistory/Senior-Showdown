@@ -47,14 +47,13 @@
 
   <div class="section">
     <div class="section-title">CODES &mdash; FORMAT &amp; VERIFICATION</div>
-    <div class="section-sub">Each grade gives the student an 8-character code. First 4 chars = grade tag (everyone same). Last 4 chars = unique to student name.</div>
+    <div class="section-sub">Each code has THREE parts: <strong>GRADE-IDENTITY-SCORE</strong>. Example: <strong>WAVE-S6KG-080</strong></div>
     <div class="codebox">
-      9th grade &rarr; starts with <strong>WAVE-</strong> &nbsp;|&nbsp;
-      10th grade &rarr; <strong>HAUN-</strong> &nbsp;|&nbsp;
-      11th grade &rarr; <strong>HOCO-</strong> &nbsp;|&nbsp;
-      12th grade &rarr; <strong>PROM-</strong>
+      &nbsp;&nbsp;<strong>WAVE</strong> / <strong>HAUN</strong> / <strong>HOCO</strong> / <strong>PROM</strong> &nbsp;&mdash; grade tag (9 / 10 / 11 / 12)<br>
+      &nbsp;&nbsp;<strong>XXXX</strong> &mdash; 4-char hash of student&rsquo;s name (use master list to verify)<br>
+      &nbsp;&nbsp;<strong>PPP</strong> &mdash; quiz score 000&ndash;100 (self-graded by the game)
     </div>
-    <p style="font-size:10pt;">Use <strong>code-master-list.html</strong> to generate the unique 4-char suffix for each student in your roster. Two students with the same name = same code (rare). Different names = different codes guaranteed.</p>
+    <p style="font-size:10pt;"><strong>To verify:</strong> Use <strong>code-master-list.html</strong>. Paste roster, get expected codes. Compare the first 9 chars (e.g., WAVE-S6KG). The last 3 chars are the student&rsquo;s end-of-grade quiz score &mdash; the game graded it automatically. 5 questions per grade, each worth 20%.</p>
   </div>
 
   <div class="section">
