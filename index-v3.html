@@ -4005,9 +4005,146 @@ function renderEndNav() {
       html += '<p style="color:#8b0000; font-size:0.9em; margin:0.5vh 0;">You need to replay this grade and finish with a positive balance before moving on.</p>';
     }
   }
+  // PROOF OF COMPLETION button — only show if balance is positive (they "won")
+  if (state.balance >= 0) {
+    html += '<button class="btn" onclick="generateProofCert()" style="background:linear-gradient(135deg,#d4af37,#b8941f); border-color:#8b6914; color:#0a1a0f;">&#x1F4DC; GENERATE PROOF (TURN IN TO TEACHER)</button>';
+  }
   html += '<button class="btn" onclick="restart()">&#x1F504; REPLAY '+state.grade+'TH GRADE</button>';
   html += '<button class="btn" onclick="show(\'sHub\')">&#x1F3E0; BACK TO START</button>';
   nav.innerHTML = html;
+}
+
+// ============ PROOF OF COMPLETION CERTIFICATE ============
+// Opens a new window with a printable certificate.
+// Includes a 6-character verification code that hashes the player's choices —
+// two students with the same code = they copied. Different choices = different code.
+function makeProofCode() {
+  // Hash key state fields into a short alphanumeric code
+  var s = state;
+  var seed = s.grade + '|' + s.startBalance + '|' + s.balance + '|';
+  // Include all log labels + deltas (the path they took through the game)
+  for (var i = 0; i < s.log.length; i++) {
+    seed += (s.log[i].label || '') + ':' + (s.log[i].delta || 0) + ';';
+  }
+  // Simple deterministic hash (djb2-ish)
+  var h = 5381;
+  for (var k = 0; k < seed.length; k++) {
+    h = ((h << 5) + h + seed.charCodeAt(k)) | 0;
+  }
+  // Convert to base36, 6 chars, uppercase
+  var code = (Math.abs(h)).toString(36).toUpperCase();
+  while (code.length < 6) code = '0' + code;
+  return code.slice(-6);
+}
+
+function generateProofCert() {
+  var studentName = prompt('Enter your FULL name (first and last) for the proof certificate:');
+  if (!studentName || studentName.trim().length < 2) {
+    alert('You need to enter your name to generate a proof certificate.');
+    return;
+  }
+  studentName = studentName.trim().toUpperCase();
+
+  var period = prompt('Enter your CLASS PERIOD (e.g., 1, 2, 3, 4, 5, 6):');
+  if (!period) period = '?';
+  period = period.trim();
+
+  var code = makeProofCode();
+  var today = new Date();
+  var dateStr = (today.getMonth()+1) + '/' + today.getDate() + '/' + today.getFullYear();
+  var timeStr = today.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+
+  // Pick top decisions/log entries to display
+  var keyEntries = state.log.filter(function(e) {
+    return e.delta !== 0 && e.label && e.label.indexOf('Starting balance') === -1 && e.label.indexOf('Carryover') === -1;
+  });
+
+  // Render the certificate HTML
+  var cert = '<!DOCTYPE html><html><head><title>SENIOR SHOWDOWN — Proof of Completion</title>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&display=swap" rel="stylesheet">' +
+    '<style>' +
+    '* { box-sizing:border-box; margin:0; padding:0; }' +
+    'body { font-family:Georgia, serif; background:#f4ecd8; padding:30px; color:#2a1a05; }' +
+    '.cert { max-width:780px; margin:0 auto; background:#fff8e7; border:8px double #8b6914; padding:40px 50px; box-shadow:0 4px 20px rgba(0,0,0,0.2); position:relative; }' +
+    '.cert::before { content:""; position:absolute; top:15px; left:15px; right:15px; bottom:15px; border:2px solid #d4af37; pointer-events:none; }' +
+    '.header { text-align:center; border-bottom:3px solid #8b6914; padding-bottom:15px; margin-bottom:25px; }' +
+    '.school { font-family:"Bangers",cursive; font-size:1.3em; color:#8b6914; letter-spacing:3px; }' +
+    '.title { font-family:"Bangers",cursive; font-size:2.8em; color:#1e5a2e; letter-spacing:4px; margin:8px 0; line-height:1; }' +
+    '.subtitle { font-family:"Bebas Neue",sans-serif; font-size:1.1em; color:#555; letter-spacing:2px; }' +
+    '.body-text { font-size:1.05em; line-height:1.7; margin:15px 0; text-align:center; }' +
+    '.student-name { font-family:"Bangers",cursive; font-size:2em; color:#1e5a2e; letter-spacing:2px; text-decoration:underline; text-decoration-color:#d4af37; padding:5px 20px; display:inline-block; margin:8px 0; }' +
+    '.stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:18px 0; background:#fff; border:1px solid #8b6914; padding:15px; }' +
+    '.stat { padding:6px 10px; }' +
+    '.stat-label { font-size:0.75em; text-transform:uppercase; color:#555; letter-spacing:1px; }' +
+    '.stat-value { font-family:"Bangers",cursive; font-size:1.3em; color:#1e5a2e; letter-spacing:1px; }' +
+    '.choices { margin:18px 0; background:#fff; border:1px solid #8b6914; padding:15px; }' +
+    '.choices h3 { font-family:"Bangers",cursive; font-size:1.2em; color:#8b6914; letter-spacing:2px; margin-bottom:10px; text-align:center; }' +
+    '.choice-row { display:flex; justify-content:space-between; padding:4px 8px; border-bottom:1px dotted #ccc; font-size:0.9em; }' +
+    '.choice-row:last-child { border-bottom:none; }' +
+    '.choice-delta { font-weight:bold; }' +
+    '.delta-pos { color:#1e5a2e; }' +
+    '.delta-neg { color:#8b0000; }' +
+    '.footer { margin-top:25px; padding-top:15px; border-top:2px solid #8b6914; display:flex; justify-content:space-between; align-items:center; }' +
+    '.code-box { background:#1e5a2e; color:#d4af37; padding:10px 20px; font-family:"Bangers",cursive; letter-spacing:4px; font-size:1.5em; border:2px solid #d4af37; }' +
+    '.code-label { font-size:0.7em; letter-spacing:2px; display:block; margin-bottom:3px; color:#ffe9a0; }' +
+    '.sig-line { border-top:1px solid #2a1a05; padding-top:4px; font-size:0.85em; min-width:200px; text-align:center; }' +
+    '.print-btn { display:block; margin:20px auto; padding:12px 30px; background:#1e5a2e; color:#fff; border:none; font-family:"Bangers",cursive; font-size:1.3em; letter-spacing:2px; cursor:pointer; border-radius:5px; }' +
+    '.print-btn:hover { background:#2a7e3e; }' +
+    '@media print { body { background:#fff; padding:0; } .cert { border:6px double #000; box-shadow:none; } .print-btn { display:none; } .cert::before { border-color:#888; } }' +
+    '</style></head><body>' +
+    '<div class="cert">' +
+    '<div class="header">' +
+      '<div class="school">ACE &mdash; ASSOCIATED STUDENT BODY</div>' +
+      '<div class="title">SENIOR SHOWDOWN</div>' +
+      '<div class="subtitle">CERTIFICATE OF COMPLETION</div>' +
+    '</div>' +
+    '<div class="body-text">This is to certify that</div>' +
+    '<div style="text-align:center;"><span class="student-name">' + studentName + '</span></div>' +
+    '<div class="body-text">successfully completed the <strong>' + state.grade + 'th Grade</strong> module of <em>Senior Showdown</em>, balancing the class budget and finishing with a positive bank.</div>' +
+    '<div class="stats-grid">' +
+      '<div class="stat"><div class="stat-label">Grade Played</div><div class="stat-value">' + state.grade + 'TH GRADE</div></div>' +
+      '<div class="stat"><div class="stat-label">Class Period</div><div class="stat-value">PERIOD ' + period + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Starting Balance</div><div class="stat-value">$' + (state.startBalance).toFixed(2) + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Ending Balance</div><div class="stat-value">$' + (state.balance).toFixed(2) + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Net Change</div><div class="stat-value">' + ((state.balance - state.startBalance) >= 0 ? '+$' : '-$') + Math.abs(state.balance - state.startBalance).toFixed(2) + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Completed On</div><div class="stat-value">' + dateStr + '</div></div>' +
+    '</div>' +
+    '<div class="choices">' +
+      '<h3>&#x1F4CB; KEY DECISIONS & TRANSACTIONS</h3>';
+  if (keyEntries.length === 0) {
+    cert += '<div style="text-align:center; padding:10px; color:#888;">No transactions recorded.</div>';
+  } else {
+    for (var i = 0; i < keyEntries.length; i++) {
+      var e = keyEntries[i];
+      var deltaClass = e.delta >= 0 ? 'delta-pos' : 'delta-neg';
+      var deltaStr = (e.delta >= 0 ? '+$' : '-$') + Math.abs(e.delta).toFixed(2);
+      cert += '<div class="choice-row"><span>' + (e.label || '(unlabeled)') + '</span><span class="choice-delta ' + deltaClass + '">' + deltaStr + '</span></div>';
+    }
+  }
+  cert += '</div>' +
+    '<div class="footer">' +
+      '<div>' +
+        '<div class="code-box"><span class="code-label">VERIFICATION CODE</span>' + code + '</div>' +
+      '</div>' +
+      '<div>' +
+        '<div class="sig-line">Student Signature</div>' +
+        '<div style="font-size:0.7em; margin-top:8px; color:#666;">Generated ' + dateStr + ' at ' + timeStr + '</div>' +
+      '</div>' +
+    '</div>' +
+    '</div>' +
+    '<button class="print-btn" onclick="window.print()">&#x1F5A8; PRINT THIS CERTIFICATE</button>' +
+    '<p style="text-align:center; font-size:0.85em; color:#666; max-width:780px; margin:10px auto;">Print this page OR screenshot it and turn it in. The Verification Code is unique to your choices &mdash; if two students show the same code, they made the exact same decisions in the same order.</p>' +
+    '</body></html>';
+
+  // Open in a new window
+  var w = window.open('', '_blank', 'width=900,height=900,scrollbars=yes');
+  if (!w) {
+    alert('Popup blocked! Please allow popups for this site and try again.');
+    return;
+  }
+  w.document.open();
+  w.document.write(cert);
+  w.document.close();
 }
 
 // Rickroll reward block — appears on every ending. The Captain Insano experience.
