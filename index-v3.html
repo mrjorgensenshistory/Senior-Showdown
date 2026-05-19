@@ -4007,7 +4007,7 @@ function renderEndNav() {
   }
   // PROOF OF COMPLETION button — only show if balance is positive (they "won")
   if (state.balance >= 0) {
-    html += '<button class="btn" onclick="generateProofCert()" style="background:linear-gradient(135deg,#d4af37,#b8941f); border-color:#8b6914; color:#0a1a0f;">&#x1F4DC; SHOW MY CODE &amp; STATS (write on worksheet)</button>';
+    html += '<button class="btn" onclick="generateProofCert()" style="background:linear-gradient(135deg,#d4af37,#b8941f); border-color:#8b6914; color:#0a1a0f;">&#x1F4DC; GET MY CODE (write it on your worksheet)</button>';
   }
   html += '<button class="btn" onclick="restart()">&#x1F504; REPLAY '+state.grade+'TH GRADE</button>';
   html += '<button class="btn" onclick="show(\'sHub\')">&#x1F3E0; BACK TO START</button>';
@@ -4222,7 +4222,7 @@ function buildAndShowCert(studentName, period, scorePct) {
   cert += '</div>' +
     '<div class="footer">' +
       '<div>' +
-        '<div class="code-box"><span class="code-label">VERIFICATION CODE</span>' + code + '</div>' +
+        '<div class="code-box"><span class="code-label">YOUR CODE</span>' + code + '</div>' +
       '</div>' +
       '<div>' +
         '<div class="sig-line">Student Signature</div>' +
@@ -4231,8 +4231,7 @@ function buildAndShowCert(studentName, period, scorePct) {
     '</div>' +
     '</div>' +
     '<button class="print-btn" onclick="window.close()">&#x2716; CLOSE THIS WINDOW</button>' +
-    '<p style="text-align:center; font-size:1em; color:#1e5a2e; font-weight:bold; max-width:780px; margin:15px auto;">&#x2192; Copy your VERIFICATION CODE and STATS onto your paper worksheet now. &#x2190;</p>' +
-    '<p style="text-align:center; font-size:0.85em; color:#666; max-width:780px; margin:10px auto;">The code is unique to YOUR choices. Two students with the same code = they made the exact same decisions. Your teacher will check.</p>' +
+    '<p style="text-align:center; font-size:1.1em; color:#1e5a2e; font-weight:bold; max-width:780px; margin:15px auto;">&#x2192; Write this code on your worksheet. &#x2190;</p>' +
     '</body></html>';
 
   // Open in a new window
