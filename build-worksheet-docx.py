@@ -312,19 +312,19 @@ def build_worksheet():
     add_question(doc, 30, 'What price did YOU set for the senior PACKAGE (prom + Grad Nite + yearbook)?', '$ ______________')
 
     # === PART 3 — REFLECTION ===
-    add_section_header(doc, '  PART 3 — REFLECTION (about YOUR game)')
+    add_section_header(doc, '  PART 3 — REFLECTION (your game + real ASB)')
     sub = doc.add_paragraph()
     sub.paragraph_format.space_after = Pt(4)
-    r = sub.add_run('  1–2 sentences each. Answers must reference specifics from YOUR playthrough.')
+    r = sub.add_run('  1–2 sentences each. Reference specifics from YOUR playthrough AND from real life at our school.')
     r.font.italic = True
     r.font.size = Pt(9)
 
     reflections = [
-        ('31', 'Which fundraiser YOU ran made the MOST money? About how much profit?'),
+        ('31', 'Which fundraiser YOU ran made the MOST money in the game? About how much profit?'),
         ('32', 'Describe a fundraiser you regret — one that lost money, got cancelled, or you skipped. What happened?'),
-        ('33', 'Which prom venue did you almost pick INSTEAD of your final choice? Why did you change your mind?'),
-        ('34', 'What was the HARDEST decision you faced in the game? What did you choose, and why?'),
-        ('35', 'Pick ONE moment in the game that surprised you — a fundraiser that did way better or worse than you expected. Describe it.'),
+        ('33', 'Compare this game to REAL ASB at our school. What did it get RIGHT? Name something specific.'),
+        ('34', 'What did the game get WRONG or LEAVE OUT about real ASB at our school? Be specific.'),
+        ('35', 'What is the MOST important thing you LEARNED from this game that applies to real ASB or class money?'),
     ]
     for num, q in reflections:
         p = doc.add_paragraph()
