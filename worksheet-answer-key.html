@@ -23,10 +23,11 @@
   .codebox { background:#1e5a2e; color:#d4af37; padding:8px 14px; margin:8px 0; font-family:'Courier New',monospace; font-size:11pt; letter-spacing:2px; }
   .no-print { background:#8b0000; color:#fff; padding:14px; text-align:center; max-width:8.5in; margin:0 auto 14px auto; font-family:Arial,sans-serif; }
   .no-print button { background:#fff; color:#8b0000; border:none; padding:8px 18px; font-weight:bold; cursor:pointer; font-size:12pt; border-radius:4px; }
+  @page { size: letter; margin: 0; }
   @media print {
-    body { background:#fff; padding:0; }
-    .sheet { box-shadow:none; margin:0; padding:0.5in; max-width:none; }
-    .no-print { display:none; }
+    body { background:#fff; padding:0; margin:0; }
+    .sheet { box-shadow:none; margin:0; padding:0.5in; max-width:none; width:100%; }
+    .no-print { display:none !important; }
   }
 </style>
 </head>
