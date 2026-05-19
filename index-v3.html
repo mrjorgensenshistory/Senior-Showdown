@@ -4093,7 +4093,7 @@ function runEndOfGradeQuiz(onComplete) {
   overlay.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,26,15,0.96); z-index:9999; overflow-y:auto; padding:3vh 2vw;';
   var html = '<div style="max-width:780px; margin:0 auto; background:#fff8e7; border:6px solid #d4af37; border-radius:10px; padding:3vh 3vw; color:#0a1a0f;">';
   html += '<h2 style="text-align:center; font-family:\'Bangers\',cursive; font-size:clamp(1.6rem,3.5vw,2.4rem); color:#1e5a2e; letter-spacing:3px;">&#x1F4DD; END-OF-GRADE QUIZ</h2>';
-  html += '<p style="text-align:center; font-size:1em; margin:0.5vh 0 2vh 0;">Answer all 5 questions. Your score becomes the last 3 digits of your code.<br><em style="font-size:0.9em; color:#555;">100% &rarr; &ldquo;-100&rdquo; &nbsp;|&nbsp; 80% &rarr; &ldquo;-080&rdquo; &nbsp;|&nbsp; 0% &rarr; &ldquo;-000&rdquo;</em></p>';
+  html += '<p style="text-align:center; font-size:1em; margin:0.5vh 0 2vh 0;">Answer all 5 questions. Click SUBMIT when finished &mdash; your code will appear.</p>';
   for (var i = 0; i < qs.length; i++) {
     html += '<div style="background:#fff; border:2px solid #8b6914; border-radius:6px; padding:14px 16px; margin:12px 0;">';
     html += '<p style="font-weight:bold; font-size:1.05em; margin-bottom:8px;">' + (i+1) + '. ' + qs[i].q + '</p>';
@@ -4106,7 +4106,7 @@ function runEndOfGradeQuiz(onComplete) {
     html += '</div>';
   }
   html += '<div style="text-align:center; margin-top:2vh;">';
-  html += '<button id="quiz-submit" style="background:#1e5a2e; color:#fff; border:none; padding:14px 36px; font-family:\'Bangers\',cursive; font-size:1.4em; letter-spacing:3px; cursor:pointer; border-radius:6px;">SUBMIT QUIZ &amp; GENERATE MY CODE</button>';
+  html += '<button id="quiz-submit" style="background:#1e5a2e; color:#fff; border:none; padding:14px 36px; font-family:\'Bangers\',cursive; font-size:1.4em; letter-spacing:3px; cursor:pointer; border-radius:6px;">SUBMIT &amp; GET MY CODE</button>';
   html += '</div>';
   html += '</div>';
   overlay.innerHTML = html;
@@ -4220,11 +4220,6 @@ function buildAndShowCert(studentName, period, scorePct) {
     }
   }
   cert += '</div>' +
-    '<div style="background:#fff8dc; border:2px solid #8b6914; padding:10px 16px; margin:14px 0; text-align:center;">' +
-      '<div style="font-size:0.85em; color:#555; letter-spacing:1px;">END-OF-GRADE QUIZ SCORE</div>' +
-      '<div style="font-family:Bangers,cursive; color:' + (scorePct >= 80 ? '#1e5a2e' : scorePct >= 60 ? '#cc7700' : '#8b0000') + '; font-size:2em; letter-spacing:3px;">' + scorePct + '%</div>' +
-      '<div style="font-size:0.75em; color:#666;">This score is the last 3 digits of your code (e.g., "-' + (scorePct<10?'00'+scorePct:scorePct<100?'0'+scorePct:'100') + '")</div>' +
-    '</div>' +
     '<div class="footer">' +
       '<div>' +
         '<div class="code-box"><span class="code-label">VERIFICATION CODE</span>' + code + '</div>' +
