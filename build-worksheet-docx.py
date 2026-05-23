@@ -210,7 +210,7 @@ def build_worksheet():
     add_grade_band(doc, '  9TH GRADE')
     add_question(doc, 1, 'How many FORMS does the game require you to fill out to run the donut sale?', '______')
     add_question(doc, 2, 'How many students must COUNT the cash from a fundraiser (per the game)?', '______')
-    add_question(doc, 3, 'What is the WHOLESALE price per dozen of donuts (in the donut sale)?', '$ ______')
+    add_question(doc, 3, 'What total PROFIT does the donut sale earn (after costs)?', '$ ______')
     add_question(doc, 4, 'What is the PROFIT CAP on the 9th-grade dance?', '$ ______')
     add_question(doc, 5, 'Adding food to the 9th-grade dance boosts attendance by what %?', '______ %')
 
@@ -222,7 +222,7 @@ def build_worksheet():
 
     add_grade_band(doc, '  11TH GRADE')
     add_question(doc, 10, 'What PERCENTAGE of HOCO profit does the JUNIOR class get in this game?', '______ %')
-    add_question(doc, 11, 'A typical HOCO net profit in this game is roughly:', '$ ______')
+    add_question(doc, 11, 'What was YOUR class’s share of the HOCO net profit (after the 50/50 split)?', '$ ______________')
     add_question(doc, 12, 'Who is the character that appears in the rickroll "reward" at the end of every grade?', '_____________________')
     add_question(doc, 13, 'The "Back to the Future"-themed prom venue is named:', '_____________________________')
     add_question(doc, 14, 'How many TOTAL prom venues does the game offer you to choose from?', '______')
