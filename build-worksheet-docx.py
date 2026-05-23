@@ -209,7 +209,7 @@ def build_worksheet():
 
     add_grade_band(doc, '  9TH GRADE')
     add_question(doc, 1, 'What football character TACKLES you when you skip the paperwork?', '_____________________')
-    add_question(doc, 2, 'The game gives you a TIP bonus on all food sold — what percent?', '______ %')
+    add_question(doc, 2, 'How many students must COUNT the cash from a fundraiser (per the game)?', '______')
     add_question(doc, 3, 'What is the PROFIT CAP on the 9th-grade dance in this game?', '$ ______')
     add_question(doc, 4, 'Adding food to the 9th-grade dance boosts attendance by what %?', '______ %')
     add_question(doc, 5, 'About how many students attend ACE total (in the game)?', '______')

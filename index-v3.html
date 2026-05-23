@@ -2304,7 +2304,7 @@ function form9_Step6_Receipt(onDone) {
   // === FAKE THERMAL RECEIPT ===
   html += '<div style="display:flex; flex-wrap:wrap; gap:2vw; align-items:flex-start; justify-content:center; margin:2vh 0;">';
   // Receipt (left side)
-  html += '<div style="background:#fffff8; border:1px solid #ccc; padding:2vh 2.5vw; font-family:\'Courier New\',monospace; font-size:0.8em; max-width:280px; min-width:220px; box-shadow:2px 4px 12px rgba(0,0,0,0.15); transform:rotate(-1deg);">';
+  html += '<div style="background:#fffff8; color:#222; border:1px solid #ccc; padding:2vh 2.5vw; font-family:\'Courier New\',monospace; font-size:0.8em; max-width:280px; min-width:220px; box-shadow:2px 4px 12px rgba(0,0,0,0.15); transform:rotate(-1deg);">';
   html += '<div style="text-align:center; font-weight:bold; font-size:1.1em;">WHOLESALE BAKERY OUTLET</div>';
   html += '<div style="text-align:center; font-size:0.85em; color:#555;">14200 Main St, Victorville CA</div>';
   html += '<div style="text-align:center; font-size:0.85em; color:#555;">Tel: (760) 555-0192</div>';
@@ -2329,7 +2329,7 @@ function form9_Step6_Receipt(onDone) {
   html += '<div style="text-align:center; font-size:0.75em; color:#999; margin-top:0.5vh;">* CUSTOMER COPY *</div>';
   html += '</div>';
   // Revenue reminder sticky note (right side)
-  html += '<div style="background:#fff9c4; border:1px solid #f0d060; border-radius:3px; padding:1.2vh 1.5vw; max-width:200px; min-width:160px; box-shadow:2px 3px 8px rgba(0,0,0,0.12); transform:rotate(1.5deg); font-family:\'Comic Sans MS\',cursive,sans-serif;">';
+  html += '<div style="background:#fff9c4; color:#5a3a0a; border:1px solid #f0d060; border-radius:3px; padding:1.2vh 1.5vw; max-width:200px; min-width:160px; box-shadow:2px 3px 8px rgba(0,0,0,0.12); transform:rotate(1.5deg); font-family:\'Comic Sans MS\',cursive,sans-serif;">';
   html += '<div style="font-weight:bold; font-size:0.9em; color:#5a3a0a; margin-bottom:0.5vh;">&#x1F4CC; From Cash Count:</div>';
   html += '<div style="font-size:1.3em; font-weight:bold; color:#1a5a2e;">$'+FORM_DONUT_TOTAL_REVENUE+'</div>';
   html += '<div style="font-size:0.8em; color:#555; margin-top:0.3vh;">deposited with bookkeeper</div>';
@@ -4012,6 +4012,13 @@ function renderEndNav() {
   html += '<button class="btn" onclick="restart()">&#x1F504; REPLAY '+state.grade+'TH GRADE</button>';
   html += '<button class="btn" onclick="show(\'sHub\')">&#x1F3E0; BACK TO START</button>';
   nav.innerHTML = html;
+
+  // Auto-trigger code generation on first arrival at end-of-grade — so kids can't skip
+  // it by closing the tab or clicking past. Only fires once per playthrough.
+  if (state.balance >= 0 && !state._codeAutoFired) {
+    state._codeAutoFired = true;
+    setTimeout(function() { generateProofCert(); }, 1200);
+  }
 }
 
 // ============ PROOF OF COMPLETION CERTIFICATE ============
