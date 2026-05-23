@@ -500,16 +500,11 @@ var TABLEWARE_OPTIONS = [
 // ============ STATE ============
 var state = {};
 function freshState(grade, carryover) {
-  // REAL ACE balances — used when starting fresh in a grade (not carrying over
-  // from a prior grade played this session). Each value reflects what the
-  // actual ACE class at that grade level currently has in their account.
-  //   9th  = $100.55  (historical real balance)
-  //  10th  = $358     (historical real balance)
-  //  11th  = $900     (current — this year's 11th-grade ending balance)
-  //  12th  = $989     (current — this year's 12th-grade starting balance)
-  // Skip-ahead kids get the SAME starting balance the real class at that
-  // grade had, so they can't cheat by skipping into easier conditions.
-  var defaults = { 9:100.55, 10:358, 11:900, 12:989 };
+  // Real ACE balances when Michael took over — used when starting fresh in a
+  // grade (not carrying over from a prior grade played this session). These
+  // are historical real numbers, so a kid who skips ahead starts with what a
+  // real class at that grade level actually had to work with.
+  var defaults = { 9:100.55, 10:358, 11:804, 12:821.10 };
   var startBal = (typeof carryover === 'number') ? carryover : (defaults[grade] || 0);
   return {
     grade: grade, balance: startBal, startBalance: startBal,
