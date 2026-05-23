@@ -208,42 +208,31 @@ def build_worksheet():
     add_section_header(doc, '  PART 1 — GAME KNOWLEDGE (only knowable by playing)')
 
     add_grade_band(doc, '  9TH GRADE')
-    add_question(doc, 1, 'What football character TACKLES you when you skip the paperwork?', '_____________________')
+    add_question(doc, 1, 'How many FORMS does the game require you to fill out to run the donut sale?', '______')
     add_question(doc, 2, 'How many students must COUNT the cash from a fundraiser (per the game)?', '______')
-    add_question(doc, 3, 'What is the PROFIT CAP on the 9th-grade dance in this game?', '$ ______')
-    add_question(doc, 4, 'Adding food to the 9th-grade dance boosts attendance by what %?', '______ %')
-    add_question(doc, 5, 'About how many students attend ACE total (in the game)?', '______')
+    add_question(doc, 3, 'What is the WHOLESALE price per dozen of donuts (in the donut sale)?', '$ ______')
+    add_question(doc, 4, 'What is the PROFIT CAP on the 9th-grade dance?', '$ ______')
+    add_question(doc, 5, 'Adding food to the 9th-grade dance boosts attendance by what %?', '______ %')
 
     add_grade_band(doc, '  10TH GRADE')
-    add_question(doc, 6, 'The biggest October event 10th-graders run is the', '_____________________')
-    add_question(doc, 7, 'If you charge MORE than $30 for a dance ticket and DON’T serve food, what happens?', '_____________________')
-    add_question(doc, 8, 'Max cars you can wash in a 3-hour car wash:', '______ cars')
-    add_question(doc, 9, 'How much do car wash SUPPLIES cost?', '$ ______')
-    add_question(doc, 10, 'What month is the Bundt Cake fundraiser?', '_____________________')
+    add_question(doc, 6, 'About how many students attend ACE total (in the game)?', '______')
+    add_question(doc, 7, 'The biggest October event 10th-graders run is the', '_____________________')
+    add_question(doc, 8, 'How much do car wash SUPPLIES cost?', '$ ______')
+    add_question(doc, 9, 'What month is the Bundt Cake fundraiser?', '_____________________')
 
     add_grade_band(doc, '  11TH GRADE')
-    p = doc.add_paragraph()
-    p.paragraph_format.left_indent = Inches(0.2)
-    p.paragraph_format.space_after = Pt(2)
-    r = p.add_run('11. Name TWO cutscene characters in the game (not students):')
-    r.font.size = Pt(10)
-    for letter in ['a', 'b']:
-        sub = doc.add_paragraph()
-        sub.paragraph_format.left_indent = Inches(0.5)
-        sub.paragraph_format.space_after = Pt(2)
-        r = sub.add_run(f'{letter}) _____________________________')
-        r.font.size = Pt(10)
-    add_question(doc, 12, 'What PERCENTAGE of HOCO profit does the JUNIOR class get in this game?', '______ %')
-    add_question(doc, 13, 'A typical HOCO net profit in this game is roughly:', '$ ______')
-    add_question(doc, 14, 'The "Back to the Future"-themed prom venue is named:', '_____________________________')
+    add_question(doc, 10, 'What PERCENTAGE of HOCO profit does the JUNIOR class get in this game?', '______ %')
+    add_question(doc, 11, 'A typical HOCO net profit in this game is roughly:', '$ ______')
+    add_question(doc, 12, 'Who is the character that appears in the rickroll "reward" at the end of every grade?', '_____________________')
+    add_question(doc, 13, 'The "Back to the Future"-themed prom venue is named:', '_____________________________')
+    add_question(doc, 14, 'How many TOTAL prom venues does the game offer you to choose from?', '______')
 
     add_grade_band(doc, '  12TH GRADE')
     add_question(doc, 15, 'How much does the Disney Grad Nite bus cost?', '$ ______')
     add_question(doc, 16, 'Yearbook cost per student:', '$ ______')
     add_question(doc, 17, 'The FREE prom venue is named:', '_____________________________')
     add_question(doc, 18, 'The MOST EXPENSIVE prom venue is named:', '_____________________________')
-    add_question(doc, 19, 'Football character who gets DISAPPOINTED when fundraisers fail:', '_____________________')
-    add_question(doc, 20, 'How much does the PRO DJ cost (the Student DJ is free)?', '$ ______')
+    add_question(doc, 19, 'How much does the PRO DJ cost (the Student DJ is free)?', '$ ______')
 
     # === PAGE 2 (force break onto next paragraph; no extra empty paragraph) ===
     title = doc.add_paragraph()
@@ -288,19 +277,19 @@ def build_worksheet():
     r.font.italic = True
     r.font.size = Pt(9)
 
-    add_question(doc, 21, '9th grade ENDING balance:', '$ ______________')
-    add_question(doc, 22, '10th grade ENDING balance:', '$ ______________')
-    add_question(doc, 23, '11th grade ENDING balance:', '$ ______________')
-    add_question(doc, 24, '12th grade ENDING balance:', '$ ______________')
-    add_question(doc, 25, 'Which prom venue did YOU pick for senior year?', '_____________________________')
-    add_question(doc, 26, 'Did YOU pick Pro DJ or Student DJ for your dance?', '_____________________')
-    add_question(doc, 27, 'Did YOU include food at the 9th-grade dance? (YES / NO)', '______')
-    add_question(doc, 28, 'What ticket price did YOU set for your 9th-grade dance?', '$ ______')
+    add_question(doc, 20, '9th grade ENDING balance:', '$ ______________')
+    add_question(doc, 21, '10th grade ENDING balance:', '$ ______________')
+    add_question(doc, 22, '11th grade ENDING balance:', '$ ______________')
+    add_question(doc, 23, '12th grade ENDING balance:', '$ ______________')
+    add_question(doc, 24, 'Which prom venue did YOU pick for senior year?', '_____________________________')
+    add_question(doc, 25, 'Did YOU pick Pro DJ or Student DJ for your dance?', '_____________________')
+    add_question(doc, 26, 'Did YOU include food at the 9th-grade dance? (YES / NO)', '______')
+    add_question(doc, 27, 'What ticket price did YOU set for your 9th-grade dance?', '$ ______')
 
     p = doc.add_paragraph()
     p.paragraph_format.left_indent = Inches(0.2)
     p.paragraph_format.space_after = Pt(2)
-    r = p.add_run('29. List THREE fundraisers YOU ran in 12th grade (in order):')
+    r = p.add_run('28. List THREE fundraisers YOU ran in 12th grade (in order):')
     r.font.size = Pt(10)
     for n in [1, 2, 3]:
         sub = doc.add_paragraph()
@@ -309,7 +298,7 @@ def build_worksheet():
         r = sub.add_run(f'{n}) _________________________________________________')
         r.font.size = Pt(10)
 
-    add_question(doc, 30, 'What price did YOU set for the senior PACKAGE (prom + Grad Nite + yearbook)?', '$ ______________')
+    add_question(doc, 29, 'What price did YOU set for the senior PACKAGE (prom + Grad Nite + yearbook)?', '$ ______________')
 
     # === PART 3 — REFLECTION ===
     add_section_header(doc, '  PART 3 — REFLECTION (your game + real ASB)')
@@ -320,11 +309,11 @@ def build_worksheet():
     r.font.size = Pt(9)
 
     reflections = [
-        ('31', 'Which fundraiser YOU ran made the MOST money in the game? About how much profit?'),
-        ('32', 'Describe a fundraiser you regret — one that lost money, got cancelled, or you skipped. What happened?'),
-        ('33', 'Compare this game to REAL ASB at our school. What did it get RIGHT? Name something specific.'),
-        ('34', 'What did the game get WRONG or LEAVE OUT about real ASB at our school? Be specific.'),
-        ('35', 'What is the MOST important thing you LEARNED from this game that applies to real ASB or class money?'),
+        ('30', 'Which fundraiser YOU ran made the MOST money in the game? About how much profit?'),
+        ('31', 'Describe a fundraiser you regret — one that lost money, got cancelled, or you skipped. What happened?'),
+        ('32', 'Compare this game to REAL ASB at our school. What did it get RIGHT? Name something specific.'),
+        ('33', 'What did the game get WRONG or LEAVE OUT about real ASB at our school? Be specific.'),
+        ('34', 'What is the MOST important thing you LEARNED from this game that applies to real ASB or class money?'),
     ]
     for num, q in reflections:
         p = doc.add_paragraph()

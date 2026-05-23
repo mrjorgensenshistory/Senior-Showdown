@@ -4062,25 +4062,25 @@ function makeProofCode(studentName, grade, scorePct) {
 // Score = (correct / 5) * 100. Embedded in the code as -PPP suffix.
 var GRADE_QUIZZES = {
   9: [
-    { q:'What is the PROFIT CAP on Sadie\'s Dance?', options:['$500','$800','$1,000','No cap'], correct:1 },
-    { q:'About how many students attend ACE total?', options:['100','200','300','500'], correct:2 },
-    { q:'Adding food to Sadie\'s boosts attendance by:', options:['+25%','+50%','+75%','+100%'], correct:1 },
-    { q:'What happens if you SKIP the paperwork and just sell donuts?', options:['You make $100','Parents get a letter','Terry Tate shuts it down — GAME OVER','Nothing happens'], correct:2 },
-    { q:'Max cars you can wash in a 3-hour car wash?', options:['24 cars','36 cars','50 cars','100 cars'], correct:1 }
+    { q:'What is the PROFIT CAP on the 9th-grade dance?', options:['$500','$800','$1,000','No cap'], correct:1 },
+    { q:'How many students are required to COUNT the cash from a fundraiser?', options:['1','2','3','5'], correct:1 },
+    { q:'Adding food to the 9th-grade dance boosts attendance by:', options:['+25%','+50%','+75%','+100%'], correct:1 },
+    { q:'WHOLESALE price for donuts in the donut sale (per dozen)?', options:['$6','$12','$18','$24'], correct:1 },
+    { q:'How many FORMS does the game make you fill out for the donut sale?', options:['2','3','5','7'], correct:2 }
   ],
   10: [
     { q:'Biggest October event 10th-graders run:', options:['Halloween dance','Haunted House','Costume contest','Pumpkin carving'], correct:1 },
-    { q:'Which grams sell in December?', options:['Candy-grams','Halloween-grams','Christmas-grams','Valentine-grams'], correct:2 },
+    { q:'Supplies cost for a car wash:', options:['$10','$20','$30','$50'], correct:2 },
     { q:'Bundt Cake fundraiser month:', options:['February','April','June','October'], correct:1 },
-    { q:'Bobby Boucher (the sad football character) is from what movie?', options:['Happy Gilmore','The Waterboy','Big Daddy','Billy Madison'], correct:1 },
-    { q:'Supplies cost for a car wash:', options:['$10','$20','$30','$50'], correct:2 }
+    { q:'About how many students attend ACE total?', options:['100','200','300','500'], correct:2 },
+    { q:'How much do you BUY donuts for per dozen (wholesale)?', options:['$6','$12','$18','$24'], correct:1 }
   ],
   11: [
     { q:'What PERCENT of HOCO profit do juniors get?', options:['25%','33%','50%','75%'], correct:2 },
-    { q:'Valentine candy-grams sell in:', options:['January','February','March','April'], correct:1 },
-    { q:'Who SHARES the HOCO event with juniors?', options:['Sophomores','Freshmen','Seniors','Faculty'], correct:2 },
-    { q:'Why does 11th grade matter for senior year?', options:['It doesn\'t','To raise enough before prom expenses','To meet new friends','Just for fun'], correct:1 },
-    { q:'A typical HOCO net profit is around:', options:['$200','$1,000','$3,000','$20,000'], correct:2 }
+    { q:'Typical HOCO net profit in the game?', options:['$200','$1,000','$3,000','$20,000'], correct:2 },
+    { q:'The "Back to the Future"-themed prom venue is named:', options:['Hawkins High Gym','Enchantment Under The Sea','The Great Hall','The Overlook Hotel'], correct:1 },
+    { q:'Who is the character in the rickroll reward at the end of every grade?', options:['Terry Tate','Bobby Boucher','Captain Insano','Adam Sandler'], correct:2 },
+    { q:'How many TOTAL prom venues does the game offer?', options:['3','4','5','6'], correct:2 }
   ],
   12: [
     { q:'Disney Grad Nite bus cost:', options:['$500','$1,200','$1,750','$3,000'], correct:2 },
@@ -4153,8 +4153,15 @@ function generateProofCert() {
   });
 }
 
+// Session-wide store of every code earned this play session. Resets on page reload.
+// Keyed by grade so a re-play overwrites cleanly with the latest score.
+window.SESSION_CODES = window.SESSION_CODES || {};
+
 function buildAndShowCert(studentName, period, scorePct) {
   var code = makeProofCode(studentName, state.grade, scorePct);
+  // Save this code so the cert can re-display ALL codes earned this session
+  // (so if a kid skipped writing one down earlier, they get a second chance).
+  window.SESSION_CODES[state.grade] = code;
   var today = new Date();
   var dateStr = (today.getMonth()+1) + '/' + today.getDate() + '/' + today.getFullYear();
   var timeStr = today.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
@@ -4190,7 +4197,7 @@ function buildAndShowCert(studentName, period, scorePct) {
     '.delta-pos { color:#1e5a2e; }' +
     '.delta-neg { color:#8b0000; }' +
     '.footer { margin-top:25px; padding-top:15px; border-top:2px solid #8b6914; display:flex; justify-content:space-between; align-items:center; }' +
-    '.code-box { background:#1e5a2e; color:#d4af37; padding:15px 24px; font-family:"Bangers",cursive; letter-spacing:4px; font-size:1.8em; border:3px solid #d4af37; text-align:center; }' +
+    '.code-box { background:#1e5a2e; color:#d4af37; padding:15px 24px; font-family:"Consolas","Courier New",monospace; font-weight:bold; letter-spacing:4px; font-size:1.6em; border:3px solid #d4af37; text-align:center; }' +
     '.code-label { font-size:0.4em; letter-spacing:2px; display:block; margin-bottom:6px; color:#ffe9a0; }' +
     '.sig-line { border-top:1px solid #2a1a05; padding-top:4px; font-size:0.85em; min-width:200px; text-align:center; }' +
     '.print-btn { display:block; margin:20px auto; padding:12px 30px; background:#1e5a2e; color:#fff; border:none; font-family:"Bangers",cursive; font-size:1.3em; letter-spacing:2px; cursor:pointer; border-radius:5px; }' +
@@ -4226,19 +4233,46 @@ function buildAndShowCert(studentName, period, scorePct) {
       cert += '<div class="choice-row"><span>' + (e.label || '(unlabeled)') + '</span><span class="choice-delta ' + deltaClass + '">' + deltaStr + '</span></div>';
     }
   }
+  cert += '</div>';
+
+  // Build the codes block — show ALL codes earned this session (not just the latest).
+  // If they played only 12th, they see only 12th. If they played 10→11→12, they see all 3.
+  var allCodes = window.SESSION_CODES || {};
+  var gradeOrder = [9, 10, 11, 12];
+  var earnedGrades = gradeOrder.filter(function(g) { return allCodes[g]; });
+  var multipleCodes = earnedGrades.length > 1;
+
+  cert += '<div class="footer" style="flex-direction:column; align-items:stretch;">';
+  if (multipleCodes) {
+    cert += '<div style="text-align:center; font-size:0.9em; color:#555; margin-bottom:10px; letter-spacing:1px;">' +
+            'ALL CODES YOU\'VE EARNED THIS SESSION &mdash; copy each one to your worksheet:</div>';
+    cert += '<div style="display:grid; grid-template-columns:repeat(' + earnedGrades.length + ',1fr); gap:10px; margin-bottom:15px;">';
+    earnedGrades.forEach(function(g) {
+      var isCurrent = (g === state.grade);
+      cert += '<div style="text-align:center;">' +
+              '<div style="font-size:0.75em; color:' + (isCurrent ? '#8b0000' : '#555') + '; font-weight:bold; letter-spacing:1.5px; margin-bottom:3px;">' +
+              g + 'TH GRADE' + (isCurrent ? ' (just earned)' : '') + '</div>' +
+              '<div class="code-box" style="font-size:1.1em; padding:8px 10px; letter-spacing:2px;">' + allCodes[g] + '</div>' +
+              '</div>';
+    });
+    cert += '</div>';
+    cert += '<div style="display:flex; justify-content:space-between; align-items:center; padding-top:10px; border-top:2px solid #8b6914;">' +
+            '<div class="sig-line">Student Signature</div>' +
+            '<div style="font-size:0.7em; color:#666;">Generated ' + dateStr + ' at ' + timeStr + '</div>' +
+            '</div>';
+  } else {
+    cert += '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+            '<div><div class="code-box"><span class="code-label">YOUR CODE</span>' + code + '</div></div>' +
+            '<div>' +
+            '<div class="sig-line">Student Signature</div>' +
+            '<div style="font-size:0.7em; margin-top:8px; color:#666;">Generated ' + dateStr + ' at ' + timeStr + '</div>' +
+            '</div>' +
+            '</div>';
+  }
   cert += '</div>' +
-    '<div class="footer">' +
-      '<div>' +
-        '<div class="code-box"><span class="code-label">YOUR CODE</span>' + code + '</div>' +
-      '</div>' +
-      '<div>' +
-        '<div class="sig-line">Student Signature</div>' +
-        '<div style="font-size:0.7em; margin-top:8px; color:#666;">Generated ' + dateStr + ' at ' + timeStr + '</div>' +
-      '</div>' +
-    '</div>' +
     '</div>' +
     '<button class="print-btn" onclick="window.close()">&#x2716; CLOSE THIS WINDOW</button>' +
-    '<p style="text-align:center; font-size:1.1em; color:#1e5a2e; font-weight:bold; max-width:780px; margin:15px auto;">&#x2192; Write this code on your worksheet. &#x2190;</p>' +
+    '<p style="text-align:center; font-size:1.1em; color:#1e5a2e; font-weight:bold; max-width:780px; margin:15px auto;">&#x2192; ' + (multipleCodes ? 'Write each code on your worksheet (one per grade-box).' : 'Write this code on your worksheet.') + ' &#x2190;</p>' +
     '</body></html>';
 
   // Open in a new window
