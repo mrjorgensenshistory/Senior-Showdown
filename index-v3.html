@@ -423,8 +423,10 @@ html, body { width:100%; height:100%; overflow:hidden; background:#0a1a0f; font-
 // ============ CONSTANTS ============
 // Class sizes by grade (current enrollment — classes shrink as students transfer out each year)
 var CLASS_SIZES = { 7:80, 8:77, 9:74, 10:73, 11:66, 12:59 };
-// For prom/pricing math: realistic senior ceiling is ~70 (we never keep more than that by 12th)
-var SENIOR_COUNT = 70;
+// For prom/pricing math: use real 11th-grade headcount (66) — these are the
+// kids who will be seniors next year. Matches the "66 students cover
+// everything" line in the Senior Package break-even narrative.
+var SENIOR_COUNT = 66;
 var YEARBOOK_COST = 45;
 var LUNCHEON_CATERED = 20;
 var LUNCHEON_POTLUCK = 4;
