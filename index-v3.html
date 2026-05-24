@@ -427,6 +427,10 @@ var CLASS_SIZES = { 7:80, 8:77, 9:74, 10:73, 11:66, 12:59 };
 // kids who will be seniors next year. Matches the "66 students cover
 // everything" line in the Senior Package break-even narrative.
 var SENIOR_COUNT = 66;
+// Realistic Senior Package uptake: 90% of seniors buy the full package.
+// The other ~10% either opt out, buy Grad-Nite-Only, or skip entirely.
+// Used to cap the Senior Packages Sold input.
+var PKG_MAX = Math.floor(SENIOR_COUNT * 0.9);  // 59
 var YEARBOOK_COST = 45;
 var LUNCHEON_CATERED = 20;
 var LUNCHEON_POTLUCK = 4;
@@ -1594,7 +1598,7 @@ function renderPricingLab() {
   html += '<h3 style="margin-top:2vh;">HOW MANY DO YOU THINK YOU&#39;LL SELL?</h3>';
   html += '<p style="font-size:0.95em; color:#555; margin-bottom:0.5vh;">You have <strong>'+SENIOR_COUNT+' seniors</strong>. Prom-Only is open to juniors.</p>';
   html += '<p style="font-size:0.95em; color:#8b0000; font-weight:bold; margin-bottom:1vh;">&#x26A0; Realistic cap: <strong>80 total prom tickets max.</strong> This year we sold 73. Students always think they\'ll sell more than they do. Plan for 80 or fewer.</p>';
-  html += '<div class="math-row"><label><strong>Senior Packages sold</strong> (0&ndash;'+SENIOR_COUNT+')</label><input type="number" id="q-pkg" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder=""></div>';
+  html += '<div class="math-row"><label><strong>Senior Packages sold</strong> (0&ndash;'+PKG_MAX+' &mdash; realistic max is 90% of seniors)</label><input type="number" id="q-pkg" min="0" max="'+PKG_MAX+'" step="1" placeholder=""></div>';
   html += '<div class="math-row"><label><strong>Grad Nite-Only tickets sold</strong> (seniors w/o package)</label><input type="number" id="q-gno" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder=""></div>';
   html += '<div class="math-row"><label><strong>Prom-Only tickets sold</strong> (juniors)</label><input type="number" id="q-pro" min="0" step="1" placeholder=""></div>';
   html += '<p id="q-warn" style="color:#8b0000; font-weight:bold; font-size:0.95em; min-height:1.2em;"></p>';
@@ -1621,7 +1625,7 @@ function renderPricingLab() {
     var qPro = +document.getElementById('q-pro').value;
     if (!pkg || !pro || !gno) { alert('Fill in ALL three prices: Senior Package, Prom-Only, and Grad Nite-Only.'); return; }
     if (isNaN(qPkg) || isNaN(qGno) || isNaN(qPro)) { alert('Fill in all three quantities (how many you expect to sell). Use 0 if none.'); return; }
-    if (qPkg > SENIOR_COUNT) { alert('You only have '+SENIOR_COUNT+' seniors. You can\'t sell '+qPkg+' Senior Packages. Adjust.'); return; }
+    if (qPkg > PKG_MAX) { alert('Realistic max is '+PKG_MAX+' Senior Packages (90% of '+SENIOR_COUNT+' seniors). You entered '+qPkg+'. Adjust.'); return; }
     if (qGno > SENIOR_COUNT) { alert('You only have '+SENIOR_COUNT+' seniors. You can\'t sell '+qGno+' Grad-Nite-Only tickets. Adjust.'); return; }
     if (qPkg + qGno > SENIOR_COUNT) { alert('Senior Packages + Grad-Nite-Only can\'t exceed '+SENIOR_COUNT+' seniors total. Adjust.'); return; }
     // Realistic 80-ticket cap. Students always think they'll sell more.
@@ -1667,7 +1671,7 @@ function updateProjection() {
   var qPro = qProEl && qProEl.value !== '' ? +qProEl.value : NaN;
 
   // Clamp
-  if (!isNaN(qPkg)) qPkg = Math.max(0, Math.min(SENIOR_COUNT, qPkg));
+  if (!isNaN(qPkg)) qPkg = Math.max(0, Math.min(PKG_MAX, qPkg));
   if (!isNaN(qGno)) qGno = Math.max(0, Math.min(SENIOR_COUNT, qGno));
   if (!isNaN(qPro)) qPro = Math.max(0, qPro);
 
