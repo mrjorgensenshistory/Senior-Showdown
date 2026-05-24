@@ -1580,113 +1580,10 @@ function renderPricingLab() {
   html += '<p style="margin-top:1vh; font-weight:bold;">If you price the Senior Package at the full break-even number, 66 students cover everything. If you drop the price below that, your bank savings + prom-only tickets + Grad-Nite-only tickets + fundraising have to close the gap.</p>';
   html += '<div class="quote">"Every $1 you drop the package price = $'+SENIOR_COUNT+' missing. Every $1 you raise it = some classmates opting out. You&#39;re in charge."</div></div></div>';
 
-  // ============ REALITY CHECK — Class of 2026 actual numbers ============
-  // Real data Michael provided. Shows kids what actually happened so they
-  // anchor on real numbers, not fantasies.
-  html += '<div style="background:#1e3a5f; color:#fff; border:3px solid #d4af37; border-radius:10px; padding:1.5vh 1.5vw; margin:2vh 0;">';
-  html += '<h3 style="color:#d4af37; letter-spacing:2px; margin-bottom:0.8vh;">&#x1F4CA; REALITY CHECK &mdash; CLASS OF 2026 (last year&rsquo;s seniors)</h3>';
-  html += '<p style="font-size:0.95em; margin-bottom:0.8vh;">Here&rsquo;s what the real ACE Class of 2026 actually spent and charged. Use it as a sanity check on your own plan.</p>';
-  html += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:1vw; font-size:0.9em;">';
-  // LEFT: expenses
-  html += '<div style="background:rgba(0,0,0,0.25); padding:0.8vh 1vw; border-radius:6px;">';
-  html += '<div style="font-weight:bold; color:#d4af37; margin-bottom:0.4vh;">ACTUAL EXPENSES</div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Disney Grad Nite (53 &times; $259)</span><span><strong>$13,727</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Grad Nite bus</span><span><strong>$1,750</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Prom venue (Riverside)</span><span><strong>$6,775</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Prom bus</span><span><strong>$5,700</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Yearbooks (53 &times; $45)</span><span><strong>$2,385</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Prom food (80 &times; $24 + tax)</span><span><strong>$2,059</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>DJ</span><span><strong>$700</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Photographer</span><span><strong>$600</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Senior Luncheon (53 &times; $15)</span><span><strong>$795</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Decorations</span><span><strong>$450</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Tableware</span><span><strong>$200</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between; border-top:2px solid #d4af37; padding-top:0.3vh; margin-top:0.3vh; font-size:1.05em;"><span><strong>TOTAL PROGRAM COST</strong></span><span><strong style="color:#ff6b6b;">$35,141</strong></span></div>';
-  html += '</div>';
-  // RIGHT: per-student reality
-  html += '<div style="background:rgba(0,0,0,0.25); padding:0.8vh 1vw; border-radius:6px;">';
-  html += '<div style="font-weight:bold; color:#d4af37; margin-bottom:0.4vh;">PER-STUDENT REALITY (53 seniors bought)</div>';
-  html += '<div style="display:flex; justify-content:space-between; padding:0.4vh 0;"><span>True cost per senior ($35,141 &divide; 53)</span><span><strong>$663.04</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between; padding:0.4vh 0;"><span>What each senior actually paid</span><span><strong>$375.00</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between; padding:0.4vh 0; color:#ff6b6b;"><span><strong>Gap per senior (covered by fundraising + savings)</strong></span><span><strong>$288.04</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between; padding:0.4vh 0; border-top:2px solid #d4af37; padding-top:0.5vh; margin-top:0.3vh;"><span>Bank savings on Oct 1 (contract-signing time)</span><span><strong>$5,000</strong></span></div>';
-  html += '<div style="margin-top:1vh; padding:0.5vh; background:rgba(212,175,55,0.15); border-left:3px solid #d4af37; font-size:0.95em;">';
-  html += '<strong>Takeaway:</strong> Out of <strong>59 seniors</strong>, <strong>53 actually bought</strong> the Senior Package (90% uptake &mdash; same realistic cap you have to plan for). Pricing it at $375 left a $288/student gap that had to be filled by class savings, prom-only ticket sales, and senior-year fundraising.';
-  html += '</div>';
-  html += '</div>';
-  html += '</div>'; // close grid
-  html += '</div>'; // close reality check card
-
-  // ============ SECOND REALITY CHECK — FCMAT cash-on-hand applied to Class of 2026 ============
-  // Walk through what would have happened in October if the Class of 2026 tried to sign
-  // their contracts with only $5,000 in the bank. Shows FCMAT in action with real numbers.
-  var oct_savings = 5000;
-  var oct_pkg_rev = 53 * 375;          // 53 packages × $375 = $19,875 (senior presales)
-  var oct_promonly_rev = 27 * 135;     // 27 junior prom-only × $135 = $3,645 (projected junior sales)
-  var oct_cash_on_hand = oct_savings + oct_pkg_rev + oct_promonly_rev;
-  // FCMAT: must cover EVERY part of Senior Package — full prom (rent, bus, food, DJ,
-  // photo, decor, tableware), yearbooks, Grad Nite (tickets + bus). ONLY luncheon
-  // is exempt (can fall back to potluck if needed).
-  var oct_locked = 35141 - 795;         // $35,141 total - $795 luncheon = $34,346
-  var oct_gap = oct_locked - oct_cash_on_hand;  // positive = SHORT
-
-  html += '<div style="background:#5f1e1e; color:#fff; border:3px solid #ff6b6b; border-radius:10px; padding:1.5vh 1.5vw; margin:2vh 0;">';
-  html += '<h3 style="color:#ff6b6b; letter-spacing:2px; margin-bottom:0.8vh;">&#x1F6A8; REALITY CHECK #2 &mdash; FCMAT CASH-ON-HAND POLICY</h3>';
-  html += '<p style="font-size:0.95em; margin-bottom:1vh;"><strong>The rule:</strong> When you sign prom contracts (October), <em>savings + projected ticket sales</em> must cover EVERY part of the Senior Package &mdash; the full prom (rent, bus, food, DJ, photo, decor, tableware), yearbooks, and Grad Nite (tickets + bus). The ONLY thing exempt is the Senior Luncheon (you can fall back to a potluck if needed). <strong>No future fundraisers allowed in this projection.</strong></p>';
-  html += '<p style="font-size:0.95em; margin-bottom:1vh;"><strong>The question:</strong> The Class of 2026 had <strong>$5,000</strong> in the bank on Oct 1. Following FCMAT, could they legally sign their prom contracts?</p>';
-  html += '<div style="background:rgba(0,0,0,0.3); padding:1vh 1vw; border-radius:6px; font-size:0.95em;">';
-  html += '<div style="font-weight:bold; color:#ffd700; margin-bottom:0.5vh; border-bottom:1px solid #d4af37; padding-bottom:0.3vh;">THE OCTOBER MATH</div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Bank savings (Oct 1)</span><span><strong>$' + oct_savings.toLocaleString() + '</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Projected: 53 Senior Packages &times; $375</span><span><strong>$' + oct_pkg_rev.toLocaleString() + '</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Projected: 27 Junior Prom-Only tickets &times; $135</span><span><strong>$' + oct_promonly_rev.toLocaleString() + '</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between; border-top:1px solid #d4af37; padding-top:0.3vh; margin-top:0.3vh;"><span><strong>TOTAL CASH ON HAND</strong></span><span><strong style="color:#90ee90;">$' + oct_cash_on_hand.toLocaleString() + '</strong></span></div>';
-  html += '<div style="margin-top:1vh; display:flex; justify-content:space-between;"><span><strong>LOCKED EXPENSES</strong> (everything except Luncheon)</span><span><strong style="color:#ff6b6b;">$' + oct_locked.toLocaleString() + '</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between; border-top:2px solid #ff6b6b; padding-top:0.5vh; margin-top:0.5vh; font-size:1.05em;"><span><strong>SHORTFALL</strong></span><span><strong style="color:#ff6b6b;">$' + oct_gap.toLocaleString() + '</strong></span></div>';
-  html += '</div>';
-  html += '<div style="margin-top:1vh; padding:0.8vh 1vw; background:rgba(255,107,107,0.2); border:2px solid #ff6b6b; border-radius:6px; font-size:0.95em;">';
-  html += '<div style="font-weight:bold; font-size:1.1em; color:#ffd700; margin-bottom:0.3vh;">&#x274C; FCMAT DENIES THE FULL CONTRACT</div>';
-  html += 'The class is <strong>$' + oct_gap.toLocaleString() + ' SHORT</strong> in October. Their Riverside pick ($6,775 rent + $5,700 bus = $12,475) is way out of reach. To pass FCMAT they would have to: <strong>raise the Senior Package price, sell more tickets, raise $' + oct_gap.toLocaleString() + ' through fall fundraisers BEFORE signing, OR pick a cheaper venue.</strong>';
-  html += '</div>';
-
-  // What's the MAX venue they could have legally booked?
-  // FCMAT rule: the FULL Senior Package budget must fit. If you pick a venue and
-  // the resulting total exceeds cash-on-hand, that venue is DENIED. No exceptions.
-  //
-  // Real bus cost for ANY off-campus venue at ACE = $5,700 (charter rate, fixed
-  // regardless of distance/venue choice). Only on-campus venues skip the bus.
-  var non_venue_locked = 13727 + 1750 + 2385 + 2059 + 700 + 600 + 450 + 200; // = $21,871
-  var max_venue_total = oct_cash_on_hand - non_venue_locked;  // = $6,649 for rent + bus combined
-  var real_bus = 5700;  // real prom bus cost for any off-campus venue
-  html += '<div style="margin-top:1vh; padding:0.8vh 1vw; background:rgba(144,238,144,0.15); border:2px solid #90ee90; border-radius:6px; font-size:0.95em;">';
-  html += '<div style="font-weight:bold; font-size:1.1em; color:#90ee90; margin-bottom:0.3vh;">&#x2705; WHAT THEY COULD HAVE BOOKED</div>';
-  html += '<div style="margin-bottom:0.5vh;"><strong>The FCMAT rule:</strong> the ENTIRE Senior Package budget must fit. If picking a venue makes the total go over, that venue is DENIED &mdash; no exceptions.</div>';
-  html += 'Subtract every NON-venue locked expense from $' + oct_cash_on_hand.toLocaleString() + ' cash on hand:';
-  html += '<div style="margin:0.5vh 0 0.5vh 1vw; font-family:\'Courier New\',monospace; font-size:0.9em; color:#ddd;">';
-  html += '$' + oct_cash_on_hand.toLocaleString() + ' cash &minus; $' + non_venue_locked.toLocaleString() + ' (Disney, Disney bus, yearbooks, food, DJ, photo, decor, tableware) = <strong style="color:#90ee90;">$' + max_venue_total.toLocaleString() + '</strong> left for venue rent + prom bus combined';
-  html += '</div>';
-  html += '<div style="margin-top:0.5vh;"><strong>Reality:</strong> The real ACE prom bus runs about <strong>$' + real_bus.toLocaleString() + '</strong> for ANY off-campus venue (charter rate). So an off-campus venue would need rent + $' + real_bus.toLocaleString() + ' bus &le; $' + max_venue_total.toLocaleString() + ' &mdash; that leaves only <strong>$' + (max_venue_total - real_bus).toLocaleString() + '</strong> for rent. No off-campus venue is that cheap.</div>';
-  html += '<table style="width:100%; margin-top:0.8vh; font-size:0.9em; border-collapse:collapse;">';
-  html += '<thead><tr style="color:#d4af37; border-bottom:1px solid #d4af37;"><th style="text-align:left; padding:0.3vh 0.5vw;">Venue</th><th style="text-align:right; padding:0.3vh 0.5vw;">Rent</th><th style="text-align:right; padding:0.3vh 0.5vw;">Bus</th><th style="text-align:right; padding:0.3vh 0.5vw;">Total</th><th style="text-align:center; padding:0.3vh 0.5vw;">Fits?</th></tr></thead><tbody>';
-  function venueRow(name, rent, bus, location) {
-    var total = rent + bus;
-    var fits = total <= max_venue_total;
-    var color = fits ? '#90ee90' : '#ff6b6b';
-    var icon = fits ? '&#x2705;' : '&#x274C;';
-    return '<tr style="border-bottom:1px solid rgba(255,255,255,0.1);"><td style="padding:0.3vh 0.5vw;">' + name + ' <span style="color:#aaa; font-size:0.9em;">(' + location + ')</span></td>' +
-           '<td style="text-align:right; padding:0.3vh 0.5vw;">$' + rent.toLocaleString() + '</td>' +
-           '<td style="text-align:right; padding:0.3vh 0.5vw;">$' + bus.toLocaleString() + '</td>' +
-           '<td style="text-align:right; padding:0.3vh 0.5vw;"><strong>$' + total.toLocaleString() + '</strong></td>' +
-           '<td style="text-align:center; padding:0.3vh 0.5vw; color:' + color + '; font-size:1.1em;">' + icon + '</td></tr>';
-  }
-  html += venueRow('Hawkins High Gym',         0, 0, 'on campus');
-  html += venueRow('Enchantment Under The Sea', 1000, 0, 'on-campus clubhouse');
-  html += venueRow('The Great Hall',           3500, real_bus, 'off campus');
-  html += venueRow('The Overlook Hotel',       5000, real_bus, 'off campus');
-  html += venueRow('Titanic Ballroom',         6775, real_bus, 'off campus');
-  html += venueRow('Riverside (their pick)',   6775, real_bus, 'off campus');
-  html += '</tbody></table>';
-  html += '<div style="margin-top:0.8vh;">Following FCMAT strictly, the Class of 2026 could ONLY have booked <strong>Hawkins or Enchantment Under The Sea</strong> &mdash; the two on-campus options that skip the bus. Every off-campus venue blows the budget once you add the $' + real_bus.toLocaleString() + ' bus.</div>';
-  html += '</div>';
+  // Reality Check cards (Class of 2026 comparison) removed per Michael —
+  // would have pitted current juniors against last year's seniors. Save for later.
+  // FCMAT cash-on-hand enforcement still runs at finalize() against the kid's
+  // own savings + ticket projections — see finalize() below.
 
   html += '<p style="font-size:0.9em; margin-top:1vh; color:#ffd700;"><strong>This is YOUR job as senior class.</strong> The game will hold YOU to the same rule when you finalize. Plan accordingly.</p>';
   html += '</div>';
@@ -3864,71 +3761,8 @@ function showFinalEndScreen() {
   h += '<div class="row"><span>ENDING BALANCE</span><span class="'+(bal>=0?'pos':'neg')+'">'+money(bal)+'</span></div>';
   tally.innerHTML = h;
 
-  // ============ SIDE-BY-SIDE: YOUR PLAN vs CLASS OF 2026 ============
-  // Compare the kid's actual game numbers to the real Class of 2026 totals.
-  // Lives on the 12th-grade end screen only (this function is 12th-grade specific).
-  var p = state.projection;
-  var c = state.calc;
-  var pkgPrice = state.prices && state.prices.pkg ? +state.prices.pkg : 0;
-  if (p && c) {
-    var compareHtml = '<div style="margin-top:2.5vh; padding:1.5vh 1.5vw; border:4px solid #d4af37; border-radius:10px; background:rgba(30,58,95,0.4);">';
-    compareHtml += '<h3 style="font-family:\'Bangers\'; color:#d4af37; letter-spacing:2px; text-align:center; margin-bottom:1vh;">&#x1F4CA; YOUR PLAN vs. CLASS OF 2026 (real)</h3>';
-    compareHtml += '<p style="text-align:center; font-size:0.95em; color:#ddd; margin-bottom:1vh;">Here&rsquo;s how your numbers stack up against what last year&rsquo;s seniors actually spent.</p>';
-    compareHtml += '<table style="width:100%; border-collapse:collapse; font-size:0.95em;">';
-    compareHtml += '<thead><tr style="border-bottom:2px solid #d4af37; color:#d4af37;">' +
-                   '<th style="text-align:left; padding:0.5vh 0.5vw;">Line item</th>' +
-                   '<th style="text-align:right; padding:0.5vh 0.5vw;">YOUR PLAN</th>' +
-                   '<th style="text-align:right; padding:0.5vh 0.5vw;">CLASS OF 2026</th>' +
-                   '</tr></thead><tbody>';
-
-    function cmpRow(label, yours, theirs) {
-      return '<tr style="border-bottom:1px solid rgba(212,175,55,0.2);">' +
-             '<td style="padding:0.5vh 0.5vw;">' + label + '</td>' +
-             '<td style="text-align:right; padding:0.5vh 0.5vw; color:#90ee90;"><strong>' + yours + '</strong></td>' +
-             '<td style="text-align:right; padding:0.5vh 0.5vw; color:#ffd700;"><strong>' + theirs + '</strong></td>' +
-             '</tr>';
-    }
-
-    compareHtml += cmpRow('Disney Grad Nite tickets',  money(p.disneyTix),   '$13,727');
-    compareHtml += cmpRow('Grad Nite bus',             money(p.disneyBus),   '$1,750');
-    compareHtml += cmpRow('Prom venue rent',           money(p.venueCost),   '$6,775 (Riverside)');
-    compareHtml += cmpRow('Prom bus',                  money(p.busCost),     '$5,700');
-    compareHtml += cmpRow('Yearbooks',                 money(p.yearbookExp), '$2,385');
-    compareHtml += cmpRow('Prom food + tip',           money(p.promFood),    '$2,059');
-    compareHtml += cmpRow('DJ + Photo + Decor + Tableware', money(p.otherProm), '$1,950');
-    compareHtml += cmpRow('Senior Luncheon',           money(p.luncheonExp), '$795');
-    compareHtml += '<tr style="border-top:2px solid #d4af37; font-size:1.1em;"><td style="padding:0.7vh 0.5vw;"><strong>TOTAL PROGRAM COST</strong></td>' +
-                   '<td style="text-align:right; padding:0.7vh 0.5vw; color:#90ee90;"><strong>' + money(p.totalExp) + '</strong></td>' +
-                   '<td style="text-align:right; padding:0.7vh 0.5vw; color:#ffd700;"><strong>$35,141</strong></td></tr>';
-    compareHtml += '</tbody></table>';
-
-    // Per-senior comparison
-    var yourBuyers = p.pkgBuyers || 0;
-    var yourPerSenior = yourBuyers > 0 ? p.totalExp / yourBuyers : 0;
-    compareHtml += '<div style="margin-top:1.5vh; padding:1vh 1vw; background:rgba(0,0,0,0.3); border-radius:6px;">';
-    compareHtml += '<table style="width:100%; border-collapse:collapse; font-size:0.95em;">';
-    compareHtml += '<thead><tr style="color:#d4af37;"><th style="text-align:left; padding:0.4vh 0.5vw;">Per-Senior Reality</th>' +
-                   '<th style="text-align:right; padding:0.4vh 0.5vw;">YOUR PLAN</th>' +
-                   '<th style="text-align:right; padding:0.4vh 0.5vw;">CLASS OF 2026</th></tr></thead><tbody>';
-    compareHtml += cmpRow('Senior Package price', money(pkgPrice), '$375');
-    compareHtml += cmpRow('Senior Packages sold', yourBuyers + ' / 66', '53 / 59 (90%)');
-    compareHtml += cmpRow('True cost per senior', money(yourPerSenior), '$663.04');
-    compareHtml += '</tbody></table>';
-    compareHtml += '</div>';
-
-    // Verdict
-    var diff = p.totalExp - 35141;
-    var diffPct = Math.round((diff / 35141) * 100);
-    var verdict;
-    if (diff < -5000) verdict = '&#x1F4B0; You spent <strong>' + money(Math.abs(diff)) + ' LESS</strong> than the Class of 2026. Did you skimp on quality, or were they overspending? Worth discussing.';
-    else if (diff < 0) verdict = '&#x2705; You spent <strong>' + money(Math.abs(diff)) + ' less</strong> than the Class of 2026. Similar quality but tighter budget.';
-    else if (diff < 5000) verdict = '&#x1F4CA; You spent <strong>' + money(diff) + ' more</strong> than the Class of 2026. Roughly the same program, slightly pricier choices.';
-    else verdict = '&#x1F4B8; You spent <strong>' + money(diff) + ' MORE</strong> than the Class of 2026 (' + diffPct + '% over). Premium choices &mdash; did your fundraising cover it?';
-    compareHtml += '<p style="margin-top:1vh; padding:0.8vh 1vw; background:rgba(212,175,55,0.15); border-left:3px solid #d4af37; font-size:0.95em;">' + verdict + '</p>';
-
-    compareHtml += '</div>';
-    tally.innerHTML += compareHtml;
-  }
+  // Class of 2026 side-by-side comparison removed per Michael — kids vs. real
+  // seniors would create unhealthy comparison dynamics. Save for later.
 
   // REALITY CHECK — interactive pricing lab with student's REAL ASB account balance
   var realityHtml = '<div style="margin-top:3vh; padding:2vh 1.5vw; border:4px solid #d4af37; border-radius:10px; background:rgba(212,175,55,0.08);">';
