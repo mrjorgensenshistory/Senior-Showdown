@@ -1580,6 +1580,42 @@ function renderPricingLab() {
   html += '<p style="margin-top:1vh; font-weight:bold;">If you price the Senior Package at the full break-even number, 66 students cover everything. If you drop the price below that, your bank savings + prom-only tickets + Grad-Nite-only tickets + fundraising have to close the gap.</p>';
   html += '<div class="quote">"Every $1 you drop the package price = $'+SENIOR_COUNT+' missing. Every $1 you raise it = some classmates opting out. You&#39;re in charge."</div></div></div>';
 
+  // ============ REALITY CHECK — Class of 2026 actual numbers ============
+  // Real data Michael provided. Shows kids what actually happened so they
+  // anchor on real numbers, not fantasies.
+  html += '<div style="background:#1e3a5f; color:#fff; border:3px solid #d4af37; border-radius:10px; padding:1.5vh 1.5vw; margin:2vh 0;">';
+  html += '<h3 style="color:#d4af37; letter-spacing:2px; margin-bottom:0.8vh;">&#x1F4CA; REALITY CHECK &mdash; CLASS OF 2026 (last year&rsquo;s seniors)</h3>';
+  html += '<p style="font-size:0.95em; margin-bottom:0.8vh;">Here&rsquo;s what the real ACE Class of 2026 actually spent and charged. Use it as a sanity check on your own plan.</p>';
+  html += '<div style="display:grid; grid-template-columns:1fr 1fr; gap:1vw; font-size:0.9em;">';
+  // LEFT: expenses
+  html += '<div style="background:rgba(0,0,0,0.25); padding:0.8vh 1vw; border-radius:6px;">';
+  html += '<div style="font-weight:bold; color:#d4af37; margin-bottom:0.4vh;">ACTUAL EXPENSES</div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Disney Grad Nite (53 &times; $259)</span><span><strong>$13,727</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Grad Nite bus</span><span><strong>$1,750</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Prom venue (Riverside)</span><span><strong>$6,775</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Prom bus</span><span><strong>$5,700</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Yearbooks (53 &times; $45)</span><span><strong>$2,385</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Prom food (80 &times; $24 + tax)</span><span><strong>$2,059</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>DJ</span><span><strong>$700</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Photographer</span><span><strong>$600</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Senior Luncheon (53 &times; $15)</span><span><strong>$795</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Decorations</span><span><strong>$450</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Tableware</span><span><strong>$200</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between; border-top:2px solid #d4af37; padding-top:0.3vh; margin-top:0.3vh; font-size:1.05em;"><span><strong>TOTAL PROGRAM COST</strong></span><span><strong style="color:#ff6b6b;">$35,141</strong></span></div>';
+  html += '</div>';
+  // RIGHT: per-student reality
+  html += '<div style="background:rgba(0,0,0,0.25); padding:0.8vh 1vw; border-radius:6px;">';
+  html += '<div style="font-weight:bold; color:#d4af37; margin-bottom:0.4vh;">PER-STUDENT REALITY (53 seniors bought)</div>';
+  html += '<div style="display:flex; justify-content:space-between; padding:0.4vh 0;"><span>True cost per senior ($35,141 &divide; 53)</span><span><strong>$663.04</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between; padding:0.4vh 0;"><span>What each senior actually paid</span><span><strong>$375.00</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between; padding:0.4vh 0; border-top:2px solid #d4af37; padding-top:0.5vh; margin-top:0.3vh; color:#ff6b6b;"><span><strong>Gap per senior (covered by fundraising + savings)</strong></span><span><strong>$288.04</strong></span></div>';
+  html += '<div style="margin-top:1vh; padding:0.5vh; background:rgba(212,175,55,0.15); border-left:3px solid #d4af37; font-size:0.95em;">';
+  html += '<strong>Takeaway:</strong> Out of ~66 seniors, only <strong>53 actually bought</strong> the Senior Package (80% uptake). Pricing it at $375 left a $288/student gap that had to be filled by class savings, prom-only ticket sales, and senior-year fundraising.';
+  html += '</div>';
+  html += '</div>';
+  html += '</div>'; // close grid
+  html += '</div>'; // close reality check card
+
   // Break-even formula shown — but NOT the calculated answer. They have to do the math.
   html += '<div class="math-panel">';
   html += '<h3>SET YOUR PRICES</h3>';
