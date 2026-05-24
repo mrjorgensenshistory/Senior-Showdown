@@ -1576,12 +1576,15 @@ function renderPricingLab() {
   html += '<p style="margin-top:1vh; font-weight:bold;">If you price the Senior Package at the full break-even number, 66 students cover everything. If you drop the price below that, your bank savings + prom-only tickets + Grad-Nite-only tickets + fundraising have to close the gap.</p>';
   html += '<div class="quote">"Every $1 you drop the package price = $'+SENIOR_COUNT+' missing. Every $1 you raise it = some classmates opting out. You&#39;re in charge."</div></div></div>';
 
-  // Break-even package price if all seniors buy in
-  var breakEvenPkg = Math.ceil(hardPerSenior + (fixedPromTotal / SENIOR_COUNT));
+  // Break-even formula shown — but NOT the calculated answer. They have to do the math.
   html += '<div class="math-panel">';
   html += '<h3>SET YOUR PRICES</h3>';
-  html += '<p style="margin-bottom:1vh;">Break-even Senior Package price if all '+SENIOR_COUNT+' seniors buy: <span class="big-num">'+money(breakEvenPkg)+'</span></p>';
-  html += '<p style="margin-bottom:1vh; font-size:0.95em;">You can price it LOWER (more seniors buy, but you owe the gap in fundraising) or HIGHER (fewer seniors buy, but each one covers more).</p>';
+  html += '<div style="background:#fff8dc; border:2px solid #8b6914; border-radius:8px; padding:1vh 1vw; margin-bottom:1vh;">';
+  html += '<p style="font-weight:bold; margin-bottom:0.5vh;">&#x1F4D0; BREAK-EVEN FORMULA</p>';
+  html += '<p style="font-size:1.05em; margin:0.5vh 0;"><strong>Break-Even Package Price = Per-Senior Variable Cost &nbsp;+&nbsp; (Fixed Prom Overhead &divide; Senior Packages Sold)</strong></p>';
+  html += '<p style="font-size:0.9em; color:#555; margin-top:0.3vh;">You have the two numbers above &mdash; per-senior variable and fixed overhead. Pick how many packages you think you&rsquo;ll sell, then do the math to find the price that covers everything. Calculator allowed.</p>';
+  html += '</div>';
+  html += '<p style="margin-bottom:1vh; font-size:0.95em;">You can price it LOWER than break-even (more seniors buy, but you owe the gap in fundraising) or HIGHER (fewer seniors buy, but each one covers more).</p>';
   html += '<div class="math-row"><label><strong>Senior Package Price</strong> ($) &mdash; what you charge each senior</label><input type="number" id="p-pkg" min="0" step="5" placeholder="$"></div>';
   html += '<div class="math-row"><label><strong>Prom-Only Ticket</strong> ($) &mdash; individual prom tickets (juniors only)</label><input type="number" id="p-pro" min="0" step="5" placeholder="$"></div>';
   html += '<div class="math-row"><label><strong>Grad Nite-Only Ticket</strong> ($) &mdash; seniors who want only Disney</label><input type="number" id="p-gno" min="0" step="5" placeholder="$"></div>';
