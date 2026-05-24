@@ -1618,7 +1618,9 @@ function renderPricingLab() {
     var qPro = +document.getElementById('q-pro').value;
     if (!pkg || !pro || !gno) { alert('Fill in ALL three prices: Senior Package, Prom-Only, and Grad Nite-Only.'); return; }
     if (isNaN(qPkg) || isNaN(qGno) || isNaN(qPro)) { alert('Fill in all three quantities (how many you expect to sell). Use 0 if none.'); return; }
-    if (qPkg + qGno > SENIOR_COUNT) { alert('Senior Packages + Grad-Nite-Only can\'t exceed '+SENIOR_COUNT+' seniors. Adjust.'); return; }
+    if (qPkg > SENIOR_COUNT) { alert('You only have '+SENIOR_COUNT+' seniors. You can\'t sell '+qPkg+' Senior Packages. Adjust.'); return; }
+    if (qGno > SENIOR_COUNT) { alert('You only have '+SENIOR_COUNT+' seniors. You can\'t sell '+qGno+' Grad-Nite-Only tickets. Adjust.'); return; }
+    if (qPkg + qGno > SENIOR_COUNT) { alert('Senior Packages + Grad-Nite-Only can\'t exceed '+SENIOR_COUNT+' seniors total. Adjust.'); return; }
     // Realistic 80-ticket cap. Students always think they'll sell more.
     if (qPkg + qPro > 80) { alert('Total prom tickets (packages + prom-only) can\'t exceed 80. This year we sold 73. Be realistic.'); return; }
     if (!validateWorksheet()) { return; }
