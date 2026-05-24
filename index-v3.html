@@ -1608,13 +1608,45 @@ function renderPricingLab() {
   html += '<div style="font-weight:bold; color:#d4af37; margin-bottom:0.4vh;">PER-STUDENT REALITY (53 seniors bought)</div>';
   html += '<div style="display:flex; justify-content:space-between; padding:0.4vh 0;"><span>True cost per senior ($35,141 &divide; 53)</span><span><strong>$663.04</strong></span></div>';
   html += '<div style="display:flex; justify-content:space-between; padding:0.4vh 0;"><span>What each senior actually paid</span><span><strong>$375.00</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between; padding:0.4vh 0; border-top:2px solid #d4af37; padding-top:0.5vh; margin-top:0.3vh; color:#ff6b6b;"><span><strong>Gap per senior (covered by fundraising + savings)</strong></span><span><strong>$288.04</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between; padding:0.4vh 0; color:#ff6b6b;"><span><strong>Gap per senior (covered by fundraising + savings)</strong></span><span><strong>$288.04</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between; padding:0.4vh 0; border-top:2px solid #d4af37; padding-top:0.5vh; margin-top:0.3vh;"><span>Bank savings on Oct 1 (contract-signing time)</span><span><strong>$5,000</strong></span></div>';
   html += '<div style="margin-top:1vh; padding:0.5vh; background:rgba(212,175,55,0.15); border-left:3px solid #d4af37; font-size:0.95em;">';
-  html += '<strong>Takeaway:</strong> Out of ~66 seniors, only <strong>53 actually bought</strong> the Senior Package (80% uptake). Pricing it at $375 left a $288/student gap that had to be filled by class savings, prom-only ticket sales, and senior-year fundraising.';
+  html += '<strong>Takeaway:</strong> Out of <strong>59 seniors</strong>, <strong>53 actually bought</strong> the Senior Package (90% uptake &mdash; same realistic cap you have to plan for). Pricing it at $375 left a $288/student gap that had to be filled by class savings, prom-only ticket sales, and senior-year fundraising.';
   html += '</div>';
   html += '</div>';
   html += '</div>'; // close grid
   html += '</div>'; // close reality check card
+
+  // ============ SECOND REALITY CHECK — FCMAT cash-on-hand applied to Class of 2026 ============
+  // Walk through what would have happened in October if the Class of 2026 tried to sign
+  // their contracts with only $5,000 in the bank. Shows FCMAT in action with real numbers.
+  var oct_savings = 5000;
+  var oct_pkg_rev = 53 * 375;          // 53 packages × $375 actual price = $19,875
+  var oct_promonly_rev = 27 * 135;     // assume 80-ticket cap, 53 pkg + 27 prom-only juniors @ $135 = $3,645
+  var oct_total_projected = oct_pkg_rev + oct_promonly_rev;
+  var oct_cash_on_hand = oct_savings + oct_total_projected;
+  var oct_locked = 35141 - 795;         // total cost minus luncheon (spring fundraisers cover that) = $34,346
+  var oct_gap = oct_locked - oct_cash_on_hand;  // positive = SHORT
+
+  html += '<div style="background:#5f1e1e; color:#fff; border:3px solid #ff6b6b; border-radius:10px; padding:1.5vh 1.5vw; margin:2vh 0;">';
+  html += '<h3 style="color:#ff6b6b; letter-spacing:2px; margin-bottom:0.8vh;">&#x1F6A8; REALITY CHECK #2 &mdash; FCMAT CASH-ON-HAND POLICY</h3>';
+  html += '<p style="font-size:0.95em; margin-bottom:1vh;"><strong>The rule:</strong> When you sign prom contracts (October), <em>savings + projected ticket revenue</em> must cover ALL locked expenses. You can\'t count on future fundraisers to bail you out &mdash; they might never happen.</p>';
+  html += '<p style="font-size:0.95em; margin-bottom:1vh;"><strong>The question:</strong> The Class of 2026 had <strong>$5,000</strong> in the bank on Oct 1. Following FCMAT, could they legally sign their prom contracts?</p>';
+  html += '<div style="background:rgba(0,0,0,0.3); padding:1vh 1vw; border-radius:6px; font-size:0.95em;">';
+  html += '<div style="font-weight:bold; color:#ffd700; margin-bottom:0.5vh; border-bottom:1px solid #d4af37; padding-bottom:0.3vh;">THE OCTOBER MATH</div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Bank savings (Oct 1)</span><span><strong>$' + oct_savings.toLocaleString() + '</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Projected: 53 Senior Packages &times; $375</span><span><strong>$' + oct_pkg_rev.toLocaleString() + '</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Projected: 27 Prom-Only tickets &times; $135 (juniors)</span><span><strong>$' + oct_promonly_rev.toLocaleString() + '</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between; border-top:1px solid #d4af37; padding-top:0.3vh; margin-top:0.3vh;"><span><strong>TOTAL CASH ON HAND</strong></span><span><strong style="color:#90ee90;">$' + oct_cash_on_hand.toLocaleString() + '</strong></span></div>';
+  html += '<div style="margin-top:1vh; display:flex; justify-content:space-between;"><span><strong>LOCKED EXPENSES</strong> (everything except Luncheon)</span><span><strong style="color:#ff6b6b;">$' + oct_locked.toLocaleString() + '</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between; border-top:2px solid #ff6b6b; padding-top:0.5vh; margin-top:0.5vh; font-size:1.05em;"><span><strong>SHORTFALL</strong></span><span><strong style="color:#ff6b6b;">$' + oct_gap.toLocaleString() + '</strong></span></div>';
+  html += '</div>';
+  html += '<div style="margin-top:1vh; padding:0.8vh 1vw; background:rgba(255,107,107,0.2); border:2px solid #ff6b6b; border-radius:6px; font-size:0.95em;">';
+  html += '<div style="font-weight:bold; font-size:1.1em; color:#ffd700; margin-bottom:0.3vh;">&#x274C; FCMAT DENIES THE CONTRACT</div>';
+  html += 'The class is <strong>$' + oct_gap.toLocaleString() + ' SHORT</strong> in October. They CANNOT legally book the prom venue + Disney + DJ + photographer + etc. with this much in the bank. To pass FCMAT they would have to: <strong>raise the Senior Package price, sell more tickets, OR raise the missing $' + oct_gap.toLocaleString() + ' through fall fundraisers BEFORE signing</strong>.';
+  html += '</div>';
+  html += '<p style="font-size:0.9em; margin-top:1vh; color:#ffd700;"><strong>This is YOUR job as senior class.</strong> The game will hold YOU to the same rule when you finalize. Plan accordingly.</p>';
+  html += '</div>';
 
   // Break-even formula shown — but NOT the calculated answer. They have to do the math.
   html += '<div class="math-panel">';
