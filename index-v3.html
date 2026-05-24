@@ -1621,41 +1621,47 @@ function renderPricingLab() {
   // Walk through what would have happened in October if the Class of 2026 tried to sign
   // their contracts with only $5,000 in the bank. Shows FCMAT in action with real numbers.
   var oct_savings = 5000;
-  var oct_pkg_rev = 53 * 375;          // 53 packages × $375 actual price = $19,875
-  var oct_promonly_rev = 27 * 135;     // assume 80-ticket cap, 53 pkg + 27 prom-only juniors @ $135 = $3,645
-  var oct_total_projected = oct_pkg_rev + oct_promonly_rev;
-  var oct_cash_on_hand = oct_savings + oct_total_projected;
+  var oct_pkg_rev = 53 * 375;          // 53 packages × $375 = $19,875 (CONFIRMED senior presales)
+  // FCMAT strict interpretation: only count revenue you can actually guarantee.
+  // Senior packages are presold to committed seniors; prom-only junior tickets
+  // are speculation and don't count toward Oct cash-on-hand.
+  var oct_cash_on_hand = oct_savings + oct_pkg_rev;
   var oct_locked = 35141 - 795;         // total cost minus luncheon (spring fundraisers cover that) = $34,346
   var oct_gap = oct_locked - oct_cash_on_hand;  // positive = SHORT
 
   html += '<div style="background:#5f1e1e; color:#fff; border:3px solid #ff6b6b; border-radius:10px; padding:1.5vh 1.5vw; margin:2vh 0;">';
   html += '<h3 style="color:#ff6b6b; letter-spacing:2px; margin-bottom:0.8vh;">&#x1F6A8; REALITY CHECK #2 &mdash; FCMAT CASH-ON-HAND POLICY</h3>';
-  html += '<p style="font-size:0.95em; margin-bottom:1vh;"><strong>The rule:</strong> When you sign prom contracts (October), <em>savings + projected ticket revenue</em> must cover ALL locked expenses. You can\'t count on future fundraisers to bail you out &mdash; they might never happen.</p>';
+  html += '<p style="font-size:0.95em; margin-bottom:1vh;"><strong>The rule:</strong> When you sign prom contracts (October), <em>savings + confirmed presales</em> must cover ALL locked expenses. You can\'t count on speculative ticket sales or future fundraisers &mdash; they might never happen.</p>';
   html += '<p style="font-size:0.95em; margin-bottom:1vh;"><strong>The question:</strong> The Class of 2026 had <strong>$5,000</strong> in the bank on Oct 1. Following FCMAT, could they legally sign their prom contracts?</p>';
   html += '<div style="background:rgba(0,0,0,0.3); padding:1vh 1vw; border-radius:6px; font-size:0.95em;">';
   html += '<div style="font-weight:bold; color:#ffd700; margin-bottom:0.5vh; border-bottom:1px solid #d4af37; padding-bottom:0.3vh;">THE OCTOBER MATH</div>';
   html += '<div style="display:flex; justify-content:space-between;"><span>Bank savings (Oct 1)</span><span><strong>$' + oct_savings.toLocaleString() + '</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Projected: 53 Senior Packages &times; $375</span><span><strong>$' + oct_pkg_rev.toLocaleString() + '</strong></span></div>';
-  html += '<div style="display:flex; justify-content:space-between;"><span>Projected: 27 Prom-Only tickets &times; $135 (juniors)</span><span><strong>$' + oct_promonly_rev.toLocaleString() + '</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between;"><span>Confirmed: 53 Senior Package presales &times; $375</span><span><strong>$' + oct_pkg_rev.toLocaleString() + '</strong></span></div>';
+  html += '<div style="display:flex; justify-content:space-between; color:#aaa; font-style:italic;"><span>(Junior prom-only tickets &mdash; speculative, NOT counted)</span><span><strong>&mdash;</strong></span></div>';
   html += '<div style="display:flex; justify-content:space-between; border-top:1px solid #d4af37; padding-top:0.3vh; margin-top:0.3vh;"><span><strong>TOTAL CASH ON HAND</strong></span><span><strong style="color:#90ee90;">$' + oct_cash_on_hand.toLocaleString() + '</strong></span></div>';
   html += '<div style="margin-top:1vh; display:flex; justify-content:space-between;"><span><strong>LOCKED EXPENSES</strong> (everything except Luncheon)</span><span><strong style="color:#ff6b6b;">$' + oct_locked.toLocaleString() + '</strong></span></div>';
   html += '<div style="display:flex; justify-content:space-between; border-top:2px solid #ff6b6b; padding-top:0.5vh; margin-top:0.5vh; font-size:1.05em;"><span><strong>SHORTFALL</strong></span><span><strong style="color:#ff6b6b;">$' + oct_gap.toLocaleString() + '</strong></span></div>';
   html += '</div>';
   html += '<div style="margin-top:1vh; padding:0.8vh 1vw; background:rgba(255,107,107,0.2); border:2px solid #ff6b6b; border-radius:6px; font-size:0.95em;">';
   html += '<div style="font-weight:bold; font-size:1.1em; color:#ffd700; margin-bottom:0.3vh;">&#x274C; FCMAT DENIES THE FULL CONTRACT</div>';
-  html += 'The class is <strong>$' + oct_gap.toLocaleString() + ' SHORT</strong> in October if they try to sign for the Riverside venue ($6,775 rent + $5,700 bus = $12,475). To pass FCMAT they would have to: <strong>raise the Senior Package price, sell more tickets, raise $' + oct_gap.toLocaleString() + ' through fall fundraisers BEFORE signing, OR pick a cheaper venue.</strong>';
+  html += 'The class is <strong>$' + oct_gap.toLocaleString() + ' SHORT</strong> in October. Their Riverside pick ($6,775 rent + $5,700 bus = $12,475) is WAY out of reach. To pass FCMAT they would have to: <strong>raise the Senior Package price, raise $' + oct_gap.toLocaleString() + ' through fall fundraisers BEFORE signing, OR pick a much cheaper venue.</strong>';
   html += '</div>';
 
   // What's the MAX venue they could have legally booked?
   var non_venue_locked = 13727 + 1750 + 2385 + 2059 + 700 + 600 + 450 + 200; // = $21,871
-  var max_venue = oct_cash_on_hand - non_venue_locked;  // = $6,649
+  var max_venue = oct_cash_on_hand - non_venue_locked;  // = $3,004 with conservative cash
   html += '<div style="margin-top:1vh; padding:0.8vh 1vw; background:rgba(144,238,144,0.15); border:2px solid #90ee90; border-radius:6px; font-size:0.95em;">';
   html += '<div style="font-weight:bold; font-size:1.1em; color:#90ee90; margin-bottom:0.3vh;">&#x2705; WHAT THEY COULD HAVE BOOKED</div>';
   html += 'Subtract every NON-venue locked expense from $' + oct_cash_on_hand.toLocaleString() + ' cash on hand:';
   html += '<div style="margin:0.5vh 0 0.5vh 1vw; font-family:\'Courier New\',monospace; font-size:0.9em; color:#ddd;">';
-  html += '$' + oct_cash_on_hand.toLocaleString() + ' cash &minus; $' + non_venue_locked.toLocaleString() + ' (Disney, yearbooks, food, DJ, photo, decor, tableware) = <strong style="color:#90ee90;">$' + max_venue.toLocaleString() + ' MAX VENUE</strong>';
+  html += '$' + oct_cash_on_hand.toLocaleString() + ' cash &minus; $' + non_venue_locked.toLocaleString() + ' (Disney, Disney bus, yearbooks, food, DJ, photo, decor, tableware) = <strong style="color:#90ee90;">$' + max_venue.toLocaleString() + ' MAX VENUE</strong>';
   html += '</div>';
-  html += '<div style="margin-top:0.5vh;">Following FCMAT, the most they could have spent on the venue (rent + bus combined) was about <strong>$' + max_venue.toLocaleString() + '</strong>. From the in-game tiers, that means they could only have booked up to <strong>The Great Hall ($6,500)</strong>. The Overlook Hotel ($9,194) and Titanic Ballroom ($12,469) would have been DENIED.</div>';
+  html += '<div style="margin-top:0.5vh;">Following FCMAT, the most they could have spent on the venue (rent + prom bus combined) was about <strong>$' + max_venue.toLocaleString() + '</strong>. From the in-game tiers, that means they could ONLY have booked:</div>';
+  html += '<ul style="margin:0.5vh 0 0.5vh 2vw; font-size:0.95em;">';
+  html += '<li><strong>Hawkins High Gym</strong> &mdash; $0 (free, on campus)</li>';
+  html += '<li><strong>Enchantment Under The Sea</strong> &mdash; $1,000 rent + $0 bus = $1,000 (on-campus clubhouse, no bus needed)</li>';
+  html += '</ul>';
+  html += '<div>The Great Hall ($6,500), Overlook ($9,194), and Titanic ($12,469) would have ALL been DENIED &mdash; they couldn\'t even afford the bus to get there. They&rsquo;d have to fundraise more before signing.</div>';
   html += '</div>';
 
   html += '<p style="font-size:0.9em; margin-top:1vh; color:#ffd700;"><strong>This is YOUR job as senior class.</strong> The game will hold YOU to the same rule when you finalize. Plan accordingly.</p>';
