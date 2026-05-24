@@ -311,9 +311,9 @@ def build_worksheet():
     reflections = [
         ('30', 'Which fundraiser YOU ran made the MOST money in the game? About how much profit?'),
         ('31', 'Describe a fundraiser you regret — one that lost money, got cancelled, or you skipped. What happened?'),
-        ('32', 'Compare this game to REAL ASB at our school. What did it get RIGHT? Name something specific.'),
-        ('33', 'What did the game get WRONG or LEAVE OUT about real ASB at our school? Be specific.'),
-        ('34', 'What is the MOST important thing you LEARNED from this game that applies to real ASB or class money?'),
+        ('32', 'What’s the MAX you think a senior would realistically pay for the Senior Package? Would your classmates have actually paid the price YOU set in the game?'),
+        ('33', 'How well did the game’s prom and Senior Package costs match what you’d EXPECTED them to cost in real life? Do you plan on holding your real prom in the gym (like many do in the game) to make the numbers work?'),
+        ('34', 'How close is YOUR REAL grade to affording the prom + Senior Package you’d actually want? If there’s a gap — what’s your plan to close it?'),
     ]
     for num, q in reflections:
         p = doc.add_paragraph()
