@@ -3821,6 +3821,72 @@ function showFinalEndScreen() {
   h += '<div class="row"><span>ENDING BALANCE</span><span class="'+(bal>=0?'pos':'neg')+'">'+money(bal)+'</span></div>';
   tally.innerHTML = h;
 
+  // ============ SIDE-BY-SIDE: YOUR PLAN vs CLASS OF 2026 ============
+  // Compare the kid's actual game numbers to the real Class of 2026 totals.
+  // Lives on the 12th-grade end screen only (this function is 12th-grade specific).
+  var p = state.projection;
+  var c = state.calc;
+  var pkgPrice = state.prices && state.prices.pkg ? +state.prices.pkg : 0;
+  if (p && c) {
+    var compareHtml = '<div style="margin-top:2.5vh; padding:1.5vh 1.5vw; border:4px solid #d4af37; border-radius:10px; background:rgba(30,58,95,0.4);">';
+    compareHtml += '<h3 style="font-family:\'Bangers\'; color:#d4af37; letter-spacing:2px; text-align:center; margin-bottom:1vh;">&#x1F4CA; YOUR PLAN vs. CLASS OF 2026 (real)</h3>';
+    compareHtml += '<p style="text-align:center; font-size:0.95em; color:#ddd; margin-bottom:1vh;">Here&rsquo;s how your numbers stack up against what last year&rsquo;s seniors actually spent.</p>';
+    compareHtml += '<table style="width:100%; border-collapse:collapse; font-size:0.95em;">';
+    compareHtml += '<thead><tr style="border-bottom:2px solid #d4af37; color:#d4af37;">' +
+                   '<th style="text-align:left; padding:0.5vh 0.5vw;">Line item</th>' +
+                   '<th style="text-align:right; padding:0.5vh 0.5vw;">YOUR PLAN</th>' +
+                   '<th style="text-align:right; padding:0.5vh 0.5vw;">CLASS OF 2026</th>' +
+                   '</tr></thead><tbody>';
+
+    function cmpRow(label, yours, theirs) {
+      return '<tr style="border-bottom:1px solid rgba(212,175,55,0.2);">' +
+             '<td style="padding:0.5vh 0.5vw;">' + label + '</td>' +
+             '<td style="text-align:right; padding:0.5vh 0.5vw; color:#90ee90;"><strong>' + yours + '</strong></td>' +
+             '<td style="text-align:right; padding:0.5vh 0.5vw; color:#ffd700;"><strong>' + theirs + '</strong></td>' +
+             '</tr>';
+    }
+
+    compareHtml += cmpRow('Disney Grad Nite tickets',  money(p.disneyTix),   '$13,727');
+    compareHtml += cmpRow('Grad Nite bus',             money(p.disneyBus),   '$1,750');
+    compareHtml += cmpRow('Prom venue rent',           money(p.venueCost),   '$6,775 (Riverside)');
+    compareHtml += cmpRow('Prom bus',                  money(p.busCost),     '$5,700');
+    compareHtml += cmpRow('Yearbooks',                 money(p.yearbookExp), '$2,385');
+    compareHtml += cmpRow('Prom food + tip',           money(p.promFood),    '$2,059');
+    compareHtml += cmpRow('DJ + Photo + Decor + Tableware', money(p.otherProm), '$1,950');
+    compareHtml += cmpRow('Senior Luncheon',           money(p.luncheonExp), '$795');
+    compareHtml += '<tr style="border-top:2px solid #d4af37; font-size:1.1em;"><td style="padding:0.7vh 0.5vw;"><strong>TOTAL PROGRAM COST</strong></td>' +
+                   '<td style="text-align:right; padding:0.7vh 0.5vw; color:#90ee90;"><strong>' + money(p.totalExp) + '</strong></td>' +
+                   '<td style="text-align:right; padding:0.7vh 0.5vw; color:#ffd700;"><strong>$35,141</strong></td></tr>';
+    compareHtml += '</tbody></table>';
+
+    // Per-senior comparison
+    var yourBuyers = p.pkgBuyers || 0;
+    var yourPerSenior = yourBuyers > 0 ? p.totalExp / yourBuyers : 0;
+    compareHtml += '<div style="margin-top:1.5vh; padding:1vh 1vw; background:rgba(0,0,0,0.3); border-radius:6px;">';
+    compareHtml += '<table style="width:100%; border-collapse:collapse; font-size:0.95em;">';
+    compareHtml += '<thead><tr style="color:#d4af37;"><th style="text-align:left; padding:0.4vh 0.5vw;">Per-Senior Reality</th>' +
+                   '<th style="text-align:right; padding:0.4vh 0.5vw;">YOUR PLAN</th>' +
+                   '<th style="text-align:right; padding:0.4vh 0.5vw;">CLASS OF 2026</th></tr></thead><tbody>';
+    compareHtml += cmpRow('Senior Package price', money(pkgPrice), '$375');
+    compareHtml += cmpRow('Senior Packages sold', yourBuyers + ' / 66', '53 / 59 (90%)');
+    compareHtml += cmpRow('True cost per senior', money(yourPerSenior), '$663.04');
+    compareHtml += '</tbody></table>';
+    compareHtml += '</div>';
+
+    // Verdict
+    var diff = p.totalExp - 35141;
+    var diffPct = Math.round((diff / 35141) * 100);
+    var verdict;
+    if (diff < -5000) verdict = '&#x1F4B0; You spent <strong>' + money(Math.abs(diff)) + ' LESS</strong> than the Class of 2026. Did you skimp on quality, or were they overspending? Worth discussing.';
+    else if (diff < 0) verdict = '&#x2705; You spent <strong>' + money(Math.abs(diff)) + ' less</strong> than the Class of 2026. Similar quality but tighter budget.';
+    else if (diff < 5000) verdict = '&#x1F4CA; You spent <strong>' + money(diff) + ' more</strong> than the Class of 2026. Roughly the same program, slightly pricier choices.';
+    else verdict = '&#x1F4B8; You spent <strong>' + money(diff) + ' MORE</strong> than the Class of 2026 (' + diffPct + '% over). Premium choices &mdash; did your fundraising cover it?';
+    compareHtml += '<p style="margin-top:1vh; padding:0.8vh 1vw; background:rgba(212,175,55,0.15); border-left:3px solid #d4af37; font-size:0.95em;">' + verdict + '</p>';
+
+    compareHtml += '</div>';
+    tally.innerHTML += compareHtml;
+  }
+
   // REALITY CHECK — interactive pricing lab with student's REAL ASB account balance
   var realityHtml = '<div style="margin-top:3vh; padding:2vh 1.5vw; border:4px solid #d4af37; border-radius:10px; background:rgba(212,175,55,0.08);">';
   realityHtml += '<h3 style="font-family:\'Bangers\'; color:#d4af37; letter-spacing:2px; text-align:center;">REALITY CHECK</h3>';
