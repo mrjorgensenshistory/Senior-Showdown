@@ -1597,7 +1597,7 @@ function renderPricingLab() {
   html += '</div>';
   html += '<h3 style="margin-top:2vh;">HOW MANY DO YOU THINK YOU&#39;LL SELL?</h3>';
   html += '<p style="font-size:0.95em; color:#555; margin-bottom:0.5vh;">You have <strong>'+SENIOR_COUNT+' seniors</strong>. Prom-Only is open to juniors.</p>';
-  html += '<p style="font-size:0.95em; color:#8b0000; font-weight:bold; margin-bottom:1vh;">&#x26A0; Realistic cap: <strong>80 total prom tickets max.</strong> This year we sold 73. Students always think they\'ll sell more than they do. Plan for 80 or fewer.</p>';
+  html += '<p style="font-size:0.95em; color:#8b0000; font-weight:bold; margin-bottom:1vh;">&#x26A0; Realistic caps: <strong>'+PKG_MAX+' Senior Packages max</strong> (90% of '+SENIOR_COUNT+' seniors &mdash; not everyone buys). <strong>80 total prom tickets max</strong> (this year we sold 73). Students always think they&rsquo;ll sell more than they do.</p>';
   html += '<div class="math-row"><label><strong>Senior Packages sold</strong> (0&ndash;'+PKG_MAX+' &mdash; realistic max is 90% of seniors)</label><input type="number" id="q-pkg" min="0" max="'+PKG_MAX+'" step="1" placeholder=""></div>';
   html += '<div class="math-row"><label><strong>Grad Nite-Only tickets sold</strong> (seniors w/o package)</label><input type="number" id="q-gno" min="0" max="'+SENIOR_COUNT+'" step="1" placeholder=""></div>';
   html += '<div class="math-row"><label><strong>Prom-Only tickets sold</strong> (juniors)</label><input type="number" id="q-pro" min="0" step="1" placeholder=""></div>';
