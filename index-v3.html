@@ -1642,9 +1642,22 @@ function renderPricingLab() {
   html += '<div style="display:flex; justify-content:space-between; border-top:2px solid #ff6b6b; padding-top:0.5vh; margin-top:0.5vh; font-size:1.05em;"><span><strong>SHORTFALL</strong></span><span><strong style="color:#ff6b6b;">$' + oct_gap.toLocaleString() + '</strong></span></div>';
   html += '</div>';
   html += '<div style="margin-top:1vh; padding:0.8vh 1vw; background:rgba(255,107,107,0.2); border:2px solid #ff6b6b; border-radius:6px; font-size:0.95em;">';
-  html += '<div style="font-weight:bold; font-size:1.1em; color:#ffd700; margin-bottom:0.3vh;">&#x274C; FCMAT DENIES THE CONTRACT</div>';
-  html += 'The class is <strong>$' + oct_gap.toLocaleString() + ' SHORT</strong> in October. They CANNOT legally book the prom venue + Disney + DJ + photographer + etc. with this much in the bank. To pass FCMAT they would have to: <strong>raise the Senior Package price, sell more tickets, OR raise the missing $' + oct_gap.toLocaleString() + ' through fall fundraisers BEFORE signing</strong>.';
+  html += '<div style="font-weight:bold; font-size:1.1em; color:#ffd700; margin-bottom:0.3vh;">&#x274C; FCMAT DENIES THE FULL CONTRACT</div>';
+  html += 'The class is <strong>$' + oct_gap.toLocaleString() + ' SHORT</strong> in October if they try to sign for the Riverside venue ($6,775 rent + $5,700 bus = $12,475). To pass FCMAT they would have to: <strong>raise the Senior Package price, sell more tickets, raise $' + oct_gap.toLocaleString() + ' through fall fundraisers BEFORE signing, OR pick a cheaper venue.</strong>';
   html += '</div>';
+
+  // What's the MAX venue they could have legally booked?
+  var non_venue_locked = 13727 + 1750 + 2385 + 2059 + 700 + 600 + 450 + 200; // = $21,871
+  var max_venue = oct_cash_on_hand - non_venue_locked;  // = $6,649
+  html += '<div style="margin-top:1vh; padding:0.8vh 1vw; background:rgba(144,238,144,0.15); border:2px solid #90ee90; border-radius:6px; font-size:0.95em;">';
+  html += '<div style="font-weight:bold; font-size:1.1em; color:#90ee90; margin-bottom:0.3vh;">&#x2705; WHAT THEY COULD HAVE BOOKED</div>';
+  html += 'Subtract every NON-venue locked expense from $' + oct_cash_on_hand.toLocaleString() + ' cash on hand:';
+  html += '<div style="margin:0.5vh 0 0.5vh 1vw; font-family:\'Courier New\',monospace; font-size:0.9em; color:#ddd;">';
+  html += '$' + oct_cash_on_hand.toLocaleString() + ' cash &minus; $' + non_venue_locked.toLocaleString() + ' (Disney, yearbooks, food, DJ, photo, decor, tableware) = <strong style="color:#90ee90;">$' + max_venue.toLocaleString() + ' MAX VENUE</strong>';
+  html += '</div>';
+  html += '<div style="margin-top:0.5vh;">Following FCMAT, the most they could have spent on the venue (rent + bus combined) was about <strong>$' + max_venue.toLocaleString() + '</strong>. From the in-game tiers, that means they could only have booked up to <strong>The Great Hall ($6,500)</strong>. The Overlook Hotel ($9,194) and Titanic Ballroom ($12,469) would have been DENIED.</div>';
+  html += '</div>';
+
   html += '<p style="font-size:0.9em; margin-top:1vh; color:#ffd700;"><strong>This is YOUR job as senior class.</strong> The game will hold YOU to the same rule when you finalize. Plan accordingly.</p>';
   html += '</div>';
 
